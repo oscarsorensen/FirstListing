@@ -11,7 +11,7 @@ $title = "Project test";
 <body>
 
 <h1><?php echo $title; ?></h1>
-<p>If you can see this, PHP is running correctly.</p>
+<p>If you can see this, PHP is running correctly TEST TEST.</p>
 
 </body>
 </html>
