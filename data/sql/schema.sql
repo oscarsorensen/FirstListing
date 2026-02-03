@@ -1,3 +1,10 @@
+CREATE DATABASE firstlisting_v1
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE firstlisting_v1;
+
+
 CREATE TABLE listings (
   id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -81,3 +88,68 @@ CREATE INDEX idx_area_norm ON listings(area_normalized);
 CREATE INDEX idx_sqm ON listings(sqm);
 CREATE INDEX idx_rooms ON listings(rooms);
 CREATE INDEX idx_domain ON listings(domain);
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+
+  role ENUM('agent','admin','private') DEFAULT 'agent',
+
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE subscriptions (
+  user_id INT PRIMARY KEY,
+
+  plan ENUM('basic','standard','pro') NOT NULL,
+  searches_per_month INT NOT NULL,
+
+  active BOOLEAN DEFAULT TRUE,
+
+  started_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE search_usage (
+  user_id INT NOT NULL,
+  month CHAR(7) NOT NULL, -- fx '2026-02'
+  searches_used INT DEFAULT 0,
+
+  PRIMARY KEY (user_id, month)
+);
+
+CREATE TABLE listing_price_history (
+  listing_id INT NOT NULL,
+  price INT NOT NULL,
+  recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE crawl_sources (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+
+  domain VARCHAR(255) NOT NULL,
+  source_type ENUM('agent','portal') NOT NULL,
+
+  enabled BOOLEAN DEFAULT TRUE,
+
+  last_crawled_at DATETIME,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+
+
+CREATE USER 'firstlisting_admin'@'localhost'
+IDENTIFIED BY 'zf4B84BHrlW9jvl4';
+
+GRANT
+  SELECT, INSERT, UPDATE, DELETE,
+  CREATE, ALTER, INDEX
+ON firstlisting.*
+TO 'firstlisting_admin'@'localhost';
+
+FLUSH PRIVILEGES;
