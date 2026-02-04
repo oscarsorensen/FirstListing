@@ -9,7 +9,6 @@ from datetime import datetime
 
 # === CONFIG ===
 
-# Vi crawler stadig kun ÉN konkret listing-side
 START_URLS = [
     "https://mediter.com/es/propiedad/2939/apartment/reventa/espana/alicante/guardamar-del-segura/urbanizaciones/"
 ]
@@ -24,19 +23,15 @@ DB_CONFIG = {
 }
 
 HEADERS = {
-    "User-Agent": "FirstListingBot/1.0 (+analysis; no crawling abuse)"
+    "User-Agent": "FirstListingBot/2.0 (+analysis; no crawling abuse)"
 }
 
-REQUEST_DELAY = 3  # pause så vi ikke belaster serveren
+REQUEST_DELAY = 3
 
 
 # === HELPERS ===
 
 def normalize_number(text):
-    """
-    Finder første tal i en tekst og normaliserer tusindtals-separatorer.
-    Returnerer int eller None.
-    """
     if not text:
         return None
     match = re.search(r'(\d[\d\.,]*)', text)
@@ -71,24 +66,36 @@ def normalize_number(text):
     return int(raw) if raw.isdigit() else None
 
 
-def extract_sqm(text):
-    """
-    Bruges specifikt til m².
-    Finder KUN tallet der hører sammen med 'm²'
-    fx: '240 m² parcela 120 m² vivienda' → 240
-    """
-    if not text:
-        return None
-    match = re.search(r'(\d+)\s*m²', text)
-    return int(match.group(1)) if match else None
-
-
 def to_int(value):
     if value is None:
         return None
     if isinstance(value, (int, float)):
         return int(value)
     return normalize_number(str(value))
+
+
+def valid_price(value):
+    if value is None:
+        return None
+    if value < 1000 or value > 100000000:
+        return None
+    return value
+
+
+def valid_sqm(value):
+    if value is None:
+        return None
+    if value < 10 or value > 2000:
+        return None
+    return value
+
+
+def valid_rooms(value):
+    if value is None:
+        return None
+    if value < 0 or value > 20:
+        return None
+    return value
 
 
 def find_first_text(tree, xpaths):
@@ -153,10 +160,10 @@ def extract_jsonld(tree):
         return {
             "title": item.get("name"),
             "description": item.get("description"),
-            "price": to_int(price),
+            "price": valid_price(to_int(price)),
             "currency": currency,
-            "sqm": to_int(sqm),
-            "rooms": to_int(rooms),
+            "sqm": valid_sqm(to_int(sqm)),
+            "rooms": valid_rooms(to_int(rooms)),
             "area_text": area_text
         }
 
@@ -190,36 +197,138 @@ def extract_meta(tree):
     return {
         "title": title,
         "description": description,
-        "price": to_int(price_text),
+        "price": valid_price(to_int(price_text)),
         "currency": currency
     }
 
 
+def pick_best_number(candidates, validator):
+    for text in candidates:
+        value = validator(to_int(text))
+        if value is not None:
+            return value
+    return None
+
+
+def extract_labeled_numbers(tree):
+    price_keywords = [
+        "price", "precio", "prix", "preis", "cost", "€", "eur"
+    ]
+    sqm_keywords = [
+        "sqm", "m²", "m2", "superficie", "superfície", "area", "surface"
+    ]
+    rooms_keywords = [
+        "rooms", "room", "bedroom", "bedrooms", "beds", "dormitorio",
+        "dormitorios", "habitacion", "habitaciones", "hab", "cuartos"
+    ]
+    parking_keywords = [
+        "parking", "garage", "garaje", "carport"
+    ]
+
+    candidates = {"price": [], "sqm": [], "rooms": []}
+
+    elements = tree.xpath("//*[normalize-space(text())]")
+    for el in elements:
+        text = " ".join(el.itertext()).strip()
+        if not text:
+            continue
+        lower = text.lower()
+
+        has_number = re.search(r"\\d", text) is not None
+
+        if any(k in lower for k in price_keywords):
+            if has_number:
+                candidates["price"].append(text)
+            else:
+                nxt = el.getnext()
+                if nxt is not None:
+                    nxt_text = " ".join(nxt.itertext()).strip()
+                    if re.search(r"\\d", nxt_text):
+                        candidates["price"].append(nxt_text)
+
+        if any(k in lower for k in sqm_keywords):
+            if has_number:
+                candidates["sqm"].append(text)
+            else:
+                nxt = el.getnext()
+                if nxt is not None:
+                    nxt_text = " ".join(nxt.itertext()).strip()
+                    if re.search(r"\\d", nxt_text):
+                        candidates["sqm"].append(nxt_text)
+
+        if any(k in lower for k in rooms_keywords) and not any(k in lower for k in parking_keywords):
+            if has_number:
+                candidates["rooms"].append(text)
+            else:
+                nxt = el.getnext()
+                if nxt is not None:
+                    nxt_text = " ".join(nxt.itertext()).strip()
+                    if re.search(r"\\d", nxt_text):
+                        candidates["rooms"].append(nxt_text)
+
+    return {
+        "price": pick_best_number(candidates["price"], valid_price),
+        "sqm": pick_best_number(candidates["sqm"], valid_sqm),
+        "rooms": pick_best_number(candidates["rooms"], valid_rooms)
+    }
+
+
 def extract_fallback(tree):
-    price_text = find_first_text(tree, [
-        "//*[contains(translate(@class,'PRICE','price'),'price') or contains(translate(@id,'PRICE','price'),'price')][contains(.,'€')]",
-        "//*[contains(text(),'€')][1]"
-    ])
+    labeled = extract_labeled_numbers(tree)
 
-    sqm_text = find_first_text(tree, [
-        "//*[contains(translate(@class,'AREA','area'),'area') or contains(translate(@class,'SUPERFICIE','superficie'),'superficie') or contains(translate(@class,'SQM','sqm'),'sqm')][contains(.,'m²') or contains(.,'m2')]",
-        "//*[contains(text(),'m²') or contains(text(),'m2')][1]"
-    ])
+    price_candidates = []
+    price_candidates.extend(tree.xpath(
+        "//*[contains(translate(@class,'PRICE','price'),'price') or "
+        "contains(translate(@id,'PRICE','price'),'price') or "
+        "contains(translate(@class,'COST','cost'),'cost') or "
+        "contains(translate(@class,'AMOUNT','amount'),'amount')][contains(.,'€') or contains(.,'EUR') or contains(.,'$')]/text()"
+    ))
 
-    rooms_text = find_first_text(tree, [
-        "//*[contains(translate(@class,'BED','bed'),'bed') or contains(translate(@class,'HAB','hab'),'hab') or contains(translate(@class,'ROOM','room'),'room')][1]",
-        "//*[contains(translate(text(),'BEDROOM','bedroom'),'bed') or contains(translate(text(),'HABITACIONES','habitaciones'),'hab') or contains(translate(text(),'ROOMS','rooms'),'room')][1]"
-    ])
+    price_candidates.extend(tree.xpath(
+        "//*[contains(translate(text(),'PRICE','price'),'price') or "
+        "contains(translate(text(),'PRECIO','precio'),'precio')]/following::*[contains(.,'€') or contains(.,'EUR') or contains(.,'$')][1]/text()"
+    ))
+
+    sqm_candidates = []
+    sqm_candidates.extend(tree.xpath(
+        "//*[contains(translate(@class,'SQM','sqm'),'sqm') or "
+        "contains(translate(@class,'M2','m2'),'m2') or "
+        "contains(translate(@class,'AREA','area'),'area') or "
+        "contains(translate(@class,'SUPERFICIE','superficie'),'superficie')][contains(.,'m²') or contains(.,'m2')]/text()"
+    ))
+
+    sqm_candidates.extend(tree.xpath(
+        "//*[contains(translate(text(),'SUPERFICIE','superficie'),'superficie') or "
+        "contains(translate(text(),'AREA','area'),'area')]/following::*[contains(.,'m²') or contains(.,'m2')][1]/text()"
+    ))
+
+    rooms_candidates = []
+    rooms_candidates.extend(tree.xpath(
+        "//*[contains(translate(@class,'BED','bed'),'bed') or "
+        "contains(translate(@class,'HAB','hab'),'hab') or "
+        "contains(translate(@class,'ROOM','room'),'room') or "
+        "contains(translate(@class,'DORM','dorm'),'dorm')]/text()"
+    ))
+
+    rooms_candidates.extend(tree.xpath(
+        "//*[contains(translate(text(),'DORMITOR','dormitor'),'dormitor') or "
+        "contains(translate(text(),'HABITAC','habitac'),'habitac') or "
+        "contains(translate(text(),'BEDROOM','bedroom'),'bedroom')]/following::*[1]/text()"
+    ))
 
     area_text = find_first_text(tree, [
-        "//*[contains(translate(@class,'LOCATION','location'),'location') or contains(translate(@class,'AREA','area'),'area') or contains(translate(@class,'ADDRESS','address'),'address')]",
-        "//*[contains(translate(@id,'LOCATION','location'),'location') or contains(translate(@id,'AREA','area'),'area') or contains(translate(@id,'ADDRESS','address'),'address')]"
+        "//*[contains(translate(@class,'LOCATION','location'),'location') or "
+        "contains(translate(@class,'AREA','area'),'area') or "
+        "contains(translate(@class,'ADDRESS','address'),'address')]",
+        "//*[contains(translate(@id,'LOCATION','location'),'location') or "
+        "contains(translate(@id,'AREA','area'),'area') or "
+        "contains(translate(@id,'ADDRESS','address'),'address')]"
     ])
 
     return {
-        "price": to_int(price_text),
-        "sqm": extract_sqm(sqm_text) if sqm_text else None,
-        "rooms": to_int(rooms_text),
+        "price": labeled.get("price") or pick_best_number(price_candidates, valid_price),
+        "sqm": labeled.get("sqm") or pick_best_number(sqm_candidates, valid_sqm),
+        "rooms": labeled.get("rooms") or pick_best_number(rooms_candidates, valid_rooms),
         "area_text": area_text
     }
 
@@ -265,14 +374,12 @@ def extract_basic_fields(page_url, response):
 def upsert_listing(data, conn):
     cur = conn.cursor(dictionary=True)
 
-    # Samme URL = samme annonce
     cur.execute("SELECT id FROM listings WHERE url = %s", (data["url"],))
     existing = cur.fetchone()
 
     now = datetime.now()
 
     if existing:
-        # Eksisterende annonce → opdater
         cur.execute("""
             UPDATE listings SET
                 title = %s,
@@ -297,7 +404,6 @@ def upsert_listing(data, conn):
         ))
         print("UPDATED:", data["url"])
     else:
-        # Ny annonce → indsæt
         cur.execute("""
             INSERT INTO listings (
                 url, domain, source_type,
