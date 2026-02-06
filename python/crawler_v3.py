@@ -121,14 +121,8 @@ def looks_like_phone(text):
 
 
 def text_from_node(node):
-    if node is None:
-        return ""
-    try:
-        if isinstance(node, html.HtmlComment):
-            return ""
-    except Exception:
-        pass
-    if not hasattr(node, "itertext"):
+    from lxml.etree import _Element
+    if node is None or not isinstance(node, _Element):
         return ""
     try:
         return " ".join(node.itertext()).strip()
@@ -266,12 +260,12 @@ def find_main_container(tree):
     return tree
 
 
-def get_first_occurrence(tree, xpath_query):
+def get_first_occurrence(node, xpath_query):
     """
     Helper to get FIRST occurrence of an element.
     This avoids picking up data from "related properties" sections.
     """
-    results = tree.xpath(xpath_query)
+    results = node.xpath(xpath_query)
     return results[0] if results else None
 
 
@@ -485,6 +479,59 @@ def extract_contacts(tree):
     }
 
 
+def extract_first_euro_price(tree, min_price=80000, max_price=10000000):
+    """
+    Pick the first €-amount within a plausible price range.
+    Search main container first, then entire document if needed.
+    """
+    def iter_text(node):
+        try:
+            return " ".join(node.itertext())
+        except Exception:
+            return ""
+
+    def first_valid_in_text(text):
+        if not text:
+            return None
+        # Match amounts with € either before or after
+        pattern = re.compile(r"(?:€\s*([\d\.,\s]+))|(?:([\d\.,\s]+)\s*€)")
+        for m in pattern.finditer(text):
+            raw = (m.group(1) or m.group(2) or "").strip()
+            if not raw:
+                continue
+            # Keep only the first numeric chunk (avoid trailing tokens)
+            raw = re.split(r"\s+", raw.strip())[0]
+            value = to_int(raw)
+            if value is None:
+                continue
+            if min_price <= value <= max_price:
+                return value
+        return None
+
+    # Site-specific: Costa Blanca Bolig uses .precio .precio-txt with price inside
+    precio_txt_nodes = tree.xpath("//*[contains(@class,'precio-txt')]")
+    for node in precio_txt_nodes:
+        price = first_valid_in_text(iter_text(node))
+        if price is not None:
+            return price
+
+    # Site-agnostic preference: look for nodes with class containing 'precio' or 'price'
+    price_nodes = tree.xpath(
+        "//*[contains(translate(@class,'PRECIO','precio'),'precio') or "
+        "contains(translate(@class,'PRICE','price'),'price')]"
+    )
+    for node in price_nodes:
+        price = first_valid_in_text(iter_text(node))
+        if price is not None:
+            return price
+
+    main = find_main_container(tree)
+    price = first_valid_in_text(iter_text(main))
+    if price is not None:
+        return price
+    return first_valid_in_text(iter_text(tree))
+
+
 def extract_from_pairs(tree):
     pairs = extract_key_value_pairs(tree)
 
@@ -558,6 +605,7 @@ def extract_labeled_numbers(tree):
     This prevents picking up data from related properties at bottom of page.
     """
     from lxml.etree import _Element
+    main = find_main_container(tree)
     
     candidates = {
         "price": [],
@@ -573,7 +621,7 @@ def extract_labeled_numbers(tree):
     # STRATEGY: Collect candidates, but give priority to earlier occurrences
     position_weights = {}  # Track position in document
     
-    for idx, el in enumerate(tree.xpath(".//*")):
+    for idx, el in enumerate(main.xpath(".//*")):
         # Skip if not an actual element (could be comment, processing instruction, etc.)
         if not isinstance(el, _Element):
             continue
@@ -583,7 +631,7 @@ def extract_labeled_numbers(tree):
             continue
 
         lower = text.lower()
-        has_number = bool(re.search(r'\\d', text))
+        has_number = bool(re.search(r'\d', text))
 
         if any(k in lower for k in price_keywords):
             if has_number and has_currency(text) and not looks_like_phone(text):
@@ -592,7 +640,7 @@ def extract_labeled_numbers(tree):
                 nxt = el.getnext()
                 if nxt is not None and isinstance(nxt, _Element):
                     nxt_text = text_from_node(nxt)
-                    if re.search(r"\\d", nxt_text) and has_currency(nxt_text) and not looks_like_phone(nxt_text):
+                    if re.search(r"\d", nxt_text) and has_currency(nxt_text) and not looks_like_phone(nxt_text):
                         candidates["price"].append((idx, nxt_text))
 
         if any(k in lower for k in sqm_keywords):
@@ -601,8 +649,8 @@ def extract_labeled_numbers(tree):
             else:
                 nxt = el.getnext()
                 if nxt is not None and isinstance(nxt, _Element):
-                    nxt_text = " ".join(nxt.itertext()).strip()
-                    if re.search(r"\\d", nxt_text):
+                    nxt_text = text_from_node(nxt)
+                    if re.search(r"\d", nxt_text):
                         candidates["sqm"].append((idx, nxt_text))
 
         if any(k in lower for k in rooms_keywords) and not any(k in lower for k in parking_keywords):
@@ -612,7 +660,7 @@ def extract_labeled_numbers(tree):
                 nxt = el.getnext()
                 if nxt is not None and isinstance(nxt, _Element):
                     nxt_text = text_from_node(nxt)
-                    if re.search(r"\\d", nxt_text):
+                    if re.search(r"\d", nxt_text):
                         candidates["rooms"].append((idx, nxt_text))
 
     # Pick FIRST valid occurrence (earliest in document)
@@ -639,6 +687,7 @@ def extract_fallback(tree):
     """
     Fallback extraction using FIRST occurrence strategy
     """
+    main = find_main_container(tree)
     labeled = extract_labeled_numbers(tree)
 
     # If labeled extraction worked, use it
@@ -646,40 +695,40 @@ def extract_fallback(tree):
         return labeled
 
     # Otherwise, search for class/id based extraction (use FIRST occurrence)
-    price_node = get_first_occurrence(tree,
+    price_node = get_first_occurrence(main,
         ".//*[contains(translate(@class,'PRICE','price'),'price') or "
         "contains(translate(@id,'PRICE','price'),'price') or "
         "contains(translate(@class,'PRECIO','precio'),'precio')]"
     )
     price = None
-    if price_node:
+    if price_node is not None:
         text = node_context_text(price_node)
         if has_currency(text) and not looks_like_phone(text):
             price = to_int(text)
 
-    sqm_node = get_first_occurrence(tree,
+    sqm_node = get_first_occurrence(main,
         ".//*[contains(translate(@class,'M2','m2'),'m2') or "
         "contains(translate(@class,'SQM','sqm'),'sqm') or "
         "contains(translate(@class,'SUPERFICIE','superficie'),'superficie')]"
     )
     sqm = None
-    if sqm_node:
+    if sqm_node is not None:
         text = node_context_text(sqm_node)
         if "m²" in text or "m2" in text.lower():
             sqm = to_int(text)
 
-    rooms_node = get_first_occurrence(tree,
+    rooms_node = get_first_occurrence(main,
         ".//*[contains(translate(@class,'BED','bed'),'bed') or "
         "contains(translate(@class,'BEDS','beds'),'beds') or "
         "contains(translate(@class,'DORM','dorm'),'dorm')]"
     )
     rooms = None
-    if rooms_node:
+    if rooms_node is not None:
         text = node_context_text(rooms_node)
         if not any(k in text.lower() for k in ("parking", "garage", "garaje")):
             rooms = to_int(text)
 
-    area_text = find_first_text(tree, [
+    area_text = find_first_text(main, [
         ".//*[contains(translate(@class,'LOCATION','location'),'location') or "
         "contains(translate(@class,'AREA','area'),'area') or "
         "contains(translate(@class,'ADDRESS','address'),'address')]"
@@ -705,13 +754,14 @@ def extract_basic_fields(page_url, response):
     contacts = extract_contacts(tree)
     long_desc = extract_long_description(tree)
     fallback = extract_fallback(tree)
+    euro_price = extract_first_euro_price(tree)
 
     title = jsonld.get("title") or micro.get("title") or meta.get("title")
     description = jsonld.get("description") or micro.get("description") or meta.get("description")
     if long_desc and (not description or len(long_desc) > len(description)):
         description = long_desc
 
-    price = jsonld.get("price") or micro.get("price") or meta.get("price") or pairs.get("price") or fallback.get("price")
+    price = euro_price or jsonld.get("price") or micro.get("price") or meta.get("price") or pairs.get("price") or fallback.get("price")
     currency = jsonld.get("currency") or micro.get("currency") or meta.get("currency") or "EUR"
 
     sqm = jsonld.get("sqm") or micro.get("sqm") or pairs.get("sqm") or fallback.get("sqm")
