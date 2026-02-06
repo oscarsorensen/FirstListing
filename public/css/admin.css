@@ -98,13 +98,49 @@ h1 {
     padding: 12px;
     margin-bottom: 16px;
     box-shadow: var(--shadow);
+    padding-left: 27px;
 }
 
 .filters form {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-    align-items: end;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    align-items: center;
+}
+
+.filters .field {
+    flex: 1 1 260px;
+    min-width: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.filters .check {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    padding-top: 0;
+    margin-top: 22px;
+    margin-left: 20px;
+}
+
+.filters .actions {
+    flex: 0 0 auto;
+    margin-top: 22px;
+}
+
+.filters .check-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 14px;
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.filters .check-label input[type="checkbox"] {
+    margin: 0;
 }
 
 label {
@@ -128,9 +164,20 @@ table {
     box-shadow: var(--shadow);
 }
 
+.table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+}
+
+.table-wrap table {
+    min-width: 1400px;
+}
+
 th, td {
     border-bottom: 1px solid var(--border);
-    padding: 8px;
+    padding: 10px 14px;
     text-align: left;
     vertical-align: top;
 }
@@ -142,6 +189,15 @@ th {
     letter-spacing: 0.03em;
 }
 
+th, td {
+    border-right: 1px solid var(--border);
+}
+
+tr th:last-child,
+tr td:last-child {
+    border-right: none;
+}
+
 tr:last-child td {
     border-bottom: none;
 }
@@ -149,6 +205,48 @@ tr:last-child td {
 a {
     color: var(--accent);
     text-decoration: none;
+}
+
+.desc-preview {
+    position: relative;
+    display: inline-block;
+    margin-right: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    font-size: 12px;
+    color: var(--text);
+    cursor: default;
+}
+
+.desc-preview::after {
+    content: attr(data-preview);
+    position: absolute;
+    left: 0;
+    top: 120%;
+    min-width: 260px;
+    max-width: 420px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #111827;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    z-index: 10;
+    white-space: normal;
+}
+
+.desc-preview:hover::after {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.desc-link {
+    font-size: 12px;
 }
 
 .nowrap {

@@ -13,6 +13,17 @@ function show_value($value) {
     return esc($value);
 }
 
+function preview_text($value, $limit = 300) {
+    if ($value === null || $value === '') {
+        return '';
+    }
+    $text = trim(preg_replace('/\s+/', ' ', strip_tags((string)$value)));
+    if (strlen($text) <= $limit) {
+        return $text;
+    }
+    return substr($text, 0, $limit) . '…';
+}
+
 $target_db = 'test2firstlisting';
 $using_target_db = false;
 $db_error = null;
@@ -145,13 +156,25 @@ if ($has_ai_listings) {
             ai.id,
             ai.raw_page_id,
             ai.title,
+            ai.description,
             ai.price,
             ai.currency,
             ai.sqm,
             ai.rooms,
+            ai.bathrooms,
+            ai.plot_sqm,
+            ai.property_type,
+            ai.listing_type,
             ai.address,
+            ai.reference_id,
+            ai.agent_name,
+            ai.agent_phone,
+            ai.agent_email,
+            rp.first_seen_at,
+            rp.fetched_at AS last_seen_at,
             ai.created_at
         FROM ai_listings ai
+        LEFT JOIN raw_pages rp ON rp.id = ai.raw_page_id
         ORDER BY ai.created_at DESC
         LIMIT 20
     ')->fetchAll(PDO::FETCH_ASSOC);
@@ -240,7 +263,7 @@ if ($has_ai_listings) {
 
     <div class="filters">
         <form method="get">
-            <div>
+            <div class="field">
                 <label for="domain">Domain</label>
                 <select name="domain" id="domain">
                     <option value="">All</option>
@@ -251,32 +274,33 @@ if ($has_ai_listings) {
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
+            <div class="field">
                 <label for="status">HTTP status</label>
                 <input type="text" name="status" id="status" value="<?= esc($status_filter) ?>" placeholder="200">
             </div>
-            <div>
-                <label><input type="checkbox" name="has_jsonld" <?= $has_jsonld ? 'checked' : '' ?>> Has JSON-LD</label>
+            <div class="check">
+                <label class="check-label"><input type="checkbox" name="has_jsonld" <?= $has_jsonld ? 'checked' : '' ?>> Has JSON-LD</label>
             </div>
-            <div>
-                <label><input type="checkbox" name="has_html" <?= $has_html ? 'checked' : '' ?>> Has HTML</label>
+            <div class="check">
+                <label class="check-label"><input type="checkbox" name="has_html" <?= $has_html ? 'checked' : '' ?>> Has HTML</label>
             </div>
-            <div>
-                <label><input type="checkbox" name="has_text" <?= $has_text ? 'checked' : '' ?>> Has text</label>
+            <div class="check">
+                <label class="check-label"><input type="checkbox" name="has_text" <?= $has_text ? 'checked' : '' ?>> Has text</label>
             </div>
-            <div>
+            <div class="actions">
                 <button type="submit">Apply filters</button>
             </div>
         </form>
     </div>
 
+    <div class="table-wrap">
     <table>
         <tr>
             <th>ID</th>
             <th>URL</th>
             <th>Domain</th>
             <th>First seen</th>
-            <th>Fetched</th>
+            <th>Last seen</th>
             <th>Status</th>
             <th>Content type</th>
             <th>HTML len</th>
@@ -327,25 +351,53 @@ if ($has_ai_listings) {
             </tr>
         <?php endif; ?>
     </table>
+    </div>
 
     <div class="panel">
         <h2>Latest AI-parsed listings (if available)</h2>
+        <div class="table-wrap">
         <table>
             <tr>
                 <th>ID</th>
                 <th>Raw page</th>
                 <th>Title</th>
+                <th>Description</th>
                 <th>Price</th>
                 <th>SQM</th>
                 <th>Rooms</th>
+                <th>Baths</th>
+                <th>Plot sqm</th>
+                <th>Type</th>
+                <th>Listing</th>
                 <th>Address</th>
+                <th>Reference</th>
+                <th>Agent</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>First seen</th>
+                <th>Last seen</th>
                 <th>Created</th>
             </tr>
             <?php foreach ($ai_latest as $row): ?>
                 <tr>
                     <td class="nowrap"><?= (int)$row['id'] ?></td>
-                    <td class="nowrap"><?= show_value($row['raw_page_id']) ?></td>
+                    <td class="nowrap">
+                        <?php if (!empty($row['raw_page_id'])): ?>
+                            <a href="admin_raw.php?id=<?= (int)$row['raw_page_id'] ?>&field=text"><?= (int)$row['raw_page_id'] ?></a>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
                     <td><?= show_value($row['title']) ?></td>
+                    <td class="nowrap">
+                        <?php if (!empty($row['description'])): ?>
+                            <?php $preview = preview_text($row['description']); ?>
+                            <span class="desc-preview" data-preview="<?= esc($preview) ?>">hover</span>
+                            <a class="desc-link" href="admin_ai.php?id=<?= (int)$row['id'] ?>&field=description">open</a>
+                        <?php else: ?>
+                            —
+                        <?php endif; ?>
+                    </td>
                     <td class="nowrap">
                         <?php if (!empty($row['price'])): ?>
                             <?= number_format((int)$row['price'], 0, ',', '.') . ' ' . esc($row['currency'] ?? 'EUR') ?>
@@ -355,16 +407,27 @@ if ($has_ai_listings) {
                     </td>
                     <td class="nowrap"><?= show_value($row['sqm']) ?></td>
                     <td class="nowrap"><?= show_value($row['rooms']) ?></td>
+                    <td class="nowrap"><?= show_value($row['bathrooms']) ?></td>
+                    <td class="nowrap"><?= show_value($row['plot_sqm']) ?></td>
+                    <td><?= show_value($row['property_type']) ?></td>
+                    <td><?= show_value($row['listing_type']) ?></td>
                     <td><?= show_value($row['address']) ?></td>
+                    <td class="nowrap"><?= show_value($row['reference_id']) ?></td>
+                    <td><?= show_value($row['agent_name']) ?></td>
+                    <td class="nowrap"><?= show_value($row['agent_phone']) ?></td>
+                    <td><?= show_value($row['agent_email']) ?></td>
+                    <td class="nowrap"><?= show_value($row['first_seen_at']) ?></td>
+                    <td class="nowrap"><?= show_value($row['last_seen_at']) ?></td>
                     <td class="nowrap"><?= show_value($row['created_at']) ?></td>
                 </tr>
             <?php endforeach; ?>
             <?php if (!$ai_latest): ?>
                 <tr>
-                    <td colspan="8">No AI-parsed listings yet.</td>
+                    <td colspan="20">No AI-parsed listings yet.</td>
                 </tr>
             <?php endif; ?>
         </table>
+        </div>
     </div>
 
     <p><a href="index.php">Back to homepage</a></p>

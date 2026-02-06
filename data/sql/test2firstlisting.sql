@@ -73,3 +73,11 @@ CREATE USER IF NOT EXISTS 'firstlisting_user'@'localhost'
 GRANT ALL PRIVILEGES ON test2firstlisting.* TO 'firstlisting_user'@'localhost';
 
 FLUSH PRIVILEGES;
+
+
+ALTER TABLE ai_listings
+  ADD COLUMN property_type VARCHAR(64) NULL AFTER title,
+  ADD COLUMN listing_type VARCHAR(32) NULL AFTER property_type,
+  ADD COLUMN bathrooms INT NULL AFTER rooms,
+  ADD COLUMN plot_sqm INT NULL AFTER sqm,
+  ADD COLUMN reference_id VARCHAR(64) NULL AFTER address;
