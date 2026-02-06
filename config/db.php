@@ -1,9 +1,9 @@
 <?php
 
 $DB_HOST = 'localhost';
-$DB_NAME = 'firstlisting_v1';
-$DB_USER = 'firstlisting_admin';  
-$DB_PASS = 'zf4B84BHrlW9jvl4';
+$DB_NAME = 'test2firstlisting';
+$DB_USER = 'firstlisting_user';  
+$DB_PASS = 'girafferharlangehalse';
 $DB_CHARSET = 'utf8mb4';
 
 $dsn = "mysql:host=$DB_HOST;dbname=$DB_NAME;charset=$DB_CHARSET";
