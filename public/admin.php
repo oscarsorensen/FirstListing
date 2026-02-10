@@ -155,6 +155,7 @@ if ($has_ai_listings) {
         SELECT
             ai.id,
             ai.raw_page_id,
+            rp.url AS raw_url,
             ai.title,
             ai.description,
             ai.price,
@@ -199,24 +200,6 @@ if ($has_ai_listings) {
             <?= $db_error ? esc($db_error) : '' ?>
         </div>
     <?php endif; ?>
-
-    <div class="panel">
-        <h2>AI parser</h2>
-        <form id="ai-parse-form" method="post" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
-            <div class="field">
-                <label for="ai_parse_limit">Rows to parse</label>
-                <input type="number" name="ai_parse_limit" id="ai_parse_limit" value="1" min="1" max="3">
-            </div>
-            <div class="actions">
-                <button id="ai-parse-btn" type="submit" name="run_ai_parse" value="1">Run AI Parse</button>
-            </div>
-        </form>
-        <p id="ai-parse-status" class="muted"></p>
-        <p id="ai-parse-timer" class="muted"></p>
-        <p id="ai-parse-left" class="muted"></p>
-        <pre id="ai-parse-output" style="max-height: 280px; overflow:auto; white-space: pre-wrap;"></pre>
-
-    </div>
 
     <div class="cards">
         <div class="card">
@@ -311,6 +294,10 @@ if ($has_ai_listings) {
         </form>
     </div>
 
+    <div class="panel">
+        <h2>Raw pages (latest crawl data)</h2>
+    </div>
+
     <div class="table-wrap">
     <table>
         <tr>
@@ -377,7 +364,7 @@ if ($has_ai_listings) {
         <table>
             <tr>
                 <th>ID</th>
-                <th>Raw page</th>
+                <th>URL</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Price</th>
@@ -400,8 +387,8 @@ if ($has_ai_listings) {
                 <tr>
                     <td class="nowrap"><?= (int)$row['id'] ?></td>
                     <td class="nowrap">
-                        <?php if (!empty($row['raw_page_id'])): ?>
-                            <a href="admin_raw.php?id=<?= (int)$row['raw_page_id'] ?>&field=text"><?= (int)$row['raw_page_id'] ?></a>
+                        <?php if (!empty($row['raw_url'])): ?>
+                            <a href="<?= esc($row['raw_url']) ?>" target="_blank">link</a>
                         <?php else: ?>
                             —
                         <?php endif; ?>
@@ -450,100 +437,5 @@ if ($has_ai_listings) {
 
     <p><a href="index.php">Back to homepage</a></p>
 </div>
-<script>
-(function () {
-    var form = document.getElementById('ai-parse-form');
-    var button = document.getElementById('ai-parse-btn');
-    var statusEl = document.getElementById('ai-parse-status');
-    var timerEl = document.getElementById('ai-parse-timer');
-    var leftEl = document.getElementById('ai-parse-left');
-    var outputEl = document.getElementById('ai-parse-output');
-    var limitInput = document.getElementById('ai_parse_limit');
-    var timerId = null;
-    var startedAt = 0;
-
-    if (!form || !button) {
-        return;
-    }
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        var limit = parseInt(limitInput.value || '1', 10);
-        if (isNaN(limit) || limit < 1) limit = 1;
-        if (limit > 3) limit = 3;
-        limitInput.value = String(limit);
-
-        var estimatedTotal = limit * 15; // simple estimate: ~15s per row
-        startedAt = Date.now();
-
-        button.disabled = true;
-        statusEl.textContent = 'Running parser...';
-        outputEl.textContent = '';
-
-        if (timerId) {
-            clearInterval(timerId);
-        }
-        timerId = setInterval(function () {
-            var elapsed = Math.floor((Date.now() - startedAt) / 1000);
-            var left = Math.max(estimatedTotal - elapsed, 0);
-            timerEl.textContent = 'Elapsed: ' + elapsed + 's';
-            leftEl.textContent = 'Estimated time left: ' + left + 's';
-        }, 1000);
-
-        var body = new FormData();
-        body.append('ai_parse_limit', String(limit));
-
-        var controller = new AbortController();
-        var timeoutId = setTimeout(function () {
-            controller.abort();
-        }, 90000);
-
-        fetch('admin_parse.php', {
-            method: 'POST',
-            body: body,
-            signal: controller.signal
-        })
-            .then(function (r) { return r.text(); })
-            .then(function (text) {
-                clearTimeout(timeoutId);
-                var data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    data = {
-                        ok: false,
-                        message: 'Server returned non-JSON response.',
-                        output: text
-                    };
-                }
-                return data;
-            })
-            .then(function (data) {
-                if (timerId) clearInterval(timerId);
-                button.disabled = false;
-
-                var elapsed = Math.floor((Date.now() - startedAt) / 1000);
-                timerEl.textContent = 'Elapsed: ' + elapsed + 's';
-                leftEl.textContent = 'Estimated time left: 0s';
-
-                if (data.ok) {
-                    statusEl.textContent = data.message + ' Duration: ' + data.duration_sec + 's';
-                } else {
-                    statusEl.textContent = 'Error: ' + (data.message || 'Unknown error');
-                }
-                outputEl.textContent = data.output || '';
-            })
-            .catch(function () {
-                clearTimeout(timeoutId);
-                if (timerId) clearInterval(timerId);
-                button.disabled = false;
-                statusEl.textContent = 'Request timed out or server error while parsing.';
-                timerEl.textContent = '';
-                leftEl.textContent = '';
-            });
-    });
-})();
-</script>
 </body>
 </html>
