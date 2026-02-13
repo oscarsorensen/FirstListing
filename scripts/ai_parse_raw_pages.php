@@ -12,7 +12,7 @@ AI-only parser:
 */
 
 $OLLAMA_URL = 'http://localhost:11434/api/generate';
-$MODEL = 'qwen2.5:14b';
+$MODEL = 'qwen2.5:7b-instruct';
 $LIMIT = 1;
 $FORCE = false;
 $RAW_ID = null;
@@ -29,101 +29,233 @@ foreach (array_slice($argv, 1) as $arg) {
     }
 }
 
+function scalar_text($v): ?string
+{
+    if ($v === null) {
+        return null;
+    }
+    if (is_string($v) || is_int($v) || is_float($v) || is_bool($v)) {
+        $t = trim((string)$v);
+        return $t === '' ? null : $t;
+    }
+    if (is_array($v)) {
+        $parts = [];
+        foreach ($v as $item) {
+            $s = scalar_text($item);
+            if ($s !== null) {
+                $parts[] = $s;
+            }
+        }
+        if (!$parts) {
+            return null;
+        }
+        return trim(implode(', ', $parts));
+    }
+    return null;
+}
+
 function txt_or_none($v): string
 {
-    $v = trim((string)$v);
-    return $v === '' ? 'None' : $v;
+    $s = scalar_text($v);
+    return $s === null ? 'None' : $s;
 }
 
 function int_or_null($v): ?int
 {
-    if ($v === null || $v === '') return null;
-    if (is_numeric($v)) return (int)$v;
-    $n = preg_replace('/[^0-9]/', '', (string)$v) ?? '';
+    $s = scalar_text($v);
+    if ($s === null) return null;
+    if (is_numeric($s)) return (int)$s;
+    $n = preg_replace('/[^0-9]/', '', $s) ?? '';
     return $n === '' ? null : (int)$n;
 }
 
-function parse_kv_response(string $responseText): array
+function pick_first(array $source, array $keys)
+{
+    foreach ($keys as $k) {
+        if (array_key_exists($k, $source) && $source[$k] !== null && $source[$k] !== '') {
+            return $source[$k];
+        }
+    }
+    return null;
+}
+
+function decode_json_response(string $responseText): ?array
+{
+    $txt = trim($responseText);
+    $txt = preg_replace('/^```json\s*/i', '', $txt) ?? $txt;
+    $txt = preg_replace('/^```\s*/', '', $txt) ?? $txt;
+    $txt = preg_replace('/\s*```$/', '', $txt) ?? $txt;
+
+    $arr = json_decode($txt, true);
+    if (is_array($arr)) {
+        return $arr;
+    }
+
+    $start = strpos($txt, '{');
+    $end = strrpos($txt, '}');
+    if ($start !== false && $end !== false && $end > $start) {
+        $slice = substr($txt, $start, $end - $start + 1);
+        $arr = json_decode($slice, true);
+        if (is_array($arr)) {
+            return $arr;
+        }
+    }
+
+    return null;
+}
+
+function parse_kv_fallback(string $responseText): array
 {
     $out = [];
-    $txt = trim($responseText);
-    $txt = preg_replace('/^```.*?\n/s', '', $txt) ?? $txt;
-    $txt = preg_replace('/```$/', '', $txt) ?? $txt;
-
-    $lines = preg_split('/\R/u', $txt) ?: [];
+    $lines = preg_split('/\R/u', trim($responseText)) ?: [];
     foreach ($lines as $line) {
         $line = trim($line);
-        if ($line === '' || !str_contains($line, ':')) {
-            continue;
-        }
+        if ($line === '' || !str_contains($line, ':')) continue;
         [$k, $v] = array_pad(explode(':', $line, 2), 2, '');
         $k = strtolower(trim($k));
         $v = trim($v);
-        if ($k !== '') {
-            $out[$k] = $v;
-        }
+        if ($k !== '') $out[$k] = $v;
     }
     return $out;
 }
 
-function call_ollama_extract(string $url, string $model, string $listingUrl, string $html, string $text, string $jsonld, ?string &$error = null): ?array
+function call_ollama_extract(string $url, string $model, string $listingUrl, string $html, ?string &$error = null): ?array
 {
     $error = null;
-    $html = mb_substr($html, 0, 5500, 'UTF-8');
-    $text = mb_substr($text, 0, 3800, 'UTF-8');
-    $jsonld = mb_substr($jsonld, 0, 2600, 'UTF-8');
 
     $prompt = <<<PROMPT
-You are a data extraction engine for real-estate listings.
+You extract real-estate fields from raw property page HTML.
 
-Task:
-Extract these fields:
-title, description, price, sqm, rooms, bathrooms, plot_sqm, property_type, listing_type, address, reference_id, agent_name, agent_phone, agent_email
+STRICT SOURCE RULES
+Use ONLY visible content from the PRIMARY property block.
 
-STRICT rules:
-1) Source priority must be: HTML first, then TEXT, then JSON-LD.
-2) Use only explicit values from source. No guessing, no invention.
-3) If a text field is missing, return "None".
-4) If a numeric field is missing, return null.
-5) listing_type must be exactly "sale", "rent", or "None".
-6) Do NOT return JSON. Return plain text lines only.
-7) One field per line, EXACTLY in this format:
-title: ...
-description: ...
-price: ...
-sqm: ...
-rooms: ...
-bathrooms: ...
-plot_sqm: ...
-property_type: ...
-listing_type: ...
-address: ...
-reference_id: ...
-agent_name: ...
-agent_phone: ...
-agent_email: ...
-8) Keep description short (max 240 chars).
+IGNORE completely:
 
-Listing URL:
-{$listingUrl}
+Similar properties
 
-HTML (priority 1):
-{$html}
+Featured listings
 
-TEXT (priority 2):
-{$text}
+Sliders
 
-JSON-LD (priority 3):
-{$jsonld}
+Carousels
+
+Related listings
+
+Footer
+
+Header
+
+Navigation menus
+
+Modals
+
+Contact forms
+
+Hidden inputs
+
+Script tags
+
+Style tags
+
+JSON-LD
+
+Meta tags (unless a field is missing from visible body)
+
+PRIMARY PROPERTY DEFINITION
+If multiple properties exist in the HTML:
+Select the property where the MAIN TITLE and MAIN PRICE appear together.
+All extracted fields must belong to that same property block.
+The reference_id must belong to the same block as the selected price.
+
+DESCRIPTION RULES
+
+Prefer the full visible description inside the main property-description block.
+
+If both meta description and visible description exist, use the visible one.
+
+Choose the longest complete visible description.
+
+Do NOT truncate.
+
+Do NOT summarize.
+
+NUMERIC RULES
+
+price: integer only.
+Remove currency symbols.
+Remove thousand separators.
+Example: "495.000€" → 495000
+
+sqm: built/interior/living area only.
+Do NOT use plot area.
+
+plot_sqm: land/plot area only.
+
+rooms: bedrooms count only.
+
+bathrooms: bathrooms count only.
+
+Never combine numbers from different blocks.
+
+If multiple numbers exist, select the one nearest to its label.
+
+LISTING TYPE
+
+"sale" if resale / for sale / venta
+
+"rent" if rental / alquiler
+
+Otherwise null
+
+ADDRESS
+
+Extract human-readable location only (street/city/zone).
+
+Do not extract script fragments.
+
+MISSING DATA
+If a field is not clearly found in the primary property block, return null.
+
+OUTPUT RULES
+Return exactly ONE single JSON object.
+No markdown.
+No explanation.
+No extra text.
+No arrays.
+No nested objects.
+
+Use exactly these keys:
+
+{
+"title": null,
+"description": null,
+"price": null,
+"sqm": null,
+"rooms": null,
+"bathrooms": null,
+"plot_sqm": null,
+"property_type": null,
+"listing_type": null,
+"address": null,
+"reference_id": null,
+"agent_name": null,
+"agent_phone": null,
+"agent_email": null
+}
+
+INPUT HTML FOLLOWS:
 PROMPT;
+
+
 
     $payload = [
         'model' => $model,
         'prompt' => $prompt,
         'stream' => false,
+        'format' => 'json',
         'options' => [
             'temperature' => 0.0,
-            'num_predict' => 280,
+            'num_predict' => 520,
             'num_gpu' => 99,
             'num_thread' => 8,
             'num_ctx' => 4096
@@ -150,9 +282,13 @@ PROMPT;
         return null;
     }
 
-    $parsed = parse_kv_response((string)$env['response']);
+    $rawText = (string)$env['response'];
+    $parsed = decode_json_response($rawText);
+    if (!is_array($parsed)) {
+        $parsed = parse_kv_fallback($rawText);
+    }
     if (!$parsed) {
-        $error = 'Model response was not parsable KV text. Raw model text: ' . mb_substr((string)$env['response'], 0, 700, 'UTF-8');
+        $error = 'Model response was not parsable JSON/KV text. Raw model text: ' . mb_substr($rawText, 0, 700, 'UTF-8');
         return null;
     }
     return $parsed;
@@ -195,11 +331,9 @@ foreach ($rows as $row) {
     $id = (int)$row['id'];
     $listingUrl = (string)$row['url'];
     $html = (string)($row['html_raw'] ?? '');
-    $text = (string)($row['text_raw'] ?? '');
-    $jsonld = (string)($row['jsonld_raw'] ?? '');
 
     $err = null;
-    $ai = call_ollama_extract($OLLAMA_URL, $MODEL, $listingUrl, $html, $text, $jsonld, $err);
+    $ai = call_ollama_extract($OLLAMA_URL, $MODEL, $listingUrl, $html, $err);
     if (!is_array($ai)) {
         echo "[raw_page_id={$id}] AI extraction failed";
         if ($err !== null) {
@@ -209,20 +343,20 @@ foreach ($rows as $row) {
         continue;
     }
 
-    $title = txt_or_none($ai['title'] ?? null);
-    $description = txt_or_none($ai['description'] ?? null);
-    $price = int_or_null($ai['price'] ?? null);
-    $sqm = int_or_null($ai['sqm'] ?? null);
-    $rooms = int_or_null($ai['rooms'] ?? null);
-    $bathrooms = int_or_null($ai['bathrooms'] ?? null);
-    $plotSqm = int_or_null($ai['plot_sqm'] ?? null);
-    $propertyType = txt_or_none($ai['property_type'] ?? null);
-    $listingType = txt_or_none($ai['listing_type'] ?? null);
-    $address = txt_or_none($ai['address'] ?? null);
-    $referenceId = txt_or_none($ai['reference_id'] ?? null);
-    $agentName = txt_or_none($ai['agent_name'] ?? null);
-    $agentPhone = txt_or_none($ai['agent_phone'] ?? null);
-    $agentEmail = txt_or_none($ai['agent_email'] ?? null);
+    $title = txt_or_none(pick_first($ai, ['title', 'name', 'property_title']));
+    $description = txt_or_none(pick_first($ai, ['description', 'desc', 'full_description']));
+    $price = int_or_null(pick_first($ai, ['price', 'price_eur', 'price_amount', 'price_value', 'prize']));
+    $sqm = int_or_null(pick_first($ai, ['sqm', 'built_sqm', 'built_area', 'constructed_area', 'floor_size']));
+    $rooms = int_or_null(pick_first($ai, ['rooms', 'bedrooms', 'beds', 'habitaciones']));
+    $bathrooms = int_or_null(pick_first($ai, ['bathrooms', 'baths', 'bath', 'banos', 'baños']));
+    $plotSqm = int_or_null(pick_first($ai, ['plot_sqm', 'plot', 'plot_area', 'land_area', 'parcel_sqm']));
+    $propertyType = txt_or_none(pick_first($ai, ['property_type', 'type', 'property']));
+    $listingType = txt_or_none(pick_first($ai, ['listing_type', 'operation', 'offer_type']));
+    $address = txt_or_none(pick_first($ai, ['address', 'location', 'street_address']));
+    $referenceId = txt_or_none(pick_first($ai, ['reference_id', 'reference', 'ref', 'property_id', 'codigo', 'code']));
+    $agentName = txt_or_none(pick_first($ai, ['agent_name', 'agent', 'agency', 'agency_name', 'broker']));
+    $agentPhone = txt_or_none(pick_first($ai, ['agent_phone', 'phone', 'telephone', 'contact_phone']));
+    $agentEmail = txt_or_none(pick_first($ai, ['agent_email', 'email', 'contact_email']));
 
     // Ensure only one row per raw page ID
     $del = $pdo->prepare('DELETE FROM ai_listings WHERE raw_page_id = :rid_raw AND id <> :rid_id');
