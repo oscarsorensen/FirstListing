@@ -1,4 +1,5 @@
 <?php
+session_start();
 $title = "FirstListing — Proof of Concept";
 ?>
 
@@ -21,6 +22,13 @@ $title = "FirstListing — Proof of Concept";
         <nav class="nav">
             <a href="how.php">How it works</a>
             <a href="helps.php">Why it helps</a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="user.php">User</a>
+                <a href="logout.php">Logout</a>
+            <?php else: ?>
+                <a href="login.php">Login</a>
+                <a href="register.php">Register</a>
+            <?php endif; ?>
             <a href="admin.php" class="pill">Admin</a>
         </nav>
     </header>

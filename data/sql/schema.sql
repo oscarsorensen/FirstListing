@@ -92,7 +92,8 @@ CREATE INDEX idx_domain ON listings(domain);
 CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
 
-  email VARCHAR(255) NOT NULL UNIQUE,
+  username VARCHAR(80) NOT NULL UNIQUE,
+  email VARCHAR(255) NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
 
   role ENUM('agent','admin','private') DEFAULT 'agent',

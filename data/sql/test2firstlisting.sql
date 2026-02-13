@@ -81,3 +81,52 @@ ALTER TABLE ai_listings
   ADD COLUMN bathrooms INT NULL AFTER rooms,
   ADD COLUMN plot_sqm INT NULL AFTER sqm,
   ADD COLUMN reference_id VARCHAR(64) NULL AFTER address;
+
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(80) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  role ENUM('agent','admin','private') DEFAULT 'agent',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE subscriptions (
+  user_id INT PRIMARY KEY,
+  plan ENUM('basic','standard','pro') NOT NULL,
+  searches_per_month INT NOT NULL,
+  active BOOLEAN DEFAULT TRUE,
+  started_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_subscriptions_user
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE search_usage (
+  user_id INT NOT NULL,
+  month CHAR(7) NOT NULL,
+  searches_used INT DEFAULT 0,
+  PRIMARY KEY (user_id, month),
+  CONSTRAINT fk_search_usage_user
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+USE test2firstlisting;
+
+SET @has_email := (
+  SELECT COUNT(*)
+  FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'users'
+    AND COLUMN_NAME = 'email'
+);
+
+SET @sql := IF(
+  @has_email = 0,
+  'ALTER TABLE users ADD COLUMN email VARCHAR(255) NULL UNIQUE AFTER username',
+  'SELECT "email column already exists"'
+);
+
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
