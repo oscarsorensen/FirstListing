@@ -15,16 +15,7 @@ function esc(string $value): string
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-function table_exists(PDO $pdo, string $table): bool
-{
-    $stmt = $pdo->prepare('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :t');
-    $stmt->execute([':t' => $table]);
-    return (int)$stmt->fetchColumn() > 0;
-}
-
 $dbName = (string)$pdo->query('SELECT DATABASE()')->fetchColumn();
-$hasRawPages = table_exists($pdo, 'raw_pages');
-$hasAiListings = table_exists($pdo, 'ai_listings');
 
 $searchInput = trim((string)($_POST['search_input'] ?? ''));
 $limit = (int)($_POST['limit'] ?? 10);
@@ -33,12 +24,11 @@ $rows = [];
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!$hasRawPages || !$hasAiListings) {
-        $error = 'Missing required tables: raw_pages and/or ai_listings.';
-    } elseif ($searchInput === '') {
+    if ($searchInput === '') {
         $error = 'Insert test data (URL or text) first.';
     } else {
-        $sql = "
+        try {
+            $sql = "
             SELECT
                 rp.id AS raw_page_id,
                 rp.url,
@@ -81,12 +71,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             LIMIT :lim
         ";
 
-        $stmt = $pdo->prepare($sql);
-        $q = '%' . $searchInput . '%';
-        $stmt->bindValue(':q', $q, PDO::PARAM_STR);
-        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
-        $stmt->execute();
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $pdo->prepare($sql);
+            $q = '%' . $searchInput . '%';
+            $stmt->bindValue(':q', $q, PDO::PARAM_STR);
+            $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $error = 'Search failed: ' . $e->getMessage();
+        }
     }
 }
 ?>
@@ -141,7 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="k">Email</div><div class="v"><?= esc((string)($_SESSION['user_email'] ?? '')) ?: '—' ?></div>
             <div class="k">Role</div><div class="v"><?= esc((string)$_SESSION['user_role']) ?></div>
             <div class="k">Database</div><div class="v"><?= esc($dbName) ?></div>
-            <div class="k">Tables</div><div class="v">raw_pages: <?= $hasRawPages ? 'yes' : 'no' ?> | ai_listings: <?= $hasAiListings ? 'yes' : 'no' ?></div>
         </div>
 
         <div class="actions">

@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 
 function esc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
@@ -25,24 +25,9 @@ function preview_text($value, $limit = 300) {
 }
 
 $target_db = 'test2firstlisting';
-$using_target_db = false;
-$db_error = null;
+$openai_model = 'gpt-4.1-mini';
 
-try {
-    $pdo->exec("USE {$target_db}");
-    $using_target_db = true;
-} catch (PDOException $e) {
-    $db_error = $e->getMessage();
-}
-
-function table_exists(PDO $pdo, $table) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = :t");
-    $stmt->execute([':t' => $table]);
-    return (int)$stmt->fetchColumn() > 0;
-}
-
-$has_raw_pages = $using_target_db ? table_exists($pdo, 'raw_pages') : false;
-$has_ai_listings = $using_target_db ? table_exists($pdo, 'ai_listings') : false;
+$pdo->exec("USE {$target_db}");
 
 $stats = [
     'raw_total' => 0,
@@ -59,36 +44,29 @@ $stats = [
     'ai_with_address' => 0,
 ];
 
-if ($has_raw_pages) {
-    $stats['raw_total'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages')->fetchColumn();
-    $stats['raw_with_html'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE html_raw IS NOT NULL AND html_raw <> ""')->fetchColumn();
-    $stats['raw_with_text'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE text_raw IS NOT NULL AND text_raw <> ""')->fetchColumn();
-    $stats['raw_with_jsonld'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE jsonld_raw IS NOT NULL AND jsonld_raw <> ""')->fetchColumn();
-    $stats['raw_first_seen'] = $pdo->query('SELECT MIN(first_seen_at) FROM raw_pages')->fetchColumn();
-    $stats['raw_first_fetch'] = $pdo->query('SELECT MIN(fetched_at) FROM raw_pages')->fetchColumn();
-    $stats['raw_last_fetch'] = $pdo->query('SELECT MAX(fetched_at) FROM raw_pages')->fetchColumn();
-}
+$stats['raw_total'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages')->fetchColumn();
+$stats['raw_with_html'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE html_raw IS NOT NULL AND html_raw <> ""')->fetchColumn();
+$stats['raw_with_text'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE text_raw IS NOT NULL AND text_raw <> ""')->fetchColumn();
+$stats['raw_with_jsonld'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE jsonld_raw IS NOT NULL AND jsonld_raw <> ""')->fetchColumn();
+$stats['raw_first_seen'] = $pdo->query('SELECT MIN(first_seen_at) FROM raw_pages')->fetchColumn();
+$stats['raw_first_fetch'] = $pdo->query('SELECT MIN(fetched_at) FROM raw_pages')->fetchColumn();
+$stats['raw_last_fetch'] = $pdo->query('SELECT MAX(fetched_at) FROM raw_pages')->fetchColumn();
 
-if ($has_ai_listings) {
-    $stats['ai_total'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings')->fetchColumn();
-    $stats['ai_with_price'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE price IS NOT NULL')->fetchColumn();
-    $stats['ai_with_sqm'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE sqm IS NOT NULL')->fetchColumn();
-    $stats['ai_with_rooms'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE rooms IS NOT NULL')->fetchColumn();
-    $stats['ai_with_address'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE address IS NOT NULL AND address <> ""')->fetchColumn();
-}
+$stats['ai_total'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings')->fetchColumn();
+$stats['ai_with_price'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE price IS NOT NULL')->fetchColumn();
+$stats['ai_with_sqm'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE sqm IS NOT NULL')->fetchColumn();
+$stats['ai_with_rooms'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE rooms IS NOT NULL')->fetchColumn();
+$stats['ai_with_address'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE address IS NOT NULL AND address <> ""')->fetchColumn();
 
-$domains_top = [];
-if ($has_raw_pages) {
-    $domains_top = $pdo->query('
-        SELECT domain, COUNT(*) AS cnt
-        FROM raw_pages
-        GROUP BY domain
-        ORDER BY cnt DESC
-        LIMIT 10
-    ')->fetchAll(PDO::FETCH_ASSOC);
-}
+$domains_top = $pdo->query('
+    SELECT domain, COUNT(*) AS cnt
+    FROM raw_pages
+    GROUP BY domain
+    ORDER BY cnt DESC
+    LIMIT 10
+')->fetchAll(PDO::FETCH_ASSOC);
 
-$all_domains = $has_raw_pages ? $pdo->query('SELECT DISTINCT domain FROM raw_pages ORDER BY domain')->fetchAll(PDO::FETCH_COLUMN) : [];
+$all_domains = $pdo->query('SELECT DISTINCT domain FROM raw_pages ORDER BY domain')->fetchAll(PDO::FETCH_COLUMN);
 
 $domain_filter = trim($_GET['domain'] ?? '');
 $has_jsonld = isset($_GET['has_jsonld']);
@@ -143,43 +121,39 @@ if ($where) {
 $sql .= ' ORDER BY fetched_at DESC LIMIT 50';
 
 $raw_pages = [];
-if ($has_raw_pages) {
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $raw_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$raw_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $ai_latest = [];
-if ($has_ai_listings) {
-    $ai_latest = $pdo->query('
-        SELECT
-            ai.id,
-            ai.raw_page_id,
-            rp.url AS raw_url,
-            ai.title,
-            ai.description,
-            ai.price,
-            ai.currency,
-            ai.sqm,
-            ai.rooms,
-            ai.bathrooms,
-            ai.plot_sqm,
-            ai.property_type,
-            ai.listing_type,
-            ai.address,
-            ai.reference_id,
-            ai.agent_name,
-            ai.agent_phone,
-            ai.agent_email,
-            rp.first_seen_at,
-            rp.fetched_at AS last_seen_at,
-            ai.created_at
-        FROM ai_listings ai
-        LEFT JOIN raw_pages rp ON rp.id = ai.raw_page_id
-        ORDER BY ai.created_at DESC
-        LIMIT 20
-    ')->fetchAll(PDO::FETCH_ASSOC);
-}
+$ai_latest = $pdo->query('
+    SELECT
+        ai.id,
+        ai.raw_page_id,
+        rp.url AS raw_url,
+        ai.title,
+        ai.description,
+        ai.price,
+        ai.currency,
+        ai.sqm,
+        ai.rooms,
+        ai.bathrooms,
+        ai.plot_sqm,
+        ai.property_type,
+        ai.listing_type,
+        ai.address,
+        ai.reference_id,
+        ai.agent_name,
+        ai.agent_phone,
+        ai.agent_email,
+        rp.first_seen_at,
+        rp.fetched_at AS last_seen_at,
+        ai.created_at
+    FROM ai_listings ai
+    LEFT JOIN raw_pages rp ON rp.id = ai.raw_page_id
+    ORDER BY ai.created_at DESC
+    LIMIT 20
+')->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -187,19 +161,12 @@ if ($has_ai_listings) {
 <head>
     <meta charset="UTF-8">
     <title>Admin dashboard v2</title>
-    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
 <div class="container">
     <h1>Admin dashboard v2</h1>
     <div class="muted">Raw crawl overview + AI pipeline status</div>
-
-    <?php if (!$using_target_db): ?>
-        <div class="panel">
-            <strong>Database error:</strong> Could not switch to <?= esc($target_db) ?>.
-            <?= $db_error ? esc($db_error) : '' ?>
-        </div>
-    <?php endif; ?>
 
     <div class="cards">
         <div class="card">
@@ -255,10 +222,33 @@ if ($has_ai_listings) {
                 <li>With sqm — <?= (int)$stats['ai_with_sqm'] ?></li>
                 <li>With rooms — <?= (int)$stats['ai_with_rooms'] ?></li>
                 <li>With address — <?= (int)$stats['ai_with_address'] ?></li>
-                <?php if (!$has_ai_listings): ?>
-                    <li>No data</li>
-                <?php endif; ?>
             </ul>
+        </div>
+    </div>
+
+    <div class="panel ai-test-panel">
+        <h2>OpenAI Test Panel</h2>
+        <div class="ai-test-grid">
+            <div>
+                <div class="muted">Runs through Python bridge (same setup as your terminal test).</div>
+
+                <form id="openai-test-form" class="ai-test-form">
+                    <div class="muted">Model: <strong><?= esc($openai_model) ?></strong></div>
+
+                    <div class="field">
+                        <label for="openai_prompt">Prompt</label>
+                        <textarea id="openai_prompt" name="openai_prompt" rows="5" placeholder="Ask something, e.g. extract fields from this HTML..."></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit">Run test</button>
+                    </div>
+                </form>
+            </div>
+            <div>
+                <label class="muted">Response</label>
+                <pre id="openai-response-box" class="ai-output"></pre>
+            </div>
         </div>
     </div>
 
@@ -435,7 +425,41 @@ if ($has_ai_listings) {
         </div>
     </div>
 
-    <p><a href="index.php">Back to homepage</a></p>
+    <p><a href="../index.php">Back to homepage</a></p>
 </div>
+<script>
+const openAiForm = document.getElementById('openai-test-form');
+const openAiPrompt = document.getElementById('openai_prompt');
+const openAiResponseBox = document.getElementById('openai-response-box');
+
+if (openAiForm && openAiPrompt && openAiResponseBox) {
+    openAiForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const prompt = openAiPrompt.value.trim();
+        if (!prompt) {
+            openAiResponseBox.textContent = 'Write a prompt first.';
+            return;
+        }
+
+        openAiResponseBox.textContent = 'Loading...';
+
+        try {
+            const body = new URLSearchParams();
+            body.set('prompt', prompt);
+
+            const res = await fetch('openai_test.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                body: body.toString()
+            });
+
+            const text = await res.text();
+            openAiResponseBox.textContent = text || 'No response returned.';
+        } catch (err) {
+            openAiResponseBox.textContent = 'Request failed.';
+        }
+    });
+}
+</script>
 </body>
 </html>

@@ -29,7 +29,7 @@ $title = "FirstListing — Proof of Concept";
                 <a href="login.php">Login</a>
                 <a href="register.php">Register</a>
             <?php endif; ?>
-            <a href="admin.php" class="pill">Admin</a>
+            <a href="admin/admin.php" class="pill">Admin</a>
         </nav>
     </header>
 

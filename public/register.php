@@ -10,18 +10,6 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-function table_has_column(PDO $pdo, string $table, string $column): bool
-{
-    $stmt = $pdo->prepare(
-        'SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = :t AND column_name = :c'
-    );
-    $stmt->execute([':t' => $table, ':c' => $column]);
-    return (int)$stmt->fetchColumn() > 0;
-}
-
-$hasUsernameColumn = table_has_column($pdo, 'users', 'username');
-$hasEmailColumn = table_has_column($pdo, 'users', 'email');
-
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -36,8 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Username can only contain letters, numbers, dot, underscore and dash.';
     } elseif ($email !== '' && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Email is not valid.';
-    } elseif (!$hasUsernameColumn) {
-        $error = 'Database missing username column in users table.';
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters.';
     } elseif (!in_array($role, ['agent', 'private'], true)) {
@@ -45,22 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            if ($hasEmailColumn) {
-                $stmt = $pdo->prepare('INSERT INTO users (username, email, password_hash, role) VALUES (:username, :email, :password_hash, :role)');
-                $stmt->execute([
-                    ':username' => $username,
-                    ':email' => $email !== '' ? strtolower($email) : null,
-                    ':password_hash' => $hash,
-                    ':role' => $role,
-                ]);
-            } else {
-                $stmt = $pdo->prepare('INSERT INTO users (username, password_hash, role) VALUES (:username, :password_hash, :role)');
-                $stmt->execute([
-                    ':username' => $username,
-                    ':password_hash' => $hash,
-                    ':role' => $role,
-                ]);
-            }
+            $stmt = $pdo->prepare('
+                INSERT INTO users (username, email, password_hash, role)
+                VALUES (:username, :email, :password_hash, :role)
+            ');
+            $stmt->execute([
+                ':username' => $username,
+                ':email' => $email !== '' ? strtolower($email) : null,
+                ':password_hash' => $hash,
+                ':role' => $role,
+            ]);
 
             $_SESSION['user_id'] = (int)$pdo->lastInsertId();
             $_SESSION['username'] = $username;

@@ -10,18 +10,6 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-function table_has_column(PDO $pdo, string $table, string $column): bool
-{
-    $stmt = $pdo->prepare(
-        'SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = :t AND column_name = :c'
-    );
-    $stmt->execute([':t' => $table, ':c' => $column]);
-    return (int)$stmt->fetchColumn() > 0;
-}
-
-$hasUsernameColumn = table_has_column($pdo, 'users', 'username');
-$hasEmailColumn = table_has_column($pdo, 'users', 'email');
-
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,21 +18,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($username === '' || $password === '') {
         $error = 'Invalid login data.';
-    } elseif (!$hasUsernameColumn) {
-        $error = 'Database missing username column in users table.';
     } else {
-        if ($hasEmailColumn) {
-            $stmt = $pdo->prepare('SELECT id, username, email, password_hash, role FROM users WHERE username = :username LIMIT 1');
-        } else {
-            $stmt = $pdo->prepare('SELECT id, username, password_hash, role FROM users WHERE username = :username LIMIT 1');
-        }
+        $stmt = $pdo->prepare('
+            SELECT id, username, email, password_hash, role
+            FROM users
+            WHERE username = :username
+            LIMIT 1
+        ');
         $stmt->execute([':username' => $username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user && password_verify($password, (string)$user['password_hash'])) {
             $_SESSION['user_id'] = (int)$user['id'];
             $_SESSION['username'] = (string)$user['username'];
-            $_SESSION['user_email'] = isset($user['email']) ? (string)$user['email'] : '';
+            $_SESSION['user_email'] = (string)($user['email'] ?? '');
             $_SESSION['user_role'] = (string)$user['role'];
             header('Location: user.php');
             exit;

@@ -233,7 +233,51 @@ input[type="text"] {
     color: var(--text);
 }
 
+textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 9px;
+    border: 1px solid #4a5f81;
+    background: #1d293b;
+    color: var(--text);
+    resize: vertical;
+}
+
+.ai-test-panel {
+    margin-bottom: 16px;
+}
+
+.ai-test-grid {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .ai-test-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.ai-test-form .field {
+    margin-bottom: 10px;
+}
+
 input[type="checkbox"] {
     transform: translateY(2px);
     accent-color: var(--accent);
+}
+
+.ai-output {
+    margin-top: 10px;
+    background: #162132;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 10px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    min-height: 220px;
+    max-height: 340px;
+    overflow: auto;
 }
