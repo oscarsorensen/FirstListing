@@ -12,12 +12,7 @@ from lxml import html
 
 # Replace with your target URLs
 START_URLS = [
-    "https://mediter.com/property/2995/bungalow/resale/spain/alicante/orihuela-costa/cabo-roig/",
-    "https://mediter.com/property/2991/villa/resale/spain/alicante/orihuela/montepinar-la-aparecida-raiguero/",
-    "https://www.engelvoelkers.com/es/en/exposes/f85f91d6-cc18-5fa8-a962-ff0564cbbaa1",
-    "https://www.engelvoelkers.com/es/en/exposes/5bfcbd93-9d23-5916-8979-b2c7bf10ab3e",
-    "https://costablancabolig.com/property/14007/exclusive-renovated-frontline-duplex-in-mascarat-altea/",
-    "https://movr.es/property/18017/smart-home-duplex-with-solar-energy-santiago-de-la-ri/"
+    "https://jensenestate.es/es/propiedad/1015/adosado-en-san-pedro-del-pinatar/"
 ]
 
 DB_CONFIG = {

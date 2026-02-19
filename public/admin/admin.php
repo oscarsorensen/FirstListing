@@ -24,10 +24,82 @@ function preview_text($value, $limit = 300) {
     return substr($text, 0, $limit) . '…';
 }
 
+function company_name(?string $domain): string
+{
+    $d = strtolower(trim((string)$domain));
+    if ($d === '') {
+        return '—';
+    }
+
+    $map = [
+        'movr.es' => 'Movr',
+        'www.movr.es' => 'Movr',
+        'jensenestate.es' => 'Jensen Estate',
+        'www.jensenestate.es' => 'Jensen Estate',
+        'mediter.com' => 'Mediter Real Estate',
+        'www.mediter.com' => 'Mediter Real Estate',
+        'costablancabolig.com' => 'Mediter Real Estate',
+        'www.costablancabolig.com' => 'Mediter Real Estate',
+    ];
+
+    if (isset($map[$d])) {
+        return $map[$d];
+    }
+
+    $host = preg_replace('/^www\./', '', $d) ?? $d;
+    $host = preg_replace('/\.(com|es|net|org|eu)$/', '', $host) ?? $host;
+    $host = str_replace(['-', '_'], ' ', $host);
+    return ucwords(trim($host)) ?: '—';
+}
+
 $target_db = 'test2firstlisting';
 $openai_model = 'gpt-4.1-mini';
 
 $pdo->exec("USE {$target_db}");
+
+$parse_feedback = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (string)($_POST['action'] ?? '') === 'parse_selected') {
+    $selectedIds = $_POST['raw_ids'] ?? [];
+    if (!is_array($selectedIds)) {
+        $selectedIds = [];
+    }
+
+    $ids = [];
+    foreach ($selectedIds as $id) {
+        $id = (int)$id;
+        if ($id > 0) {
+            $ids[$id] = $id;
+        }
+    }
+    $ids = array_values($ids);
+
+    if (!$ids) {
+        $parse_feedback[] = 'No rows selected.';
+    } elseif (!function_exists('exec')) {
+        $parse_feedback[] = 'Server does not allow running parser from admin (exec disabled).';
+    } else {
+        $phpBin = escapeshellarg('/opt/homebrew/bin/php');
+        $scriptPath = escapeshellarg(__DIR__ . '/../../scripts/openai_parse_raw_pages.php');
+        $ok = 0;
+        $failed = 0;
+
+        foreach ($ids as $id) {
+            $output = [];
+            $code = 1;
+            $cmd = $phpBin . ' ' . $scriptPath . ' --id=' . (int)$id . ' --limit=1 --force 2>&1';
+            exec($cmd, $output, $code);
+            if ($code === 0) {
+                $ok++;
+            } else {
+                $failed++;
+                $firstLine = trim((string)($output[0] ?? 'Unknown parser error'));
+                $parse_feedback[] = "ID {$id} failed: {$firstLine}";
+            }
+        }
+
+        $parse_feedback[] = "Parse complete. Success: {$ok}, Failed: {$failed}.";
+    }
+}
 
 $stats = [
     'raw_total' => 0,
@@ -78,40 +150,41 @@ $where = [];
 $params = [];
 
 if ($domain_filter !== '') {
-    $where[] = 'domain = :domain';
+    $where[] = 'rp.domain = :domain';
     $params[':domain'] = $domain_filter;
 }
 
 if ($has_jsonld) {
-    $where[] = 'jsonld_raw IS NOT NULL AND jsonld_raw <> ""';
+    $where[] = 'rp.jsonld_raw IS NOT NULL AND rp.jsonld_raw <> ""';
 }
 
 if ($has_html) {
-    $where[] = 'html_raw IS NOT NULL AND html_raw <> ""';
+    $where[] = 'rp.html_raw IS NOT NULL AND rp.html_raw <> ""';
 }
 
 if ($has_text) {
-    $where[] = 'text_raw IS NOT NULL AND text_raw <> ""';
+    $where[] = 'rp.text_raw IS NOT NULL AND rp.text_raw <> ""';
 }
 
 if ($status_filter !== '') {
-    $where[] = 'http_status = :http_status';
+    $where[] = 'rp.http_status = :http_status';
     $params[':http_status'] = $status_filter;
 }
 
 $sql = '
     SELECT
-        id,
-        url,
-        domain,
-        first_seen_at,
-        fetched_at,
-        http_status,
-        content_type,
-        LENGTH(html_raw) AS html_len,
-        LENGTH(text_raw) AS text_len,
-        LENGTH(jsonld_raw) AS jsonld_len
-    FROM raw_pages
+        rp.id,
+        rp.url,
+        rp.domain,
+        rp.first_seen_at,
+        rp.fetched_at,
+        rp.http_status,
+        rp.content_type,
+        LENGTH(rp.html_raw) AS html_len,
+        LENGTH(rp.text_raw) AS text_len,
+        LENGTH(rp.jsonld_raw) AS jsonld_len,
+        EXISTS(SELECT 1 FROM ai_listings ai WHERE ai.raw_page_id = rp.id) AS is_parsed
+    FROM raw_pages rp
 ';
 
 if ($where) {
@@ -131,6 +204,7 @@ $ai_latest = $pdo->query('
         ai.id,
         ai.raw_page_id,
         rp.url AS raw_url,
+        rp.domain AS raw_domain,
         ai.title,
         ai.description,
         ai.price,
@@ -286,66 +360,94 @@ $ai_latest = $pdo->query('
 
     <div class="panel">
         <h2>Raw pages (latest crawl data)</h2>
+        <?php if ($parse_feedback): ?>
+            <ul>
+                <?php foreach ($parse_feedback as $line): ?>
+                    <li><?= esc($line) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+        <div class="actions">
+            <button type="button" id="select-all-unparsed">Select all unparsed</button>
+        </div>
     </div>
 
     <div class="table-wrap">
-    <table>
-        <tr>
-            <th>ID</th>
-            <th>URL</th>
-            <th>Domain</th>
-            <th>First seen</th>
-            <th>Last seen</th>
-            <th>Status</th>
-            <th>Content type</th>
-            <th>HTML len</th>
-            <th>Text len</th>
-            <th>JSON-LD len</th>
-        </tr>
-        <?php foreach ($raw_pages as $row): ?>
-            <tr>
-                <td class="nowrap"><?= (int)$row['id'] ?></td>
-                <td class="nowrap">
-                    <?php if (!empty($row['url'])): ?>
-                        <a href="<?= esc($row['url']) ?>" target="_blank">link</a>
-                    <?php else: ?>
-                        —
-                    <?php endif; ?>
-                </td>
-                <td><?= show_value($row['domain']) ?></td>
-                <td class="nowrap"><?= show_value($row['first_seen_at']) ?></td>
-                <td class="nowrap"><?= show_value($row['fetched_at']) ?></td>
-                <td class="nowrap"><?= show_value($row['http_status']) ?></td>
-                <td><?= show_value($row['content_type']) ?></td>
-                <td class="nowrap">
-                    <?php if (!empty($row['html_len'])): ?>
-                        <a href="admin_raw.php?id=<?= (int)$row['id'] ?>&field=html"><?= show_value($row['html_len']) ?></a>
-                    <?php else: ?>
-                        —
-                    <?php endif; ?>
-                </td>
-                <td class="nowrap">
-                    <?php if (!empty($row['text_len'])): ?>
-                        <a href="admin_raw.php?id=<?= (int)$row['id'] ?>&field=text"><?= show_value($row['text_len']) ?></a>
-                    <?php else: ?>
-                        —
-                    <?php endif; ?>
-                </td>
-                <td class="nowrap">
-                    <?php if (!empty($row['jsonld_len'])): ?>
-                        <a href="admin_raw.php?id=<?= (int)$row['id'] ?>&field=jsonld"><?= show_value($row['jsonld_len']) ?></a>
-                    <?php else: ?>
-                        —
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        <?php if (!$raw_pages): ?>
-            <tr>
-                <td colspan="10">No raw pages match the filters.</td>
-            </tr>
-        <?php endif; ?>
-    </table>
+        <form method="post">
+            <input type="hidden" name="action" value="parse_selected">
+            <table>
+                <tr>
+                    <th>Parsed</th>
+                    <th>ID</th>
+                    <th>URL</th>
+                    <th>Domain</th>
+                    <th>First seen</th>
+                    <th>Last seen</th>
+                    <th>Status</th>
+                    <th>Content type</th>
+                    <th>HTML len</th>
+                    <th>Text len</th>
+                    <th>JSON-LD len</th>
+                </tr>
+                <?php foreach ($raw_pages as $row): ?>
+                    <?php $isParsed = (int)$row['is_parsed'] === 1; ?>
+                    <tr>
+                        <td class="nowrap">
+                            <?php if ($isParsed): ?>
+                                Yes
+                            <?php else: ?>
+                                <label>
+                                    No
+                                    <input type="checkbox" class="parse-checkbox" name="raw_ids[]" value="<?= (int)$row['id'] ?>">
+                                </label>
+                            <?php endif; ?>
+                        </td>
+                        <td class="nowrap"><?= (int)$row['id'] ?></td>
+                        <td class="nowrap">
+                            <?php if (!empty($row['url'])): ?>
+                                <a href="<?= esc($row['url']) ?>" target="_blank">link</a>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
+                        </td>
+                        <td><?= show_value($row['domain']) ?></td>
+                        <td class="nowrap"><?= show_value($row['first_seen_at']) ?></td>
+                        <td class="nowrap"><?= show_value($row['fetched_at']) ?></td>
+                        <td class="nowrap"><?= show_value($row['http_status']) ?></td>
+                        <td><?= show_value($row['content_type']) ?></td>
+                        <td class="nowrap">
+                            <?php if (!empty($row['html_len'])): ?>
+                                <a href="admin_raw.php?id=<?= (int)$row['id'] ?>&field=html"><?= show_value($row['html_len']) ?></a>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
+                        </td>
+                        <td class="nowrap">
+                            <?php if (!empty($row['text_len'])): ?>
+                                <a href="admin_raw.php?id=<?= (int)$row['id'] ?>&field=text"><?= show_value($row['text_len']) ?></a>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
+                        </td>
+                        <td class="nowrap">
+                            <?php if (!empty($row['jsonld_len'])): ?>
+                                <a href="admin_raw.php?id=<?= (int)$row['id'] ?>&field=jsonld"><?= show_value($row['jsonld_len']) ?></a>
+                            <?php else: ?>
+                                —
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+                <?php if (!$raw_pages): ?>
+                    <tr>
+                        <td colspan="11">No raw pages match the filters.</td>
+                    </tr>
+                <?php endif; ?>
+            </table>
+            <div class="actions">
+                <button type="submit">Parse selected unparsed</button>
+            </div>
+        </form>
     </div>
 
     <div class="panel">
@@ -355,6 +457,7 @@ $ai_latest = $pdo->query('
             <tr>
                 <th>ID</th>
                 <th>URL</th>
+                <th>Company</th>
                 <th>Title</th>
                 <th>Description</th>
                 <th>Price</th>
@@ -383,6 +486,7 @@ $ai_latest = $pdo->query('
                             —
                         <?php endif; ?>
                     </td>
+                    <td><?= esc(company_name($row['raw_domain'] ?? null)) ?></td>
                     <td><?= show_value($row['title']) ?></td>
                     <td class="nowrap">
                         <?php if (!empty($row['description'])): ?>
@@ -418,7 +522,7 @@ $ai_latest = $pdo->query('
             <?php endforeach; ?>
             <?php if (!$ai_latest): ?>
                 <tr>
-                    <td colspan="20">No AI-parsed listings yet.</td>
+                    <td colspan="21">No AI-parsed listings yet.</td>
                 </tr>
             <?php endif; ?>
         </table>
@@ -458,6 +562,15 @@ if (openAiForm && openAiPrompt && openAiResponseBox) {
         } catch (err) {
             openAiResponseBox.textContent = 'Request failed.';
         }
+    });
+}
+
+const selectAllUnparsedBtn = document.getElementById('select-all-unparsed');
+if (selectAllUnparsedBtn) {
+    selectAllUnparsedBtn.addEventListener('click', function () {
+        document.querySelectorAll('.parse-checkbox').forEach(function (cb) {
+            cb.checked = true;
+        });
     });
 }
 </script>
