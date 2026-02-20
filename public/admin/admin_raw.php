@@ -1,31 +1,30 @@
 <?php
 
+// DB-forbindelse
 require_once __DIR__ . '/../../config/db.php';
 
+// Simpel escaping til output
 function esc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
+// Vælg database
 $target_db = 'test2firstlisting';
-$db_error = null;
+$pdo->exec("USE {$target_db}");
 
-try {
-    $pdo->exec("USE {$target_db}");
-} catch (PDOException $e) {
-    $db_error = $e->getMessage();
-}
-
+// Hent parametre fra URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $field = $_GET['field'] ?? '';
-$allowed_fields = ['html', 'text', 'jsonld'];
 $field_map = [
     'html' => 'html_raw',
     'text' => 'text_raw',
     'jsonld' => 'jsonld_raw',
 ];
 
+// Hvis input er ugyldigt, vis ingen data
 $row = null;
-if ($db_error === null && $id > 0 && in_array($field, $allowed_fields, true)) {
+if ($id > 0 && isset($field_map[$field])) {
+    // Hent rå indhold (html/text/jsonld) for valgt id
     $stmt = $pdo->prepare(
         'SELECT id, url, domain, ' . $field_map[$field] . ' AS content
          FROM raw_pages
@@ -48,11 +47,7 @@ if ($db_error === null && $id > 0 && in_array($field, $allowed_fields, true)) {
     <h1>Raw data</h1>
     <div class="muted">View stored HTML/text/JSON-LD</div>
 
-    <?php if ($db_error !== null): ?>
-        <div class="panel">
-            <strong>Database error:</strong> <?= esc($db_error) ?>
-        </div>
-    <?php elseif (!$row): ?>
+    <?php if (!$row): ?>
         <div class="panel">
             <strong>No data found.</strong> Check the ID and field.
         </div>

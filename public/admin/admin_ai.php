@@ -1,26 +1,24 @@
 <?php
 
+// DB-forbindelse
 require_once __DIR__ . '/../../config/db.php';
 
+// Simpel escaping til output
 function esc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
+// Vælg database
 $target_db = 'test2firstlisting';
-$db_error = null;
+$pdo->exec("USE {$target_db}");
 
-try {
-    $pdo->exec("USE {$target_db}");
-} catch (PDOException $e) {
-    $db_error = $e->getMessage();
-}
-
+// Hent parametre fra URL
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $field = $_GET['field'] ?? '';
-$allowed_fields = ['description'];
 
+// Hvis input er gyldigt, hent AI-row
 $row = null;
-if ($db_error === null && $id > 0 && in_array($field, $allowed_fields, true)) {
+if ($id > 0 && $field === 'description') {
     $stmt = $pdo->prepare(
         'SELECT id, raw_page_id, title, description
          FROM ai_listings
@@ -43,11 +41,7 @@ if ($db_error === null && $id > 0 && in_array($field, $allowed_fields, true)) {
     <h1>AI data</h1>
     <div class="muted">View AI-parsed description</div>
 
-    <?php if ($db_error !== null): ?>
-        <div class="panel">
-            <strong>Database error:</strong> <?= esc($db_error) ?>
-        </div>
-    <?php elseif (!$row): ?>
+    <?php if (!$row): ?>
         <div class="panel">
             <strong>No data found.</strong> Check the ID and field.
         </div>

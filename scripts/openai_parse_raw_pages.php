@@ -2,21 +2,16 @@
 
 declare(strict_types=1);
 
+// DB-forbindelse
 require_once __DIR__ . '/../config/db.php';
 
-/*
-Simple OpenAI parser for school MVP:
-1) Read raw_pages
-2) Preprocess HTML/Text/JSON-LD to reduce tokens
-3) Ask OpenAI for structured JSON
-4) Upsert into ai_listings
-*/
-
+// Standard-indstillinger
 $MODEL = 'gpt-4.1-mini';
 $LIMIT = 1;
 $RAW_ID = null;
 $FORCE = false;
 
+// CLI-parametre: --limit=, --id=, --force, --model=
 foreach (array_slice($argv, 1) as $arg) {
     if (str_starts_with($arg, '--limit=')) {
         $LIMIT = max(1, (int)substr($arg, 8));
@@ -29,33 +24,21 @@ foreach (array_slice($argv, 1) as $arg) {
     }
 }
 
-function load_env_file(string $path): void
+// Læs API-nøgle direkte fra .env (kun OPENAI_API_KEY)
+function read_api_key(string $envPath): string
 {
-    if (!is_file($path) || !is_readable($path)) return;
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    if (!is_array($lines)) return;
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
-        [$name, $value] = array_map('trim', explode('=', $line, 2));
-        if ($name === '') continue;
-        if (
-            (str_starts_with($value, '"') && str_ends_with($value, '"')) ||
-            (str_starts_with($value, "'") && str_ends_with($value, "'"))
-        ) {
-            $value = substr($value, 1, -1);
-        }
-        putenv($name . '=' . $value);
-        $_ENV[$name] = $value;
-        $_SERVER[$name] = $value;
+    $env = @parse_ini_file($envPath);
+    if (!is_array($env)) {
+        return '';
     }
+    return trim((string)($env['OPENAI_API_KEY'] ?? ''), "\"'");
 }
 
-function get_api_key(): string
-{
-    return (string)(getenv('OPENAI_API_KEY') ?: getenv('OPENAIAPI') ?: '');
-}
-
+// Klargør HTML til AI 
+// Output består af:
+// 1) TARGETED_SNIPPETS: title, headers og linjer med nøgleord (price, sqm, rooms osv.)
+// 2) MAIN_TEXT: almindelig tekst fra HTML (renset)
+// Begge dele afkortes med mb_substr -> færre tokens.
 function preprocess_html(string $html): string
 {
     if ($html === '') return '';
@@ -94,6 +77,9 @@ function preprocess_html(string $html): string
     return $out;
 }
 
+// Find gode description-kandidater direkte i HTML.
+// De her bruges som første prioritet for feltet "description",
+// så modellen ikke gætter eller forkorter unødigt.
 function extract_description_candidates(string $html): string
 {
     if ($html === '') return '';
@@ -116,7 +102,6 @@ function extract_description_candidates(string $html): string
         }
     }
 
-    // Keep longest relevant description blocks first.
     usort($candidates, function ($a, $b) {
         return mb_strlen((string)$b, 'UTF-8') <=> mb_strlen((string)$a, 'UTF-8');
     });
@@ -127,16 +112,19 @@ function extract_description_candidates(string $html): string
 
 function preprocess_text(string $text): string
 {
+    // text_raw bliver fladet ud og afkortet.
     $text = trim(preg_replace('/\s+/u', ' ', $text) ?? $text);
     return mb_substr($text, 0, 3000, 'UTF-8');
 }
 
 function preprocess_jsonld(string $jsonld): string
 {
+    // jsonld_raw afkortes, fordi vi kun bruger det som sidste fallback-kilde.
     $jsonld = trim($jsonld);
     return mb_substr($jsonld, 0, 2500, 'UTF-8');
 }
 
+// Forsøg at parse JSON, også hvis model svarer med markdown-codeblock
 function decode_json_response(string $content): ?array
 {
     $txt = trim($content);
@@ -165,12 +153,13 @@ function to_int_or_null($v): ?int
 
 function to_text_or_null($v): ?string
 {
-    if ($v === null) return null;
+    if ($v === null || $v === '') return null;
     $s = trim((string)$v);
-    if ($s === '' || strtolower($s) === 'none' || strtolower($s) === 'null') return null;
+    if (in_array(strtolower($s), ['none', 'null'], true)) return null;
     return $s;
 }
 
+// Kald OpenAI og returner struktureret JSON-felter
 function call_openai_extract(string $apiKey, string $model, string $url, string $descriptionCandidates, string $htmlSnippet, string $textSnippet, string $jsonldSnippet, ?string &$error = null): ?array
 {
     $error = null;
@@ -205,21 +194,25 @@ Rules:
 - rooms = bedrooms count
 - bathrooms = bathrooms count
 - sqm = built/interior/living area
-- plot_sqm = land/plot area
+- plot_sqm/plot size = land/plot area
 - reference_id = ref/code/id for the listing
 
 URL:
 {$url}
 
+// 1) Bedste kilde til fuld description
 DESCRIPTION_CANDIDATES:
 {$descriptionCandidates}
 
+// 2) Primær kilde til felter som price/sqm/rooms/type/address/reference
 HTML_SNIPPETS:
 {$htmlSnippet}
 
+// 3) Backup-kilde hvis HTML mangler noget
 TEXT_SNIPPET:
 {$textSnippet}
 
+// 4) Sidste fallback-kilde
 JSONLD_SNIPPET:
 {$jsonldSnippet}
 PROMPT;
@@ -230,7 +223,7 @@ PROMPT;
             ['role' => 'system', 'content' => 'You are a strict data extractor.'],
             ['role' => 'user', 'content' => $prompt],
         ],
-        'temperature' => 0.0,
+        'temperature' => 0.0, //no inventa nada, como josevicente demonstraba 
         'response_format' => ['type' => 'json_object'],
     ];
 
@@ -252,13 +245,13 @@ PROMPT;
     }
 
     $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $env = json_decode((string)$response, true);
+    $body = json_decode((string)$response, true);
     if ($httpCode >= 400) {
-        $error = (string)($env['error']['message'] ?? ('HTTP ' . $httpCode));
+        $error = (string)($body['error']['message'] ?? ('HTTP ' . $httpCode));
         return null;
     }
 
-    $content = (string)($env['choices'][0]['message']['content'] ?? '');
+    $content = (string)($body['choices'][0]['message']['content'] ?? '');
     if ($content === '') {
         $error = 'Empty model response.';
         return null;
@@ -273,15 +266,17 @@ PROMPT;
     return $parsed;
 }
 
-load_env_file(__DIR__ . '/../.env');
-$apiKey = get_api_key();
+// Hent API-nøgle
+$apiKey = read_api_key(__DIR__ . '/../.env');
 if ($apiKey === '') {
-    fwrite(STDERR, "Missing OPENAI_API_KEY/OPENAIAPI in .env\n");
+    fwrite(STDERR, "Missing OPENAI_API_KEY in .env\n");
     exit(1);
 }
 
+// Vælg database
 $pdo->exec('USE test2firstlisting');
 
+// Hent rows der skal parses
 $sql = "SELECT rp.id, rp.url, rp.html_raw, rp.text_raw, rp.jsonld_raw
         FROM raw_pages rp
         LEFT JOIN ai_listings ai ON ai.raw_page_id = rp.id";
@@ -309,9 +304,15 @@ if (!$rows) {
 
 echo "Processing " . count($rows) . " row(s) with {$MODEL}...\n";
 
+// Parse hver row og skriv til ai_listings
 foreach ($rows as $row) {
     $id = (int)$row['id'];
     $url = (string)$row['url'];
+    // De 4 inputblokke der sendes til modellen:
+    // - descriptionCandidates: målrettet tekst til description
+    // - htmlSnippet: hovedkilde til strukturerede felter
+    // - textSnippet: backup
+    // - jsonldSnippet: sidste fallback
     $descriptionCandidates = extract_description_candidates((string)($row['html_raw'] ?? ''));
     $htmlSnippet = preprocess_html((string)($row['html_raw'] ?? ''));
     $textSnippet = preprocess_text((string)($row['text_raw'] ?? ''));
@@ -339,7 +340,7 @@ foreach ($rows as $row) {
     $agentPhone = to_text_or_null($ai['agent_phone'] ?? null);
     $agentEmail = to_text_or_null($ai['agent_email'] ?? null);
 
-    // Keep ai_listings.id aligned with raw_pages.id and remove prior mismatched rows.
+    // Hold ID ens mellem raw_pages og ai_listings
     $del = $pdo->prepare('DELETE FROM ai_listings WHERE raw_page_id = :rid_raw AND id <> :rid_id');
     $del->execute([':rid_raw' => $id, ':rid_id' => $id]);
 

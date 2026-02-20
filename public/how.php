@@ -30,12 +30,12 @@ $title = "How it works — FirstListing";
             <div class="step">
                 <div class="num">01</div>
                 <h3>Crawl & store</h3>
-                <p>We crawl a small set of sites and store raw HTML, text and JSON‑LD in MySQL.</p>
+                <p>We crawl (read) a small set of sites and store raw HTML, text and JSON‑LD in MySQL.</p>
             </div>
             <div class="step">
                 <div class="num">02</div>
                 <h3>AI organizes</h3>
-                <p>AI extracts structured fields (price, sqm, rooms, address) with confidence scores.</p>
+                <p>AI extracts structured fields (price, sqm, rooms, address).</p>
             </div>
             <div class="step">
                 <div class="num">03</div>

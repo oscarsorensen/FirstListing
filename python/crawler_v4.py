@@ -2,7 +2,7 @@ import json
 import re
 import time
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin, urldefrag
 
 import mysql.connector
 import requests
@@ -10,10 +10,8 @@ from lxml import html
 
 # === CONFIG ===
 
-# Replace with your target URLs
-START_URLS = [
-    "https://jensenestate.es/es/propiedad/1015/adosado-en-san-pedro-del-pinatar/"
-]
+SITE_ROOT = "https://jensenestate.es/"
+SITE_HOST = "jensenestate.es"
 
 DB_CONFIG = {
     "host": "localhost",
@@ -24,11 +22,10 @@ DB_CONFIG = {
     "use_unicode": True,
 }
 
-HEADERS = {
-    "User-Agent": "FirstListingBot/4.0 (+school MVP; respectful crawl)"
-}
-
-REQUEST_DELAY = 3
+HEADERS = {"User-Agent": "FirstListingBot/4.0 (+school MVP; respectful crawl)"}
+REQUEST_DELAY = 1.5
+TIMEOUT = 15
+MAX_BFS_PAGES = 25
 
 
 # === HELPERS ===
@@ -39,13 +36,22 @@ def clean_text(text):
     return re.sub(r"\s+", " ", text).strip()
 
 
+def is_listing_url(url):
+    # Jensen listing pages normally contain /propiedad/
+    return "/propiedad/" in url
+
+
+def normalize_url(url):
+    url = urldefrag(url)[0].strip()
+    if url.endswith("/") and len(url) > len("https://jensenestate.es/"):
+        url = url[:-1]
+    return url
+
+
 def extract_text_and_jsonld(html_bytes):
     tree = html.fromstring(html_bytes)
-
-    # text_raw
     text_raw = clean_text(" ".join(tree.itertext()))
 
-    # jsonld_raw: store as JSON list of objects
     jsonld_items = []
     for scr in tree.xpath("//script[@type='application/ld+json']/text()"):
         try:
@@ -63,7 +69,74 @@ def extract_text_and_jsonld(html_bytes):
     return text_raw, jsonld_raw
 
 
-def upsert_raw_page(cur, data):
+def discover_listing_urls():
+    # Crawl interne links (BFS) på jensenestate.es
+    listing_urls = set()
+
+    seeds = [
+        SITE_ROOT,
+        urljoin(SITE_ROOT, "es/"),
+        urljoin(SITE_ROOT, "en/"),
+        urljoin(SITE_ROOT, "es/propiedades/"),
+    ]
+    queue = [normalize_url(s) for s in seeds]
+    visited = set()
+    max_pages = MAX_BFS_PAGES
+
+    while queue and len(visited) < max_pages:
+        page_url = queue.pop(0)
+        if page_url in visited:
+            continue
+        visited.add(page_url)
+
+        try:
+            r = requests.get(page_url, headers=HEADERS, timeout=TIMEOUT)
+        except requests.RequestException:
+            continue
+        if r.status_code != 200:
+            continue
+
+        try:
+            tree = html.fromstring(r.content)
+        except Exception:
+            continue
+
+        for href in tree.xpath("//a/@href"):
+            href = normalize_url(urljoin(page_url, href))
+            parsed = urlparse(href)
+            if parsed.scheme not in ("http", "https"):
+                continue
+            if parsed.netloc not in (SITE_HOST, f"www.{SITE_HOST}"):
+                continue
+            if is_listing_url(href):
+                listing_urls.add(href)
+                continue
+            # Følg kun almindelige HTML-sider
+            if (
+                href not in visited
+                and href not in queue
+                and not href.endswith((".jpg", ".jpeg", ".png", ".webp", ".pdf", ".xml", ".zip"))
+            ):
+                queue.append(href)
+
+        print(f"[bfs {len(visited)}/{max_pages}] {page_url} | listings so far: {len(listing_urls)}")
+        time.sleep(0.2)
+
+    print(f"Found {len(listing_urls)} listing URLs from jensenestate.es crawl.")
+    return sorted(list(listing_urls))
+
+
+def url_exists(cur, url):
+    cur.execute("SELECT id FROM raw_pages WHERE url = %s LIMIT 1", (url,))
+    row = cur.fetchone()
+    return row[0] if row else None
+
+
+def touch_last_seen(cur, url):
+    cur.execute("UPDATE raw_pages SET fetched_at = NOW() WHERE url = %s", (url,))
+
+
+def insert_new_listing(cur, data):
     cur.execute(
         """
         INSERT INTO raw_pages (
@@ -71,15 +144,6 @@ def upsert_raw_page(cur, data):
             http_status, content_type, html_raw, text_raw, jsonld_raw
         )
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
-        ON DUPLICATE KEY UPDATE
-            domain = VALUES(domain),
-            first_seen_at = IF(first_seen_at IS NULL, VALUES(fetched_at), first_seen_at),
-            fetched_at = VALUES(fetched_at),
-            http_status = VALUES(http_status),
-            content_type = VALUES(content_type),
-            html_raw = VALUES(html_raw),
-            text_raw = VALUES(text_raw),
-            jsonld_raw = VALUES(jsonld_raw)
         """,
         (
             data["url"],
@@ -102,32 +166,55 @@ def run():
     cur = conn.cursor()
 
     try:
-        for url in START_URLS:
-            print("Fetching:", url)
-            time.sleep(REQUEST_DELAY)
+        listing_urls = discover_listing_urls()
+        if not listing_urls:
+            print("No listing URLs found.")
+            return
 
-            response = requests.get(url, headers=HEADERS, timeout=15)
-            status = response.status_code
-            content_type = response.headers.get("Content-Type", "")
+        print(f"Found {len(listing_urls)} listing URLs")
+
+        new_count = 0
+        seen_count = 0
+
+        for url in listing_urls:
+            existing_id = url_exists(cur, url)
+            if existing_id:
+                touch_last_seen(cur, url)
+                conn.commit()
+                seen_count += 1
+                print(f"SEEN (updated last seen): {url}")
+                continue
+
+            print(f"NEW (fetching): {url}")
+            try:
+                response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            except requests.RequestException:
+                print(f"FAILED fetch: {url}")
+                continue
 
             text_raw, jsonld_raw = extract_text_and_jsonld(response.content)
-
             parsed = urlparse(url)
+            now = datetime.now()
+
             data = {
                 "url": url,
                 "domain": parsed.netloc,
-                "first_seen_at": datetime.now(),
-                "fetched_at": datetime.now(),
-                "http_status": status,
-                "content_type": content_type,
+                "first_seen_at": now,
+                "fetched_at": now,
+                "http_status": response.status_code,
+                "content_type": response.headers.get("Content-Type", ""),
                 "html_raw": response.text,
                 "text_raw": text_raw,
                 "jsonld_raw": jsonld_raw,
             }
 
-            upsert_raw_page(cur, data)
+            insert_new_listing(cur, data)
             conn.commit()
-            print("UPSERTED:", url)
+            new_count += 1
+            print(f"INSERTED: {url}")
+            time.sleep(REQUEST_DELAY)
+
+        print(f"Done. New: {new_count}, Already seen: {seen_count}")
     finally:
         cur.close()
         conn.close()
