@@ -217,6 +217,8 @@ $has_jsonld = isset($_GET['has_jsonld']);
 $has_html = isset($_GET['has_html']);
 $has_text = isset($_GET['has_text']);
 $status_filter = trim($_GET['status'] ?? '');
+$sort_raw = trim($_GET['sort_raw'] ?? '');
+$sort_ai  = trim($_GET['sort_ai'] ?? '');
 
 // Build WHERE filters for the raw_pages query based on the active filter selections
 $where = [];
@@ -264,14 +266,17 @@ if ($where) {
     $sql .= ' WHERE ' . implode(' AND ', $where);
 }
 
-$sql .= ' ORDER BY is_parsed ASC, rp.fetched_at DESC LIMIT 50';
+$sql .= $sort_raw === 'id'
+    ? ' ORDER BY rp.id DESC LIMIT 50'
+    : ' ORDER BY is_parsed ASC, rp.fetched_at DESC LIMIT 50';
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $raw_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch the latest AI-parsed listings to show in the table
-$ai_latest = $pdo->query('
+$ai_order = $sort_ai === 'id' ? 'ai.id DESC' : 'ai.created_at DESC';
+$ai_latest = $pdo->query("
     SELECT
         ai.id,
         ai.raw_page_id,
@@ -297,9 +302,9 @@ $ai_latest = $pdo->query('
         ai.created_at
     FROM ai_listings ai
     LEFT JOIN raw_pages rp ON rp.id = ai.raw_page_id
-    ORDER BY ai.created_at DESC
+    ORDER BY {$ai_order}
     LIMIT 20
-')->fetchAll(PDO::FETCH_ASSOC);
+")->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
 <!DOCTYPE html>
@@ -417,7 +422,7 @@ $ai_latest = $pdo->query('
         </form>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="raw-table">
         <h2>Raw pages (latest crawl data)</h2>
         <?php if ($parse_feedback): ?>
             <ul>
@@ -438,9 +443,14 @@ $ai_latest = $pdo->query('
         <form method="post" id="parse-unparsed-form">
             <input type="hidden" name="action" value="parse_selected">
             <table>
+                <?php
+                $raw_sort_params = $_GET;
+                if ($sort_raw === 'id') { unset($raw_sort_params['sort_raw']); } else { $raw_sort_params['sort_raw'] = 'id'; }
+                $raw_sort_url = '?' . http_build_query($raw_sort_params);
+                ?>
                 <tr>
                     <th>Parsed</th>
-                    <th>ID</th>
+                    <th>ID <a href="<?= esc($raw_sort_url) ?>#raw-table" class="sort-btn <?= $sort_raw === 'id' ? 'sort-btn-active' : '' ?>">sort</a></th>
                     <th>URL</th>
                     <th>Domain</th>
                     <th>First seen</th>
@@ -485,12 +495,17 @@ $ai_latest = $pdo->query('
         </form>
     </div>
 
-    <div class="panel">
+    <div class="panel" id="ai-table">
         <h2>AI-parsed listings </h2>
         <div class="table-wrap" style="max-height: 800px; overflow: auto;">
         <table>
+            <?php
+            $ai_sort_params = $_GET;
+            if ($sort_ai === 'id') { unset($ai_sort_params['sort_ai']); } else { $ai_sort_params['sort_ai'] = 'id'; }
+            $ai_sort_url = '?' . http_build_query($ai_sort_params);
+            ?>
             <tr>
-                <th>ID</th>
+                <th>ID <a href="<?= esc($ai_sort_url) ?>#ai-table" class="sort-btn <?= $sort_ai === 'id' ? 'sort-btn-active' : '' ?>">sort</a></th>
                 <th>URL</th>
                 <th>Company</th>
                 <th>Title</th>

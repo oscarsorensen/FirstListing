@@ -282,3 +282,17 @@ input[type="checkbox"] {
     max-height: 340px;
     overflow: auto;
 }
+
+.sort-btn {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 1px 6px;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    text-decoration: none;
+    vertical-align: middle;
+}
+.sort-btn:hover { border-color: var(--accent); color: var(--accent); }
+.sort-btn-active { border-color: var(--accent); color: var(--accent); }
