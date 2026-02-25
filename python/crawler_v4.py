@@ -1,8 +1,9 @@
 import json
 import re
+import sys
 import time
 from datetime import datetime
-from urllib.parse import urlparse, urljoin, urldefrag
+from urllib.parse import urlparse, urldefrag
 
 import mysql.connector
 import requests
@@ -12,6 +13,7 @@ from lxml import html
 
 SITE_ROOT = "https://jensenestate.es/"
 SITE_HOST = "jensenestate.es"
+LISTING_INDEX_URL = "https://jensenestate.es/es/propiedades/"
 
 DB_CONFIG = {
     "host": "localhost",
@@ -22,10 +24,12 @@ DB_CONFIG = {
     "use_unicode": True,
 }
 
-HEADERS = {"User-Agent": "FirstListingBot/4.0 (+school MVP; respectful crawl)"}
+HEADERS = {"User-Agent": "FirstListingBot/4.0 (+school MVP; allowed by Gitte, respectful crawl)"}
 REQUEST_DELAY = 1.5
 TIMEOUT = 15
-MAX_BFS_PAGES = 25
+DEFAULT_MAX_LISTINGS = 50
+PAGINATION_STEP = 12
+MAX_CATALOG_PAGES = 40
 
 
 # === HELPERS ===
@@ -37,8 +41,8 @@ def clean_text(text):
 
 
 def is_listing_url(url):
-    # Jensen listing pages normally contain /propiedad/
-    return "/propiedad/" in url
+    # Kun spanske listing-URLs: /es/propiedad/<tal>[/slug]
+    return re.match(r"^https://jensenestate\.es/es/propiedad/\d+(?:/[^?#]*)?$", url) is not None
 
 
 def normalize_url(url):
@@ -69,26 +73,21 @@ def extract_text_and_jsonld(html_bytes):
     return text_raw, jsonld_raw
 
 
-def discover_listing_urls():
-    # Crawl interne links (BFS) på jensenestate.es
+def catalog_url_for_offset(offset):
+    # Første side er uden query-string
+    if offset <= 1:
+        return LISTING_INDEX_URL
+    return f"{LISTING_INDEX_URL}?p={offset}"
+
+
+def discover_listing_urls(max_listings):
+    # Crawl katalogsider med kendt pagination-mønster: p=1,13,25,37...
     listing_urls = set()
+    offsets = [1 + (i * PAGINATION_STEP) for i in range(MAX_CATALOG_PAGES)]
+    pages_without_new = 0
 
-    seeds = [
-        SITE_ROOT,
-        urljoin(SITE_ROOT, "es/"),
-        urljoin(SITE_ROOT, "en/"),
-        urljoin(SITE_ROOT, "es/propiedades/"),
-    ]
-    queue = [normalize_url(s) for s in seeds]
-    visited = set()
-    max_pages = MAX_BFS_PAGES
-
-    while queue and len(visited) < max_pages:
-        page_url = queue.pop(0)
-        if page_url in visited:
-            continue
-        visited.add(page_url)
-
+    for index, offset in enumerate(offsets, start=1):
+        page_url = normalize_url(catalog_url_for_offset(offset))
         try:
             r = requests.get(page_url, headers=HEADERS, timeout=TIMEOUT)
         except requests.RequestException:
@@ -101,8 +100,9 @@ def discover_listing_urls():
         except Exception:
             continue
 
+        before = len(listing_urls)
         for href in tree.xpath("//a/@href"):
-            href = normalize_url(urljoin(page_url, href))
+            href = normalize_url(href if href.startswith("http") else ("https://jensenestate.es" + href))
             parsed = urlparse(href)
             if parsed.scheme not in ("http", "https"):
                 continue
@@ -110,20 +110,38 @@ def discover_listing_urls():
                 continue
             if is_listing_url(href):
                 listing_urls.add(href)
-                continue
-            # Følg kun almindelige HTML-sider
-            if (
-                href not in visited
-                and href not in queue
-                and not href.endswith((".jpg", ".jpeg", ".png", ".webp", ".pdf", ".xml", ".zip"))
-            ):
-                queue.append(href)
+                if len(listing_urls) >= max_listings:
+                    print(f"Reached max listings ({max_listings}) during discovery.")
+                    return sorted(list(listing_urls))[:max_listings]
 
-        print(f"[bfs {len(visited)}/{max_pages}] {page_url} | listings so far: {len(listing_urls)}")
+        added = len(listing_urls) - before
+        if added == 0:
+            pages_without_new += 1
+        else:
+            pages_without_new = 0
+
+        print(f"[catalog {index}/{MAX_CATALOG_PAGES}] {page_url} | +{added} | listings so far: {len(listing_urls)}")
+
+        # Stop hvis flere sider i træk ikke giver nye listings
+        if pages_without_new >= 3:
+            print("Stopping discovery: 3 catalog pages in a row with no new listing links.")
+            break
+
         time.sleep(0.2)
 
-    print(f"Found {len(listing_urls)} listing URLs from jensenestate.es crawl.")
-    return sorted(list(listing_urls))
+    print(f"Found {len(listing_urls)} listing URLs from /es/propiedades crawl.")
+    return sorted(list(listing_urls))[:max_listings]
+
+
+def read_max_listings():
+    max_listings = DEFAULT_MAX_LISTINGS
+    for arg in sys.argv[1:]:
+        if arg.startswith("--max-listings="):
+            try:
+                max_listings = max(1, int(arg.split("=", 1)[1]))
+            except ValueError:
+                pass
+    return max_listings
 
 
 def url_exists(cur, url):
@@ -162,16 +180,17 @@ def insert_new_listing(cur, data):
 # === MAIN ===
 
 def run():
+    max_listings = read_max_listings()
     conn = mysql.connector.connect(**DB_CONFIG)
     cur = conn.cursor()
 
     try:
-        listing_urls = discover_listing_urls()
+        listing_urls = discover_listing_urls(max_listings)
         if not listing_urls:
             print("No listing URLs found.")
             return
 
-        print(f"Found {len(listing_urls)} listing URLs")
+        print(f"Found {len(listing_urls)} listing URLs (max {max_listings})")
 
         new_count = 0
         seen_count = 0

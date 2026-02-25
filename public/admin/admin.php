@@ -100,6 +100,7 @@ $pdo->exec("USE {$target_db}");
 $parse_feedback = [];
 $crawler_feedback = [];
 $selected_sites = ['jensenestate'];
+$crawl_max_listings = 50;
 $action = (string)($_POST['action'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'parse_selected') {
@@ -138,6 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
         $selected_sites = [];
     }
     $selected_sites = array_values(array_unique(array_map('strval', $selected_sites)));
+    $crawl_max_listings = max(1, (int)($_POST['crawl_max_listings'] ?? 50));
     $cmd = (string)($_POST['crawler_cmd'] ?? '');
 
     if ($cmd === 'run') {
@@ -150,9 +152,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
             $scriptPath = escapeshellarg($project_root . '/python/crawler_v4.py');
             $workdir = escapeshellarg($project_root);
             $logPath = escapeshellarg($crawler_log_file);
+            $maxListingsArg = '--max-listings=' . (int)$crawl_max_listings;
             $out = [];
             $code = 1;
-            $runCmd = "cd {$workdir} && {$pythonBin} {$scriptPath} > {$logPath} 2>&1 & echo $!";
+            $runCmd = "cd {$workdir} && {$pythonBin} -u {$scriptPath} {$maxListingsArg} > {$logPath} 2>&1 & echo $!";
             exec($runCmd, $out, $code);
             $pid = (int)trim((string)($out[0] ?? '0'));
             if ($code === 0 && $pid > 0) {
@@ -431,10 +434,16 @@ $ai_latest = $pdo->query('
                 <input type="hidden" name="action" value="crawler_control">
                 <div class="field">
                     <label>Sites to crawl</label>
-                    <label class="check-label">
-                        <input type="checkbox" name="crawl_sites[]" value="jensenestate" <?= in_array('jensenestate', $selected_sites, true) ? 'checked' : '' ?>>
-                        Jensen Estate
-                    </label>
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <label class="check-label">
+                            <input type="checkbox" name="crawl_sites[]" value="jensenestate" <?= in_array('jensenestate', $selected_sites, true) ? 'checked' : '' ?>>
+                            Jensen Estate
+                        </label>
+                        <label class="check-label" for="crawl_max_listings" style="display:flex; gap:8px; align-items:center;">
+                            Max listings
+                            <input type="number" id="crawl_max_listings" name="crawl_max_listings" min="1" step="1" value="<?= (int)$crawl_max_listings ?>" style="width:90px;">
+                        </label>
+                    </div>
                 </div>
                 <div class="actions">
                     <button type="submit" name="crawler_cmd" value="run">Run Crawler</button>
@@ -493,7 +502,8 @@ $ai_latest = $pdo->query('
         <?php endif; ?>
         <div class="actions">
             <button type="button" id="select-all-unparsed">Select all unparsed</button>
-            <button type="submit" id="parse-selected-btn" form="parse-unparsed-form">Parse selected unparsed</button>
+            <button type="button" id="deselect-all-unparsed">Deselect all</button>
+            <button type="submit" id="parse-selected-btn" form="parse-unparsed-form">Parse selected</button>
             <span id="parse-loading" class="muted" style="display: none;">Parsing</span>
         </div>
     </div>
@@ -550,7 +560,7 @@ $ai_latest = $pdo->query('
     </div>
 
     <div class="panel">
-        <h2>Latest AI-parsed listings (if available)</h2>
+        <h2>AI-parsed listings </h2>
         <div class="table-wrap" style="max-height: 800px; overflow: auto;">
         <table>
             <tr>
@@ -573,7 +583,7 @@ $ai_latest = $pdo->query('
                 <th>Email</th>
                 <th>First seen</th>
                 <th>Last seen</th>
-                <th>Created</th>
+                <th>Created (in AI-parsed)</th>
             </tr>
             <?php foreach ($ai_latest as $row): ?>
                 <tr>
@@ -656,9 +666,15 @@ openAiForm.addEventListener('submit', async function (e) {
 });
 
 const selectAllUnparsedBtn = document.getElementById('select-all-unparsed');
+const deselectAllUnparsedBtn = document.getElementById('deselect-all-unparsed');
 selectAllUnparsedBtn.addEventListener('click', function () {
     document.querySelectorAll('.parse-checkbox').forEach(function (cb) {
         cb.checked = true;
+    });
+});
+deselectAllUnparsedBtn.addEventListener('click', function () {
+    document.querySelectorAll('.parse-checkbox').forEach(function (cb) {
+        cb.checked = false;
     });
 });
 
