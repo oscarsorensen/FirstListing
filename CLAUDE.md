@@ -4,12 +4,14 @@
 
 **FirstListing** is a school project (MVP) built by a first-year Desarrollo Aplicaciones Web (DAW) student.
 
+The developer's name is **Oscar**.
+
 ## Code Style & Complexity Rules
 
 - **Keep it simple.** This is a school project — code must be readable and understandable by an advanced first-year DAW student.
 - Avoid over-engineering. No unnecessary abstractions, design patterns, or frameworks.
 - Prefer clear, explicit code over clever or compact code.
-- Add comments where logic isn't immediately obvious.
+- Always use `#` comments (Python) or `//` comments (PHP/JS) placed **above** the code block they describe — never docstrings or inline comments at the end of a line unless very short
 - Do not introduce new libraries or tools without a good reason and explicit approval.
 
 ## Tech Stack

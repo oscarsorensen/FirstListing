@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-// DB-forbindelse
+// Connect to the database
 require_once __DIR__ . '/../config/db.php';
 
-// Standard-indstillinger
+// Default settings — can be overridden via CLI arguments
 $MODEL = 'gpt-4.1-mini';
 $LIMIT = 1;
 $RAW_ID = null;
 $FORCE = false;
 
-// CLI-parametre: --limit=, --id=, --force, --model=
+// Read CLI arguments: --limit=N, --id=N, --force, --model=name
 foreach (array_slice($argv, 1) as $arg) {
     if (str_starts_with($arg, '--limit=')) {
         $LIMIT = max(1, (int)substr($arg, 8));
@@ -24,7 +24,7 @@ foreach (array_slice($argv, 1) as $arg) {
     }
 }
 
-// Læs API-nøgle direkte fra .env (kun OPENAI_API_KEY)
+// Read the OpenAI API key from the .env file
 function read_api_key(string $envPath): string
 {
     $env = @parse_ini_file($envPath);
@@ -34,30 +34,34 @@ function read_api_key(string $envPath): string
     return trim((string)($env['OPENAI_API_KEY'] ?? ''), "\"'");
 }
 
-// Klargør HTML til AI 
-// Output består af:
-// 1) TARGETED_SNIPPETS: title, headers og linjer med nøgleord (price, sqm, rooms osv.)
-// 2) MAIN_TEXT: almindelig tekst fra HTML (renset)
-// Begge dele afkortes med mb_substr -> færre tokens.
+// Prepare the raw HTML for the AI by extracting only the most useful parts.
+// Output has two sections:
+// 1) TARGETED_SNIPPETS: title, headers, and lines containing keywords (price, sqm, rooms etc.)
+// 2) MAIN_TEXT: all visible text from the page, cleaned and trimmed
 function preprocess_html(string $html): string
 {
     if ($html === '') return '';
 
+    // Remove comments, scripts, styles and extra whitespace
     $html = preg_replace('/<!--.*?-->/s', ' ', $html) ?? $html;
     $html = preg_replace('/<(script|style|noscript|svg)[^>]*>.*?<\/\\1>/is', ' ', $html) ?? $html;
     $html = preg_replace('/\s+/u', ' ', $html) ?? $html;
 
     $snippets = [];
 
+    // Extract the page title
     if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $m)) {
         $snippets[] = 'TITLE: ' . trim(strip_tags($m[1]));
     }
+
+    // Extract the first 4 headings (h1, h2)
     if (preg_match_all('/<h[1-2][^>]*>(.*?)<\/h[1-2]>/is', $html, $hm)) {
         foreach (array_slice($hm[1], 0, 4) as $h) {
             $snippets[] = 'HEADER: ' . trim(strip_tags($h));
         }
     }
 
+    // Extract lines that contain real-estate keywords like price, sqm, rooms etc.
     $keywords = '(price|precio|€|eur|m²|sqm|bed|room|bath|baño|bano|reference|ref|agent|agency|phone|email|address|location)';
     if (preg_match_all('/[^<>]{0,120}' . $keywords . '[^<>]{0,120}/iu', $html, $km)) {
         foreach (array_slice($km[0], 0, 80) as $line) {
@@ -68,6 +72,7 @@ function preprocess_html(string $html): string
         }
     }
 
+    // Combine snippets and main text, trim both to stay within token limits
     $joined = implode("\n", array_unique($snippets));
     $mainText = trim(strip_tags($html));
     $mainText = preg_replace('/\s+/u', ' ', $mainText) ?? $mainText;
@@ -77,15 +82,16 @@ function preprocess_html(string $html): string
     return $out;
 }
 
-// Find gode description-kandidater direkte i HTML.
-// De her bruges som første prioritet for feltet "description",
-// så modellen ikke gætter eller forkorter unødigt.
+// Try to find the full property description text directly in the HTML.
+// This is sent to the AI as the primary source for the "description" field
+// so it doesn't summarise or rewrite the text.
 function extract_description_candidates(string $html): string
 {
     if ($html === '') return '';
 
     $candidates = [];
 
+    // Check the <meta name="description"> tag first
     if (preg_match('/<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']/is', $html, $m)) {
         $meta = trim(html_entity_decode(strip_tags((string)$m[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         if ($meta !== '') {
@@ -93,6 +99,7 @@ function extract_description_candidates(string $html): string
         }
     }
 
+    // Then look for divs/sections with description-related class names
     if (preg_match_all('/<(section|div|article|p)[^>]*(description|descripcion|property-description|listing-description)[^>]*>(.*?)<\/\\1>/is', $html, $m)) {
         foreach ($m[3] as $chunk) {
             $txt = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string)$chunk), ENT_QUOTES | ENT_HTML5, 'UTF-8')) ?? '');
@@ -102,6 +109,7 @@ function extract_description_candidates(string $html): string
         }
     }
 
+    // Sort by length (longest first) and remove duplicates
     usort($candidates, function ($a, $b) {
         return mb_strlen((string)$b, 'UTF-8') <=> mb_strlen((string)$a, 'UTF-8');
     });
@@ -110,21 +118,22 @@ function extract_description_candidates(string $html): string
     return mb_substr(implode("\n\n", array_slice($candidates, 0, 5)), 0, 12000, 'UTF-8');
 }
 
+// Clean and trim the plain text version of the page
 function preprocess_text(string $text): string
 {
-    // text_raw bliver fladet ud og afkortet.
     $text = trim(preg_replace('/\s+/u', ' ', $text) ?? $text);
     return mb_substr($text, 0, 3000, 'UTF-8');
 }
 
+// Clean and trim the JSON-LD data — used as a last fallback source
 function preprocess_jsonld(string $jsonld): string
 {
-    // jsonld_raw afkortes, fordi vi kun bruger det som sidste fallback-kilde.
     $jsonld = trim($jsonld);
     return mb_substr($jsonld, 0, 2500, 'UTF-8');
 }
 
-// Forsøg at parse JSON, også hvis model svarer med markdown-codeblock
+// Try to parse a JSON response from the model.
+// Handles cases where the model wraps the JSON in a markdown code block (```json ... ```)
 function decode_json_response(string $content): ?array
 {
     $txt = trim($content);
@@ -133,6 +142,8 @@ function decode_json_response(string $content): ?array
     $txt = preg_replace('/\s*```$/', '', $txt) ?? $txt;
     $arr = json_decode($txt, true);
     if (is_array($arr)) return $arr;
+
+    // As a fallback, try to extract just the JSON object from the response
     $start = strpos($txt, '{');
     $end = strrpos($txt, '}');
     if ($start !== false && $end !== false && $end > $start) {
@@ -143,6 +154,7 @@ function decode_json_response(string $content): ?array
     return null;
 }
 
+// Convert a value to an integer, or null if it's empty or not numeric
 function to_int_or_null($v): ?int
 {
     if ($v === null || $v === '') return null;
@@ -151,6 +163,7 @@ function to_int_or_null($v): ?int
     return $n === '' ? null : (int)$n;
 }
 
+// Convert a value to a string, or null if it's empty or literally "none"/"null"
 function to_text_or_null($v): ?string
 {
     if ($v === null || $v === '') return null;
@@ -159,10 +172,13 @@ function to_text_or_null($v): ?string
     return $s;
 }
 
-// Kald OpenAI og returner struktureret JSON-felter
+// Send the prepared data to OpenAI and return the extracted fields as an array.
+// Returns null if the request fails or the model returns invalid data.
 function call_openai_extract(string $apiKey, string $model, string $url, string $descriptionCandidates, string $htmlSnippet, string $textSnippet, string $jsonldSnippet, ?string &$error = null): ?array
 {
     $error = null;
+
+    // The prompt tells the model exactly what to extract and in what format
     $prompt = <<<PROMPT
 Extract real-estate fields from the provided source snippets.
 Priority: DESCRIPTION_CANDIDATES first, then HTML_SNIPPETS, then TEXT_SNIPPET, then JSONLD_SNIPPET.
@@ -200,33 +216,31 @@ Rules:
 URL:
 {$url}
 
-// 1) Bedste kilde til fuld description
 DESCRIPTION_CANDIDATES:
 {$descriptionCandidates}
 
-// 2) Primær kilde til felter som price/sqm/rooms/type/address/reference
 HTML_SNIPPETS:
 {$htmlSnippet}
 
-// 3) Backup-kilde hvis HTML mangler noget
 TEXT_SNIPPET:
 {$textSnippet}
 
-// 4) Sidste fallback-kilde
 JSONLD_SNIPPET:
 {$jsonldSnippet}
 PROMPT;
 
+    // Build the request payload
     $payload = [
         'model' => $model,
         'messages' => [
             ['role' => 'system', 'content' => 'You are a strict data extractor.'],
             ['role' => 'user', 'content' => $prompt],
         ],
-        'temperature' => 0.0, //no inventa nada, como josevicente demonstraba 
+        'temperature' => 0.0,
         'response_format' => ['type' => 'json_object'],
     ];
 
+    // Send the request to OpenAI using cURL
     $ch = curl_init('https://api.openai.com/v1/chat/completions');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
@@ -244,6 +258,7 @@ PROMPT;
         return null;
     }
 
+    // Check for HTTP errors
     $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $body = json_decode((string)$response, true);
     if ($httpCode >= 400) {
@@ -251,12 +266,14 @@ PROMPT;
         return null;
     }
 
+    // Extract the model's reply text
     $content = (string)($body['choices'][0]['message']['content'] ?? '');
     if ($content === '') {
         $error = 'Empty model response.';
         return null;
     }
 
+    // Parse the JSON from the reply
     $parsed = decode_json_response($content);
     if (!is_array($parsed)) {
         $error = 'Model did not return valid JSON.';
@@ -266,25 +283,27 @@ PROMPT;
     return $parsed;
 }
 
-// Hent API-nøgle
+// Load the API key — stop if it's missing
 $apiKey = read_api_key(__DIR__ . '/../.env');
 if ($apiKey === '') {
     fwrite(STDERR, "Missing OPENAI_API_KEY in .env\n");
     exit(1);
 }
 
-// Vælg database
+// Select the correct database
 $pdo->exec('USE test2firstlisting');
 
-// Hent rows der skal parses
+// Build the query to select raw pages that haven't been parsed yet (or all if --force)
 $sql = "SELECT rp.id, rp.url, rp.html_raw, rp.text_raw, rp.jsonld_raw
         FROM raw_pages rp
         LEFT JOIN ai_listings ai ON ai.raw_page_id = rp.id";
 $params = [];
 if ($RAW_ID !== null) {
+    // Parse a specific row by ID
     $sql .= " WHERE rp.id = :raw_id";
     $params[':raw_id'] = $RAW_ID;
 } elseif (!$FORCE) {
+    // Only parse rows that have no AI result yet, or where the page was re-fetched
     $sql .= " WHERE ai.id IS NULL OR rp.fetched_at > ai.updated_at";
 }
 $sql .= " ORDER BY rp.fetched_at DESC LIMIT :lim";
@@ -304,20 +323,18 @@ if (!$rows) {
 
 echo "Processing " . count($rows) . " row(s) with {$MODEL}...\n";
 
-// Parse hver row og skriv til ai_listings
+// Loop through each row, send it to OpenAI, and save the result to ai_listings
 foreach ($rows as $row) {
     $id = (int)$row['id'];
     $url = (string)$row['url'];
-    // De 4 inputblokke der sendes til modellen:
-    // - descriptionCandidates: målrettet tekst til description
-    // - htmlSnippet: hovedkilde til strukturerede felter
-    // - textSnippet: backup
-    // - jsonldSnippet: sidste fallback
-    $descriptionCandidates = extract_description_candidates((string)($row['html_raw'] ?? ''));
-    $htmlSnippet = preprocess_html((string)($row['html_raw'] ?? ''));
-    $textSnippet = preprocess_text((string)($row['text_raw'] ?? ''));
-    $jsonldSnippet = preprocess_jsonld((string)($row['jsonld_raw'] ?? ''));
 
+    // Prepare the four input blocks sent to the model
+    $descriptionCandidates = extract_description_candidates((string)($row['html_raw'] ?? ''));
+    $htmlSnippet            = preprocess_html((string)($row['html_raw'] ?? ''));
+    $textSnippet            = preprocess_text((string)($row['text_raw'] ?? ''));
+    $jsonldSnippet          = preprocess_jsonld((string)($row['jsonld_raw'] ?? ''));
+
+    // Call OpenAI and get the extracted fields
     $err = null;
     $ai = call_openai_extract($apiKey, $MODEL, $url, $descriptionCandidates, $htmlSnippet, $textSnippet, $jsonldSnippet, $err);
     if (!is_array($ai)) {
@@ -325,25 +342,23 @@ foreach ($rows as $row) {
         continue;
     }
 
-    $title = to_text_or_null($ai['title'] ?? null);
-    $description = to_text_or_null($ai['description'] ?? null);
-    $price = to_int_or_null($ai['price'] ?? null);
-    $sqm = to_int_or_null($ai['sqm'] ?? null);
-    $rooms = to_int_or_null($ai['rooms'] ?? null);
-    $bathrooms = to_int_or_null($ai['bathrooms'] ?? null);
-    $plotSqm = to_int_or_null($ai['plot_sqm'] ?? null);
+    // Convert each field to the correct type (int or string), or null if missing
+    $title        = to_text_or_null($ai['title'] ?? null);
+    $description  = to_text_or_null($ai['description'] ?? null);
+    $price        = to_int_or_null($ai['price'] ?? null);
+    $sqm          = to_int_or_null($ai['sqm'] ?? null);
+    $rooms        = to_int_or_null($ai['rooms'] ?? null);
+    $bathrooms    = to_int_or_null($ai['bathrooms'] ?? null);
+    $plotSqm      = to_int_or_null($ai['plot_sqm'] ?? null);
     $propertyType = to_text_or_null($ai['property_type'] ?? null);
-    $listingType = to_text_or_null($ai['listing_type'] ?? null);
-    $address = to_text_or_null($ai['address'] ?? null);
-    $referenceId = to_text_or_null($ai['reference_id'] ?? null);
-    $agentName = to_text_or_null($ai['agent_name'] ?? null);
-    $agentPhone = to_text_or_null($ai['agent_phone'] ?? null);
-    $agentEmail = to_text_or_null($ai['agent_email'] ?? null);
+    $listingType  = to_text_or_null($ai['listing_type'] ?? null);
+    $address      = to_text_or_null($ai['address'] ?? null);
+    $referenceId  = to_text_or_null($ai['reference_id'] ?? null);
+    $agentName    = to_text_or_null($ai['agent_name'] ?? null);
+    $agentPhone   = to_text_or_null($ai['agent_phone'] ?? null);
+    $agentEmail   = to_text_or_null($ai['agent_email'] ?? null);
 
-    // Hold ID ens mellem raw_pages og ai_listings
-    $del = $pdo->prepare('DELETE FROM ai_listings WHERE raw_page_id = :rid_raw AND id <> :rid_id');
-    $del->execute([':rid_raw' => $id, ':rid_id' => $id]);
-
+    // Insert or update the AI result in ai_listings
     $upsert = "INSERT INTO ai_listings
         (id, raw_page_id, title, property_type, listing_type, description, price, currency, sqm, plot_sqm, rooms, bathrooms,
          address, reference_id, agent_name, agent_phone, agent_email, created_at, updated_at)
@@ -370,23 +385,23 @@ foreach ($rows as $row) {
 
     $ins = $pdo->prepare($upsert);
     $ins->execute([
-        ':id' => $id,
-        ':raw_page_id' => $id,
-        ':title' => $title,
+        ':id'            => $id,
+        ':raw_page_id'   => $id,
+        ':title'         => $title,
         ':property_type' => $propertyType,
-        ':listing_type' => $listingType,
-        ':description' => $description,
-        ':price' => $price,
-        ':currency' => 'EUR',
-        ':sqm' => $sqm,
-        ':plot_sqm' => $plotSqm,
-        ':rooms' => $rooms,
-        ':bathrooms' => $bathrooms,
-        ':address' => $address,
-        ':reference_id' => $referenceId,
-        ':agent_name' => $agentName,
-        ':agent_phone' => $agentPhone,
-        ':agent_email' => $agentEmail,
+        ':listing_type'  => $listingType,
+        ':description'   => $description,
+        ':price'         => $price,
+        ':currency'      => 'EUR',
+        ':sqm'           => $sqm,
+        ':plot_sqm'      => $plotSqm,
+        ':rooms'         => $rooms,
+        ':bathrooms'     => $bathrooms,
+        ':address'       => $address,
+        ':reference_id'  => $referenceId,
+        ':agent_name'    => $agentName,
+        ':agent_phone'   => $agentPhone,
+        ':agent_email'   => $agentEmail,
     ]);
 
     echo "[raw_page_id={$id}] Parsed and saved\n";

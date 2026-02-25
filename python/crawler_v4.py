@@ -33,6 +33,8 @@ DEFAULT_MAX_LISTINGS = 50
 
 # === HELPERS ===
 
+
+
 def clean_text(text):
     """Remove extra whitespace from a string."""
     if not text:

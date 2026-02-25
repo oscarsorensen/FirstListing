@@ -1,22 +1,22 @@
 <?php
 
-// DB-forbindelse
+// Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 
-// Simpel escaping til output
+// Escape a value for safe HTML output
 function esc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
-// Vælg database
+// Select the correct database
 $target_db = 'test2firstlisting';
 $pdo->exec("USE {$target_db}");
 
-// Hent parametre fra URL
+// Read the ID and field name from the URL (?id=X&field=description)
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $field = $_GET['field'] ?? '';
 
-// Hvis input er gyldigt, hent AI-row
+// Only fetch data if the ID is valid and the field is "description"
 $row = null;
 if ($id > 0 && $field === 'description') {
     $stmt = $pdo->prepare(

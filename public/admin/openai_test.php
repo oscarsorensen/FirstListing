@@ -1,16 +1,16 @@
 <?php
 
-// Returner ren tekst til svar-boksen i admin
+// Return plain text so the response shows up in the admin test box
 header('Content-Type: text/plain; charset=UTF-8');
 
-// Tillad kun POST fra formularen
+// Only allow POST requests from the form
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo 'Method not allowed.';
     exit;
 }
 
-// Hent prompt fra formularen
+// Get the prompt from the form — stop if it's empty
 $prompt = trim((string)($_POST['prompt'] ?? ''));
 if ($prompt === '') {
     http_response_code(400);
@@ -18,7 +18,7 @@ if ($prompt === '') {
     exit;
 }
 
-// Læs API-nøgle fra .env
+// Read the API key from the .env file
 $env = @parse_ini_file(__DIR__ . '/../../.env');
 $apiKey = trim((string)($env['OPENAI_API_KEY'] ?? ''), "\"'");
 if ($apiKey === '') {
@@ -27,7 +27,7 @@ if ($apiKey === '') {
     exit;
 }
 
-// Byg request til OpenAI
+// Build the request payload for OpenAI
 $payload = [
     'model' => 'gpt-4.1-mini',
     'messages' => [
@@ -37,7 +37,7 @@ $payload = [
     'temperature' => 0.2,
 ];
 
-// Send request
+// Send the request to OpenAI using cURL
 $ch = curl_init('https://api.openai.com/v1/chat/completions');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -49,7 +49,7 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload, JSON_UNESCAPED_UNICOD
 curl_setopt($ch, CURLOPT_TIMEOUT, 60);
 $response = curl_exec($ch);
 
-// Returner svaret
+// Return the model's reply, or an error message if something went wrong
 if ($response === false) {
     http_response_code(500);
     echo 'Request failed.';

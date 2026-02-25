@@ -2,15 +2,15 @@
 
 session_start();
 
-// DB-forbindelse
+// Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 
-// Simpel escaping til HTML-output
+// Escape a value for safe HTML output
 function esc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
-// Vis tom værdi som streg
+// Return a dash if the value is empty, otherwise return it escaped
 function show_value($value) {
     if ($value === null || $value === '') {
         return '—';
@@ -18,7 +18,7 @@ function show_value($value) {
     return esc($value);
 }
 
-// Kort preview af lang tekst
+// Return a short preview of a long text, trimmed to the character limit
 function preview_text($value, $limit = 300) {
     if ($value === null || $value === '') {
         return '';
@@ -30,7 +30,7 @@ function preview_text($value, $limit = 300) {
     return substr($text, 0, $limit) . '…';
 }
 
-// Link hvis værdi findes, ellers streg
+// Return a clickable link if the URL exists, otherwise a dash
 function link_or_dash($url, $label = 'link') {
     if (!$url) {
         return '—';
@@ -38,7 +38,7 @@ function link_or_dash($url, $label = 'link') {
     return '<a href="' . esc($url) . '" target="_blank">' . esc($label) . '</a>';
 }
 
-// Link til raw felt hvis længde findes
+// Return a link to the raw data viewer if the field has content, otherwise a dash
 function raw_len_link($id, $field, $len) {
     if (!$len) {
         return '—';
@@ -46,7 +46,7 @@ function raw_len_link($id, $field, $len) {
     return '<a href="admin_raw.php?id=' . (int)$id . '&field=' . esc($field) . '">' . show_value($len) . '</a>';
 }
 
-// Tjek om crawler-proces stadig kører ud fra PID-fil
+// Check if the crawler process is still running by reading its PID from a file
 function crawler_is_running($pidFile) {
     if (!is_file($pidFile)) {
         return false;
@@ -61,7 +61,7 @@ function crawler_is_running($pidFile) {
     return $code === 0 && !empty($out);
 }
 
-// Omsæt domæne til firmanavn i tabellen
+// Convert a domain name to a readable company name for display in the table
 function company_name(?string $domain): string
 {
     $d = strtolower(trim((string)$domain));
@@ -69,6 +69,7 @@ function company_name(?string $domain): string
         return '—';
     }
 
+    // Known domains mapped to their company names
     $map = [
         'movr.es' => 'Movr',
         'www.movr.es' => 'Movr',
@@ -84,13 +85,14 @@ function company_name(?string $domain): string
         return $map[$d];
     }
 
+    // Fallback: clean up the domain name into something readable
     $host = preg_replace('/^www\./', '', $d) ?? $d;
     $host = preg_replace('/\.(com|es|net|org|eu)$/', '', $host) ?? $host;
     $host = str_replace(['-', '_'], ' ', $host);
     return ucwords(trim($host)) ?: '—';
 }
 
-// Grundopsætning
+// Basic setup — paths, database, and default values
 $target_db = 'test2firstlisting';
 $openai_model = 'gpt-4.1-mini';
 $project_root = realpath(__DIR__ . '/../../') ?: (__DIR__ . '/../../');
@@ -98,7 +100,7 @@ $crawler_pid_file = '/tmp/firstlisting_crawler.pid';
 $crawler_log_file = '/tmp/firstlisting_crawler.log';
 $pdo->exec("USE {$target_db}");
 
-// Parse valgte raw IDs fra tabellen
+// Initialise feedback arrays and read the POST action
 $parse_feedback = [];
 $crawler_feedback = $_SESSION['crawler_feedback'] ?? [];
 unset($_SESSION['crawler_feedback']);
@@ -106,8 +108,10 @@ $selected_sites = ['jensenestate'];
 $crawl_max_listings = 50;
 $action = (string)($_POST['action'] ?? '');
 
+// Handle the "Parse selected" form — runs the AI parser on the chosen raw pages
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'parse_selected') {
     $selectedIds = $_POST['raw_ids'] ?? [];
+    // Clean the IDs: convert to integers, remove duplicates and zeros
     $ids = array_values(array_unique(array_filter(array_map('intval', is_array($selectedIds) ? $selectedIds : []), fn($v) => $v > 0)));
 
     if (!$ids) {
@@ -118,6 +122,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'parse_selected') {
         $ok = 0;
         $failed = 0;
 
+        // Remove the time limit — OpenAI calls can take more than 30 seconds
+        set_time_limit(0);
+
+        // Run the parser script once for each selected ID
         foreach ($ids as $id) {
             $output = [];
             $code = 1;
@@ -136,6 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'parse_selected') {
     }
 }
 
+// Handle the crawler control form (run / stop / clear log)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
     $selected_sites = $_POST['crawl_sites'] ?? [];
     if (!is_array($selected_sites)) {
@@ -151,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
         } elseif (crawler_is_running($crawler_pid_file)) {
             $crawler_feedback[] = 'Crawler is already running.';
         } else {
+            // Start the crawler as a background process and save its PID to a file
             $pythonBin = escapeshellarg('/opt/homebrew/bin/python3');
             $scriptPath = escapeshellarg($project_root . '/python/crawler_v4.py');
             $workdir = escapeshellarg($project_root);
@@ -169,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
             }
         }
     } elseif ($cmd === 'stop') {
+        // Kill the crawler process using the saved PID
         if (!crawler_is_running($crawler_pid_file)) {
             $crawler_feedback[] = 'Crawler is not running.';
             @unlink($crawler_pid_file);
@@ -181,6 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
             $crawler_feedback[] = $code === 0 ? 'Crawler stopped.' : 'Could not stop crawler.';
         }
     } elseif ($cmd === 'clear_log') {
+        // Wipe the log file contents
         if (@file_put_contents($crawler_log_file, '') !== false) {
             $crawler_feedback[] = 'Crawler log cleared.';
         } else {
@@ -206,7 +218,7 @@ $has_html = isset($_GET['has_html']);
 $has_text = isset($_GET['has_text']);
 $status_filter = trim($_GET['status'] ?? '');
 
-// Byg filtre til raw_pages tabellen
+// Build WHERE filters for the raw_pages query based on the active filter selections
 $where = [];
 $params = [];
 
@@ -258,7 +270,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 $raw_pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Hent seneste AI-resultater
+// Fetch the latest AI-parsed listings to show in the table
 $ai_latest = $pdo->query('
     SELECT
         ai.id,

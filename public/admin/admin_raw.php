@@ -1,30 +1,32 @@
 <?php
 
-// DB-forbindelse
+// Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 
-// Simpel escaping til output
+// Escape a value for safe HTML output
 function esc($value) {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
 
-// Vælg database
+// Select the correct database
 $target_db = 'test2firstlisting';
 $pdo->exec("USE {$target_db}");
 
-// Hent parametre fra URL
+// Read the ID and field name from the URL (?id=X&field=html/text/jsonld)
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 $field = $_GET['field'] ?? '';
+
+// Map the short field name to the actual database column name
 $field_map = [
-    'html' => 'html_raw',
-    'text' => 'text_raw',
+    'html'   => 'html_raw',
+    'text'   => 'text_raw',
     'jsonld' => 'jsonld_raw',
 ];
 
-// Hvis input er ugyldigt, vis ingen data
+// Only fetch data if the ID and field are valid
 $row = null;
 if ($id > 0 && isset($field_map[$field])) {
-    // Hent rå indhold (html/text/jsonld) for valgt id
+    // Fetch the raw content (html/text/jsonld) for the given ID
     $stmt = $pdo->prepare(
         'SELECT id, url, domain, ' . $field_map[$field] . ' AS content
          FROM raw_pages
