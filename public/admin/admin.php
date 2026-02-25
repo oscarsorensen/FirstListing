@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 // DB-forbindelse
 require_once __DIR__ . '/../../config/db.php';
 
@@ -98,7 +100,8 @@ $pdo->exec("USE {$target_db}");
 
 // Parse valgte raw IDs fra tabellen
 $parse_feedback = [];
-$crawler_feedback = [];
+$crawler_feedback = $_SESSION['crawler_feedback'] ?? [];
+unset($_SESSION['crawler_feedback']);
 $selected_sites = ['jensenestate'];
 $crawl_max_listings = 50;
 $action = (string)($_POST['action'] ?? '');
@@ -184,48 +187,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
             $crawler_feedback[] = 'Could not clear crawler log.';
         }
     }
+
+    // Store feedback in session and redirect — this prevents the form from
+    // being resubmitted if the user reloads the page (PRG pattern)
+    $_SESSION['crawler_feedback'] = $crawler_feedback;
+    header('Location: admin.php');
+    exit;
 }
 
 $crawler_running = crawler_is_running($crawler_pid_file);
-
-// Dashboard-tal
-$stats = [
-    'raw_total' => 0,
-    'raw_with_html' => 0,
-    'raw_with_text' => 0,
-    'raw_with_jsonld' => 0,
-    'raw_first_seen' => null,
-    'raw_first_fetch' => null,
-    'raw_last_fetch' => null,
-    'ai_total' => 0,
-    'ai_with_price' => 0,
-    'ai_with_sqm' => 0,
-    'ai_with_rooms' => 0,
-    'ai_with_address' => 0,
-];
-
-$stats['raw_total'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages')->fetchColumn();
-$stats['raw_with_html'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE html_raw IS NOT NULL AND html_raw <> ""')->fetchColumn();
-$stats['raw_with_text'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE text_raw IS NOT NULL AND text_raw <> ""')->fetchColumn();
-$stats['raw_with_jsonld'] = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages WHERE jsonld_raw IS NOT NULL AND jsonld_raw <> ""')->fetchColumn();
-$stats['raw_first_seen'] = $pdo->query('SELECT MIN(first_seen_at) FROM raw_pages')->fetchColumn();
-$stats['raw_first_fetch'] = $pdo->query('SELECT MIN(fetched_at) FROM raw_pages')->fetchColumn();
-$stats['raw_last_fetch'] = $pdo->query('SELECT MAX(fetched_at) FROM raw_pages')->fetchColumn();
-
-$stats['ai_total'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings')->fetchColumn();
-$stats['ai_with_price'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE price IS NOT NULL')->fetchColumn();
-$stats['ai_with_sqm'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE sqm IS NOT NULL')->fetchColumn();
-$stats['ai_with_rooms'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE rooms IS NOT NULL')->fetchColumn();
-$stats['ai_with_address'] = (int)$pdo->query('SELECT COUNT(*) FROM ai_listings WHERE address IS NOT NULL AND address <> ""')->fetchColumn();
-
-// Top domæner og filtervalg
-$domains_top = $pdo->query('
-    SELECT domain, COUNT(*) AS cnt
-    FROM raw_pages
-    GROUP BY domain
-    ORDER BY cnt DESC
-    LIMIT 10
-')->fetchAll(PDO::FETCH_ASSOC);
+$crawled_total = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages')->fetchColumn();
 
 $all_domains = $pdo->query('SELECT DISTINCT domain FROM raw_pages ORDER BY domain')->fetchAll(PDO::FETCH_COLUMN);
 
@@ -334,64 +305,6 @@ $ai_latest = $pdo->query('
     <h1>Admin dashboard v2</h1>
     <div class="muted">Raw crawl overview + AI pipeline status</div>
 
-    <div class="cards">
-        <div class="card">
-            <div class="label">Raw pages</div>
-            <div class="value"><?= (int)$stats['raw_total'] ?></div>
-        </div>
-        <div class="card">
-            <div class="label">With HTML</div>
-            <div class="value"><?= (int)$stats['raw_with_html'] ?></div>
-        </div>
-        <div class="card">
-            <div class="label">With text</div>
-            <div class="value"><?= (int)$stats['raw_with_text'] ?></div>
-        </div>
-        <div class="card">
-            <div class="label">With JSON-LD</div>
-            <div class="value"><?= (int)$stats['raw_with_jsonld'] ?></div>
-        </div>
-        <div class="card">
-            <div class="label">AI listings</div>
-            <div class="value"><?= (int)$stats['ai_total'] ?></div>
-        </div>
-        <div class="card">
-            <div class="label">AI with price</div>
-            <div class="value"><?= (int)$stats['ai_with_price'] ?></div>
-        </div>
-        <div class="card">
-            <div class="label">First seen</div>
-            <div class="value"><?= show_value($stats['raw_first_seen']) ?></div>
-        </div>
-        <div class="card">
-            <div class="label">Last fetch</div>
-            <div class="value"><?= show_value($stats['raw_last_fetch']) ?></div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="panel">
-            <h2>Top domains (max 10)</h2>
-            <ul>
-                <?php foreach ($domains_top as $row): ?>
-                    <li><?= esc($row['domain']) ?> — <?= (int)$row['cnt'] ?></li>
-                <?php endforeach; ?>
-                <?php if (!$domains_top): ?>
-                    <li>No data</li>
-                <?php endif; ?>
-            </ul>
-        </div>
-        <div class="panel">
-            <h2>AI coverage</h2>
-            <ul>
-                <li>With price — <?= (int)$stats['ai_with_price'] ?></li>
-                <li>With sqm — <?= (int)$stats['ai_with_sqm'] ?></li>
-                <li>With rooms — <?= (int)$stats['ai_with_rooms'] ?></li>
-                <li>With address — <?= (int)$stats['ai_with_address'] ?></li>
-            </ul>
-        </div>
-    </div>
-
     <div class="row">
         <div class="panel ai-test-panel" style="flex: 1;">
             <h2>OpenAI Test Panel</h2>
@@ -439,6 +352,7 @@ $ai_latest = $pdo->query('
                             <input type="checkbox" name="crawl_sites[]" value="jensenestate" <?= in_array('jensenestate', $selected_sites, true) ? 'checked' : '' ?>>
                             Jensen Estate
                         </label>
+                        <span class="muted">Crawled: <strong><?= $crawled_total ?> / 761</strong></span>
                         <label class="check-label" for="crawl_max_listings" style="display:flex; gap:8px; align-items:center;">
                             Max listings
                             <input type="number" id="crawl_max_listings" name="crawl_max_listings" min="1" step="1" value="<?= (int)$crawl_max_listings ?>" style="width:90px;">
