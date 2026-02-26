@@ -14,6 +14,8 @@ $FORCE = false;
 // Read CLI arguments: --limit=N, --id=N, --force
 // CLI = Command Line Interface: run this script from the terminal with extra options.
 // Example: php openai_parse_raw_pages.php --limit=10 --force
+// Here i tell the parser what to do, how many rows to process, if i want to force re-parse etc.
+// It is used in the admin panel with Parse Selected
 foreach (array_slice($argv, 1) as $arg) {
     if (str_starts_with($arg, '--limit=')) {
         // How many rows to process in one run
@@ -120,7 +122,7 @@ function extract_description_candidates(string $html): string
 function preprocess_text(string $text): string
 {
     $text = trim(preg_replace('/\s+/u', ' ', $text) ?? $text);
-    return mb_substr($text, 0, 3000, 'UTF-8');
+    return mb_substr($text, 0, 10000, 'UTF-8');
 }
 
 // Clean and trim the JSON-LD data — used as a last fallback source
