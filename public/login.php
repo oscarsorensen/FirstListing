@@ -1,10 +1,11 @@
 <?php
 
-declare(strict_types=1);
-
+// Start the session so we can read and write $_SESSION variables
 session_start();
+// Load the database connection ($pdo)
 require_once __DIR__ . '/../config/db.php';
 
+// If the user is already logged in, send them to the user page
 if (isset($_SESSION['user_id'])) {
     header('Location: user.php');
     exit;
@@ -12,13 +13,17 @@ if (isset($_SESSION['user_id'])) {
 
 $error = '';
 
+// Only run this block when the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Read and clean up the submitted values
     $username = trim((string)($_POST['username'] ?? ''));
     $password = (string)($_POST['password'] ?? '');
 
+    // Make sure neither field is empty
     if ($username === '' || $password === '') {
         $error = 'Invalid login data.';
     } else {
+        // Look up the user in the database by username
         $stmt = $pdo->prepare('
             SELECT id, username, email, password_hash, role
             FROM users
@@ -28,7 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([':username' => $username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Check that the user exists and the password matches the stored hash
         if ($user && password_verify($password, (string)$user['password_hash'])) {
+            // Store user info in the session so other pages know who is logged in
             $_SESSION['user_id'] = (int)$user['id'];
             $_SESSION['username'] = (string)$user['username'];
             $_SESSION['user_email'] = (string)($user['email'] ?? '');
@@ -41,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Converts special characters to HTML entities to prevent XSS
 function esc(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
@@ -53,18 +61,6 @@ function esc(string $value): string
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | FirstListing</title>
     <link rel="stylesheet" href="css/user.css">
-    <style>
-        .auth-wrap { max-width: 520px; margin: 40px auto; }
-        .auth-card { background: #fff; border: 1px solid #cdd9ea; border-radius: 14px; padding: 20px; box-shadow: 0 14px 28px rgba(33,47,75,.14); }
-        .auth-card h1 { margin-top: 0; }
-        .field { margin-bottom: 12px; }
-        .field label { display: block; margin-bottom: 6px; font-size: 13px; color: #55637a; }
-        .field input { width: 100%; padding: 10px; border: 1px solid #cdd9ea; border-radius: 8px; }
-        .error { color: #b91c1c; margin-bottom: 10px; }
-        .actions { display: flex; gap: 10px; align-items: center; }
-        .btn { background: #3f72d9; color: #fff; border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; }
-        a { color: #3f72d9; }
-    </style>
 </head>
 <body>
 <div class="page auth-wrap">
@@ -79,6 +75,7 @@ function esc(string $value): string
         <form method="post" action="login.php">
             <div class="field">
                 <label for="username">Username</label>
+                <!-- Keep the typed username in the field if the form fails -->
                 <input id="username" type="text" name="username" required value="<?= esc((string)($_POST['username'] ?? '')) ?>">
             </div>
 

@@ -1,33 +1,39 @@
 <?php
 
-declare(strict_types=1);
-
+// Start the session so we can read who is logged in
 session_start();
+// Load the database connection ($pdo)
 require_once __DIR__ . '/../config/db.php';
 
+// If not logged in, send to the login page
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
+// Converts special characters to HTML entities to prevent XSS
 function esc(string $value): string
 {
     return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
 }
 
-$dbName = (string)$pdo->query('SELECT DATABASE()')->fetchColumn();
-
+// Read search input and result limit from the form, with safe defaults
 $searchInput = trim((string)($_POST['search_input'] ?? ''));
 $limit = (int)($_POST['limit'] ?? 10);
+// Clamp the limit between 1 and 50 so the user can't request an unlimited number of rows
 $limit = max(1, min(50, $limit));
 $rows = [];
 $error = '';
 
+// Only run the search when the form has been submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($searchInput === '') {
         $error = 'Insert test data (URL or text) first.';
     } else {
         try {
+            // Find all raw pages (and their AI-extracted data) that match the search term.
+            // The subquery counts how many OTHER listings share the same reference ID, title,
+            // or price+sqm+rooms combination — that number is "copy_hits".
             $sql = "
             SELECT
                 rp.id AS raw_page_id,
@@ -72,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ";
 
             $stmt = $pdo->prepare($sql);
+            // Wrap the search term in % wildcards so it matches anywhere in the field
             $q = '%' . $searchInput . '%';
             $stmt->bindValue(':q', $q, PDO::PARAM_STR);
             $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
@@ -90,37 +97,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User | FirstListing</title>
     <link rel="stylesheet" href="css/user.css">
-    <style>
-        .user-wrap { max-width: 1100px; margin: 34px auto 50px; }
-        .user-card,
-        .tool-card {
-            background: #fff;
-            border: 1px solid #cdd9ea;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 14px 28px rgba(33,47,75,.14);
-        }
-        .tool-card { margin-top: 16px; }
-        .user-card h1 { margin-top: 0; }
-        .data { display: grid; grid-template-columns: 130px 1fr; gap: 8px 12px; margin: 16px 0; }
-        .k { color: #55637a; }
-        .v { font-weight: 600; }
-        .actions { display: flex; gap: 12px; }
-        .btn { background: #3f72d9; color: #fff; text-decoration: none; border-radius: 8px; padding: 10px 14px; border: 0; cursor: pointer; }
-        .link { color: #3f72d9; }
-        .field { margin-bottom: 12px; }
-        .field label { display: block; margin-bottom: 6px; color: #55637a; font-size: 13px; }
-        .field input, .field textarea { width: 100%; border: 1px solid #cdd9ea; border-radius: 8px; padding: 10px; font-size: 14px; }
-        .row { display: grid; grid-template-columns: 1fr 140px; gap: 12px; }
-        .hint { color: #64748b; font-size: 12px; margin-top: 3px; }
-        .error { color: #9f1239; background: #ffe4ec; border: 1px solid #f6b8ca; border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }
-        .ok { color: #0f766e; background: #ecfeff; border: 1px solid #bae6fd; border-radius: 8px; padding: 8px 10px; margin-bottom: 12px; }
-        .table-wrap { overflow-x: auto; margin-top: 12px; }
-        table { width: 100%; border-collapse: collapse; min-width: 860px; }
-        th, td { border-bottom: 1px solid #e4eaf5; padding: 8px 10px; text-align: left; font-size: 13px; vertical-align: top; }
-        th { background: #f2f6fd; text-transform: uppercase; font-size: 11px; letter-spacing: .03em; }
-        .muted-sm { color: #708199; font-size: 12px; }
-    </style>
 </head>
 <body>
 <div class="page user-wrap">
@@ -128,12 +104,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>User page</h1>
         <p class="muted">Simple user area (MVP).</p>
 
+        <!-- Display basic info from the session -->
         <div class="data">
             <div class="k">User ID</div><div class="v"><?= (int)$_SESSION['user_id'] ?></div>
             <div class="k">Username</div><div class="v"><?= esc((string)($_SESSION['username'] ?? 'unknown')) ?></div>
             <div class="k">Email</div><div class="v"><?= esc((string)($_SESSION['user_email'] ?? '')) ?: '—' ?></div>
             <div class="k">Role</div><div class="v"><?= esc((string)$_SESSION['user_role']) ?></div>
-            <div class="k">Database</div><div class="v"><?= esc($dbName) ?></div>
         </div>
 
         <div class="actions">
@@ -146,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Find Copies (Test)</h2>
         <p class="muted-sm">Insert URL/text from a listing and search for possible duplicates in stored data.</p>
 
+        <!-- Show error or success message after a search -->
         <?php if ($error !== ''): ?>
             <div class="error"><?= esc($error) ?></div>
         <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
@@ -155,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="post" action="user.php">
             <div class="field">
                 <label for="search_input">Test data (URL or text)</label>
+                <!-- Keep the typed text in the textarea after a search -->
                 <textarea id="search_input" name="search_input" rows="4" placeholder="Paste URL, title, reference, or text from a listing..."><?= esc($searchInput) ?></textarea>
                 <div class="hint">Tip: URL, title keyword, or reference code gives the best quick results.</div>
             </div>
@@ -170,6 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </form>
 
+        <!-- Only show the results table if there are rows to display -->
         <?php if ($rows): ?>
             <div class="table-wrap">
                 <table>
@@ -197,11 +176,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </td>
                             <td><?= esc((string)($r['domain'] ?? '')) ?></td>
                             <td><?= esc((string)($r['title'] ?? '')) ?></td>
+                            <!-- Format price with dot as thousands separator -->
                             <td><?= $r['price'] !== null ? number_format((int)$r['price'], 0, ',', '.') : '—' ?></td>
                             <td><?= $r['sqm'] !== null ? (int)$r['sqm'] : '—' ?></td>
                             <td><?= $r['rooms'] !== null ? (int)$r['rooms'] : '—' ?></td>
                             <td><?= $r['bathrooms'] !== null ? (int)$r['bathrooms'] : '—' ?></td>
                             <td><?= esc((string)($r['reference_id'] ?? '')) ?: '—' ?></td>
+                            <!-- Higher copy_hits means more listings share the same data -->
                             <td><?= (int)($r['copy_hits'] ?? 0) ?></td>
                         </tr>
                     <?php endforeach; ?>

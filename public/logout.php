@@ -1,14 +1,10 @@
 <?php
 
-declare(strict_types=1);
-
+// Start the session so we can access and destroy it
 session_start();
-$_SESSION = [];
-if (ini_get('session.use_cookies')) {
-    $params = session_get_cookie_params();
-    setcookie(session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
-}
+// Wipe all session data and end the session
 session_destroy();
 
+// Send the user back to the homepage
 header('Location: index.php');
 exit;
