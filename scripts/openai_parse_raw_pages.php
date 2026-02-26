@@ -5,22 +5,25 @@ declare(strict_types=1);
 // Connect to the database
 require_once __DIR__ . '/../config/db.php';
 
-// Default settings — can be overridden via CLI arguments
+// Default settings
 $MODEL = 'gpt-4.1-mini';
 $LIMIT = 1;
 $RAW_ID = null;
 $FORCE = false;
 
-// Read CLI arguments: --limit=N, --id=N, --force, --model=name
+// Read CLI arguments: --limit=N, --id=N, --force
+// CLI = Command Line Interface: run this script from the terminal with extra options.
+// Example: php openai_parse_raw_pages.php --limit=10 --force
 foreach (array_slice($argv, 1) as $arg) {
     if (str_starts_with($arg, '--limit=')) {
+        // How many rows to process in one run
         $LIMIT = max(1, (int)substr($arg, 8));
     } elseif (str_starts_with($arg, '--id=')) {
+        // Process only one specific row by its raw_pages ID
         $RAW_ID = max(1, (int)substr($arg, 5));
     } elseif ($arg === '--force') {
+        // Re-parse all rows, even ones already processed
         $FORCE = true;
-    } elseif (str_starts_with($arg, '--model=')) {
-        $MODEL = trim((string)substr($arg, 8));
     }
 }
 
@@ -34,10 +37,10 @@ function read_api_key(string $envPath): string
     return trim((string)($env['OPENAI_API_KEY'] ?? ''), "\"'");
 }
 
-// Prepare the raw HTML for the AI by extracting only the most useful parts.
-// Output has two sections:
-// 1) TARGETED_SNIPPETS: title, headers, and lines containing keywords (price, sqm, rooms etc.)
-// 2) MAIN_TEXT: all visible text from the page, cleaned and trimmed
+// Prepare the raw HTML for the AI by extracting only the most useful parts:
+// the page title, h1/h2 headings, and any lines containing real-estate keywords.
+// Plain text is already stored in text_raw by the crawler (higher quality than
+// strip_tags), so there is no need to re-extract it here.
 function preprocess_html(string $html): string
 {
     if ($html === '') return '';
@@ -72,14 +75,9 @@ function preprocess_html(string $html): string
         }
     }
 
-    // Combine snippets and main text, trim both to stay within token limits
+    // Deduplicate and join, then trim to stay within token limits
     $joined = implode("\n", array_unique($snippets));
-    $mainText = trim(strip_tags($html));
-    $mainText = preg_replace('/\s+/u', ' ', $mainText) ?? $mainText;
-
-    $out = "TARGETED_SNIPPETS:\n" . mb_substr($joined, 0, 9000, 'UTF-8')
-        . "\n\nMAIN_TEXT:\n" . mb_substr($mainText, 0, 18000, 'UTF-8');
-    return $out;
+    return "TARGETED_SNIPPETS:\n" . mb_substr($joined, 0, 9000, 'UTF-8');
 }
 
 // Try to find the full property description text directly in the HTML.
@@ -133,17 +131,15 @@ function preprocess_jsonld(string $jsonld): string
 }
 
 // Try to parse a JSON response from the model.
-// Handles cases where the model wraps the JSON in a markdown code block (```json ... ```)
+// We use response_format: json_object (see call_openai_extract), so the API always
+// returns plain JSON. The fallback below handles any unexpected edge cases.
 function decode_json_response(string $content): ?array
 {
     $txt = trim($content);
-    $txt = preg_replace('/^```json\s*/i', '', $txt) ?? $txt;
-    $txt = preg_replace('/^```\s*/', '', $txt) ?? $txt;
-    $txt = preg_replace('/\s*```$/', '', $txt) ?? $txt;
     $arr = json_decode($txt, true);
     if (is_array($arr)) return $arr;
 
-    // As a fallback, try to extract just the JSON object from the response
+    // Fallback: try to extract just the JSON object from the response
     $start = strpos($txt, '{');
     $end = strrpos($txt, '}');
     if ($start !== false && $end !== false && $end > $start) {

@@ -16,6 +16,8 @@ from lxml import html
 SITE_HOST = "jensenestate.es"
 SITEMAP_INDEX_URL = "https://jensenestate.es/sitemap-index.xml"
 
+
+#  gonna move database pw to more safe location later.
 DB_CONFIG = {
     "host": "localhost",
     "user": "firstlisting_user",
@@ -34,35 +36,30 @@ DEFAULT_MAX_LISTINGS = 50
 # === HELPERS ===
 
 
-
+# We clean text mainly to reduce token count when sending to AI later.
 def clean_text(text):
-    """Remove extra whitespace from a string."""
     if not text:
         return ""
     return re.sub(r"\s+", " ", text).strip()
 
-
+# Checks that we are actually on a property page, not a catalog page with multiple listings.
 def is_listing_url(url):
-    """Return True if the URL is a single property listing (not a catalog page)."""
     return re.match(r"^https://jensenestate\.es/es/propiedad/\d+(?:/[^?#]*)?$", url) is not None
 
 
+# Makes the URL consistent (removes # fragments and trailing slashes) so it's easier to store and compare.
 def normalize_url(url):
-    """Remove URL fragments (#) and trailing slashes."""
     url = urldefrag(url)[0].strip()
     if url.endswith("/") and len(url) > len("https://jensenestate.es/"):
         url = url[:-1]
     return url
 
-
+# Parses raw HTML and extracts two things:
+# 1. Plain text — all visible text on the page joined into one string
+# 2. JSON-LD — structured data embedded by the site for search engines, often contains property details
 def extract_text_and_jsonld(html_bytes):
-    """
-    Parse raw HTML and extract:
-    - Plain text (all visible text joined into one string)
-    - JSON-LD structured data (used by search engines, often contains property details)
-    """
     tree = html.fromstring(html_bytes)
-    text_raw = clean_text(" ".join(tree.itertext()))
+    text_raw = clean_text(" ".join(tree.itertext())) #calling function
 
     jsonld_items = []
     for script in tree.xpath("//script[@type='application/ld+json']/text()"):
@@ -81,16 +78,10 @@ def extract_text_and_jsonld(html_bytes):
     return text_raw, jsonld_raw
 
 
+# Discovers all listing URLs from the site's XML sitemap.
+# The sitemap is published by the site daily and lists all properties.
+# Steps: fetch the sitemap index → download each sitemap file → return URLs that match the listing pattern.
 def discover_listing_urls(max_listings):
-    """
-    Discover all listing URLs from the site's XML sitemap.
-    The sitemap is published by the site daily and lists all properties.
-
-    Steps:
-    1. Fetch the sitemap index to find the actual sitemap file(s)
-    2. Download and parse each sitemap file
-    3. Return all URLs that match the listing URL pattern
-    """
     # Step 1: fetch the sitemap index
     print(f"Fetching sitemap index: {SITEMAP_INDEX_URL}")
     response = requests.get(SITEMAP_INDEX_URL, headers=HEADERS, timeout=TIMEOUT)
@@ -116,8 +107,8 @@ def discover_listing_urls(max_listings):
 
         sitemap = ElementTree.fromstring(content)
         for loc in sitemap.findall(".//sm:loc", ns):
-            url = normalize_url(loc.text.strip())
-            if is_listing_url(url):
+            url = normalize_url(loc.text.strip()) #calling function
+            if is_listing_url(url): #calling function
                 listing_urls.append(url)
                 if len(listing_urls) >= max_listings:
                     print(f"Reached max listings ({max_listings}).")
@@ -127,8 +118,10 @@ def discover_listing_urls(max_listings):
     return listing_urls
 
 
+# Reads the --max-listings=N argument from the command line, so we can limit how many listings to crawl.
+#This is just for me to have a count of how many listings there are. Only relevant for the presentation, 
+#becuase generally i will be crawling all listings.
 def read_max_listings():
-    """Read --max-listings=N from command line arguments."""
     for arg in sys.argv[1:]:
         if arg.startswith("--max-listings="):
             try:
@@ -140,20 +133,19 @@ def read_max_listings():
 
 # === DATABASE ===
 
+# Checks if a URL already exists in the database. Returns the row ID if found, so we can update the timestamp instead of inserting a duplicate.
 def url_exists(cur, url):
-    """Return the existing row ID if this URL is already in the database."""
     cur.execute("SELECT id FROM raw_pages WHERE url = %s LIMIT 1", (url,))
     row = cur.fetchone()
     return row[0] if row else None
 
-
+# Updates the fetched_at timestamp for a listing we've already seen (so we know when it was last checked).
 def touch_last_seen(cur, url):
-    """Update the fetched_at timestamp for an existing listing."""
     cur.execute("UPDATE raw_pages SET fetched_at = NOW() WHERE url = %s", (url,))
 
 
+# Inserts a new listing into the raw_pages table (only called when the URL is not already in the database).
 def insert_listing(cur, url, domain, http_status, content_type, html_raw, text_raw, jsonld_raw):
-    """Insert a new listing into raw_pages."""
     now = datetime.now()
     cur.execute(
         """
@@ -175,7 +167,7 @@ def run():
     cur = conn.cursor()
 
     try:
-        listing_urls = discover_listing_urls(max_listings)
+        listing_urls = discover_listing_urls(max_listings) #calling function (s)
         if not listing_urls:
             print("No listing URLs found.")
             return
@@ -187,7 +179,7 @@ def run():
 
         for url in listing_urls:
             # Skip if already in the database, just update the timestamp
-            if url_exists(cur, url):
+            if url_exists(cur, url): #calling function
                 touch_last_seen(cur, url)
                 conn.commit()
                 seen_count += 1
@@ -204,7 +196,7 @@ def run():
 
             text_raw, jsonld_raw = extract_text_and_jsonld(response.content)
 
-            try:
+            try: #calling function
                 insert_listing(
                     cur,
                     url=url,
@@ -222,6 +214,7 @@ def run():
                 # The URL already exists in the database (duplicate).
                 # This can happen if the URL was truncated in the DB and
                 # url_exists() didn't catch it. We just skip it and move on.
+                # This might not be the best fix, but it prevents the crawler from crashing on duplicates. Yes i had problems with this.
                 conn.rollback()
                 print(f"[SKIPPED]  {url} (duplicate in DB)")
 
