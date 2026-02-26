@@ -1,5 +1,8 @@
 <?php
 
+//description page. I could delete this now that it works every time. Maybe later.
+
+
 // Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 

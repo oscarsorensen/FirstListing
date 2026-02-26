@@ -1,5 +1,8 @@
 <?php
 
+//my test window i used to test connection to OpenAI API, before i really understood how it worked. Now its just a chat. 
+//im thinking about changing this into a chat on the public page later, with info about the site.
+
 // Return plain text so the response shows up in the admin test box
 header('Content-Type: text/plain; charset=UTF-8');
 

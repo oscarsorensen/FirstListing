@@ -1,5 +1,7 @@
 <?php
 
+//Raw data page. I could delete this like admin_ai, but i havnt done it yet. Its interesting to have.
+
 // Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 
