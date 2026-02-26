@@ -24,6 +24,34 @@ $title = "How it works — FirstListing";
         </nav>
     </header>
 
+    <section class="hero hero-shell page-hero page-hero-small">
+        <div class="hero-bg page-hero-image page-hero-how"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-text">
+            <p class="eyebrow">How the MVP works</p>
+            <h1>From raw crawl data to AI-organized duplicate detection.</h1>
+            <p class="lead">
+                This page shows the technical flow in the project: crawl, store, organize, filter and compare.
+                The goal is transparency and a clear proof-of-concept pipeline.
+            </p>
+            <div class="meta">
+                <span>MySQL raw storage</span>
+                <span>AI field extraction</span>
+                <span>Vector similarity ranking</span>
+            </div>
+        </div>
+        <div class="hero-side">
+            <div class="hero-note">
+                <div class="hero-note-title">Pipeline focus</div>
+                <ul>
+                    <li>Traceable raw evidence first</li>
+                    <li>AI helps organize, not invent</li>
+                    <li>“First seen” is crawler-based</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
     <section class="steps">
         <div class="section-title">How it works</div>
         <div class="grid">
@@ -51,6 +79,22 @@ $title = "How it works — FirstListing";
                 <div class="num">05</div>
                 <h3>First seen</h3>
                 <p>We keep the earliest “first seen” timestamp as the proxy for the original listing.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="final-cta-card">
+            <div>
+                <p class="eyebrow">Next step</p>
+                <h2>See why this workflow is useful in practice</h2>
+                <p class="lead-small">
+                    The value is not just the AI extraction. It is the combination of evidence, timestamps and matching logic.
+                </p>
+            </div>
+            <div class="cta-row">
+                <a href="helps.php" class="cta">Why it helps</a>
+                <a href="index.php" class="ghost">Back to home</a>
             </div>
         </div>
     </section>

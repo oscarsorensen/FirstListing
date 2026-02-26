@@ -267,8 +267,8 @@ if ($where) {
 }
 
 $sql .= $sort_raw === 'id'
-    ? ' ORDER BY rp.id DESC LIMIT 50'
-    : ' ORDER BY is_parsed ASC, rp.fetched_at DESC LIMIT 50';
+    ? ' ORDER BY rp.id DESC LIMIT 200'
+    : ' ORDER BY is_parsed ASC, rp.fetched_at DESC LIMIT 200';
 
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
@@ -303,7 +303,7 @@ $ai_latest = $pdo->query("
     FROM ai_listings ai
     LEFT JOIN raw_pages rp ON rp.id = ai.raw_page_id
     ORDER BY {$ai_order}
-    LIMIT 20
+    LIMIT 200
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 ?>

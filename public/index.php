@@ -33,45 +33,78 @@ $title = "FirstListing — Proof of Concept";
         </nav>
     </header>
 
-    <section class="hero">
+    <section class="hero hero-shell">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+
         <div class="hero-text">
-            <p class="eyebrow">School MVP — 5 sites, real listings</p>
-            <h1>Find duplicates and the earliest listing, fast.</h1>
+            <p class="eyebrow">School MVP · Real estate duplicate detection</p>
+            <h1>Track duplicate listings and compare who appeared first.</h1>
             <p class="lead">
-                We crawl a small set of trusted portals, store the raw data,
-                and use AI + vector similarity to detect duplicates across agents.
+                FirstListing stores raw listing evidence (HTML, text and JSON-LD), organizes key fields with AI,
+                and helps compare duplicate property listings across agencies.
             </p>
+
             <div class="cta-row">
-                <button class="cta">Search duplicates</button>
+                <a href="register.php" class="cta">Search duplicates</a>
+                <a href="how.php" class="ghost">See how it works</a>
             </div>
+
             <div class="meta">
                 <span>Proof-of-concept</span>
-                <span>First seen = first time our crawler saw it</span>
+                <span>First seen by our crawler (not a legal ownership claim)</span>
+            </div>
+
+            <div class="hero-stats">
+                <div class="stat-tile">
+                    <div class="stat-label">Raw evidence</div>
+                    <div class="stat-value">HTML + Text + JSON-LD</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Extraction</div>
+                    <div class="stat-value">AI-assisted fields</div>
+                </div>
+                <div class="stat-tile">
+                    <div class="stat-label">Matching</div>
+                    <div class="stat-value">SQL + Vector similarity</div>
+                </div>
             </div>
         </div>
-        <div class="hero-card">
-            <div class="card-header">
-                <span>Duplicate match</span>
-                <span class="score">0.91</span>
-            </div>
-            <div class="card-body">
-                <div class="chip">Guardamar del Segura</div>
-                <div class="title">Apartment · 3 rooms · 90 m²</div>
-                <div class="price">€299,000</div>
-                <div class="mini">
-                    <div>
-                        <div class="label">First seen</div>
-                        <div class="value">2026‑02‑06</div>
-                    </div>
-                    <div>
-                        <div class="label">Source</div>
-                        <div class="value">Mediter</div>
-                    </div>
-                    <div>
-                        <div class="label">Matches</div>
-                        <div class="value">2 agents</div>
+
+        <div class="hero-side">
+            <div class="hero-card">
+                <div class="card-header">
+                    <span>Duplicate match candidate</span>
+                    <span class="score">0.91</span>
+                </div>
+                <div class="card-body">
+                    <div class="chip">Guardamar del Segura</div>
+                    <div class="title">Apartment · 3 rooms · 90 m²</div>
+                    <div class="price">€299,000</div>
+                    <div class="mini">
+                        <div>
+                            <div class="label">First seen</div>
+                            <div class="value">2026‑02‑06</div>
+                        </div>
+                        <div>
+                            <div class="label">Source</div>
+                            <div class="value">Mediter</div>
+                        </div>
+                        <div>
+                            <div class="label">Matches</div>
+                            <div class="value">2 agents</div>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="hero-note">
+                <div class="hero-note-title">What the system stores</div>
+                <ul>
+                    <li>Raw page content for traceability</li>
+                    <li>AI-organized fields in separate table</li>
+                    <li>Crawler timestamps for first/last seen</li>
+                </ul>
             </div>
         </div>
     </section>
@@ -120,6 +153,23 @@ $title = "FirstListing — Proof of Concept";
                 <span>First seen</span>
                 <span>Match score</span>
                 <span>Source transparency</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="final-cta-card">
+            <div>
+               
+                <h2>Create an account and test duplicate search flow</h2>
+                <p class="lead-small">
+                    Start with the user page and sample input. The current version focuses on crawler evidence,
+                    AI extraction and admin visibility.
+                </p>
+            </div>
+            <div class="cta-row">
+                <a href="register.php" class="cta">Register</a>
+                <a href="login.php" class="ghost">Login</a>
             </div>
         </div>
     </section>

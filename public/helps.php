@@ -24,6 +24,34 @@ $title = "Why it helps — FirstListing";
         </nav>
     </header>
 
+    <section class="hero hero-shell page-hero page-hero-small">
+        <div class="hero-bg page-hero-image page-hero-helps"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-text">
+            <p class="eyebrow">Why it helps</p>
+            <h1>Useful signal, cleaner data, and better transparency in one workflow.</h1>
+            <p class="lead">
+                FirstListing helps reduce duplicate noise and make listing comparisons easier to audit.
+                It is especially useful as a school MVP because the evidence trail is visible.
+            </p>
+            <div class="meta">
+                <span>Duplicate reduction</span>
+                <span>Confidence + source visibility</span>
+                <span>Crawler timestamp signal</span>
+            </div>
+        </div>
+        <div class="hero-side">
+            <div class="hero-note">
+                <div class="hero-note-title">What this page explains</div>
+                <ul>
+                    <li>Why clustering duplicates matters</li>
+                    <li>Why raw data improves trust</li>
+                    <li>Why “first seen” is useful in an MVP</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
     <section class="trust">
         <div class="trust-card">
             <h2>Reduce duplicate noise</h2>
@@ -71,6 +99,22 @@ $title = "Why it helps — FirstListing";
                 <span>Hybrid extraction</span>
                 <span>AI organizing</span>
                 <span>Future‑ready</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="final-cta">
+        <div class="final-cta-card">
+            <div>
+                <p class="eyebrow">Try it</p>
+                <h2>Create an account and test the user flow</h2>
+                <p class="lead-small">
+                    The current MVP is strongest as a technical demonstration: crawling, storing evidence, AI extraction and admin review.
+                </p>
+            </div>
+            <div class="cta-row">
+                <a href="register.php" class="cta">Register</a>
+                <a href="index.php" class="ghost">Back to home</a>
             </div>
         </div>
     </section>
