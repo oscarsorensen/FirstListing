@@ -41,8 +41,7 @@ function read_api_key(string $envPath): string
 
 // Prepare the raw HTML for the AI by extracting only the most useful parts:
 // the page title, h1/h2 headings, and any lines containing real-estate keywords.
-// Plain text is already stored in text_raw by the crawler (higher quality than
-// strip_tags), so there is no need to re-extract it here.
+// Plain text is already stored in text_raw by the crawler 
 function preprocess_html(string $html): string
 {
     if ($html === '') return '';
