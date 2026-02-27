@@ -551,6 +551,49 @@ body {
     border-color: #cbdcf6;
 }
 
+.state-pill.ok {
+    background: #d1fae5;
+    color: #065f46;
+    border-color: #6ee7b7;
+}
+
+.state-pill.error {
+    background: #ffe4ec;
+    color: #9f1239;
+    border-color: #f6b8ca;
+}
+
+/* Score badges used in the duplicates table */
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.score-badge.score-high { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+.score-badge.score-med  { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.score-badge.score-low  { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+
+/* AI comparison result badges in the duplicates table */
+.ai-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.ai-badge.ai-same { background: #d1fae5; color: #065f46; border-color: #6ee7b7; }
+.ai-badge.ai-diff { background: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
+
 .data {
     display: grid;
     grid-template-columns: 140px 1fr;

@@ -119,7 +119,7 @@ def discover_listing_urls(max_listings):
 
 
 # Reads the --max-listings=N argument from the command line, so we can limit how many listings to crawl.
-#This is just for me to have a count of how many listings there are. Only relevant for the presentation, 
+#This is just for me to have a count of how many listings there are. Only relevant for the presentation,
 #becuase generally i will be crawling all listings.
 def read_max_listings():
     for arg in sys.argv[1:]:
@@ -129,6 +129,16 @@ def read_max_listings():
             except ValueError:
                 pass
     return DEFAULT_MAX_LISTINGS
+
+
+# Reads the --url=https://... argument from the command line.
+# When set, the crawler skips sitemap discovery and just fetches that one URL.
+# Returns the URL string, or None if the argument was not provided.
+def read_single_url():
+    for arg in sys.argv[1:]:
+        if arg.startswith("--url="):
+            return arg.split("=", 1)[1].strip()
+    return None
 
 
 # === DATABASE ===
@@ -162,6 +172,69 @@ def insert_listing(cur, url, domain, http_status, content_type, html_raw, text_r
 # === MAIN ===
 
 def run():
+    # Single-URL mode: crawl one specific page instead of the full sitemap.
+    # Called from user.php when a user pastes a URL into the search form.
+    # Prints "RAW_PAGE_ID:N" to stdout so PHP can capture the database row ID.
+    single_url = read_single_url()
+    if single_url:
+        url = normalize_url(single_url)
+        conn = mysql.connector.connect(**DB_CONFIG)
+        cur = conn.cursor()
+        try:
+            # If we already have this URL in the database, just update the timestamp
+            existing_id = url_exists(cur, url)
+            if existing_id:
+                touch_last_seen(cur, url)
+                conn.commit()
+                print(f"[SEEN]      {url}")
+                # PHP reads this line to get the row ID
+                print(f"RAW_PAGE_ID:{existing_id}")
+                return
+
+            # Fetch the page
+            print(f"[FETCHING]  {url}")
+            try:
+                response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+            except requests.RequestException as e:
+                print(f"[FAILED]    {url}: {e}", file=sys.stderr)
+                sys.exit(1)
+
+            text_raw, jsonld_raw = extract_text_and_jsonld(response.content)
+
+            try:
+                insert_listing(
+                    cur,
+                    url=url,
+                    domain=urlparse(url).netloc,
+                    http_status=response.status_code,
+                    content_type=response.headers.get("Content-Type", ""),
+                    html_raw=response.text,
+                    text_raw=text_raw,
+                    jsonld_raw=jsonld_raw,
+                )
+                conn.commit()
+                # cur.lastrowid gives the auto-increment ID of the row we just inserted
+                new_id = cur.lastrowid
+                print(f"[INSERTED]  {url}")
+                print(f"RAW_PAGE_ID:{new_id}")
+            except mysql.connector.IntegrityError:
+                # Race condition: URL was inserted between our check and insert.
+                # Roll back and try to find the existing ID.
+                conn.rollback()
+                cur.execute("SELECT id FROM raw_pages WHERE url = %s LIMIT 1", (url,))
+                row = cur.fetchone()
+                if row:
+                    print(f"[SKIPPED]   {url} (duplicate in DB)")
+                    print(f"RAW_PAGE_ID:{row[0]}")
+                else:
+                    print(f"[FAILED]    {url} (integrity error, no ID found)", file=sys.stderr)
+                    sys.exit(1)
+        finally:
+            cur.close()
+            conn.close()
+        return
+
+    # Normal sitemap mode (unchanged from before)
     max_listings = read_max_listings()
     conn = mysql.connector.connect(**DB_CONFIG)
     cur = conn.cursor()
