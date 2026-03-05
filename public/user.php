@@ -32,6 +32,7 @@ $listing        = null;
 $raw_page       = null;
 $candidates     = [];
 $ai_comparisons = [];    // keyed by raw_page_id
+$already_in_db  = false; // true if the submitted URL was already in raw_pages
 
 // Run a shell command, capture output lines and exit code
 function run_cmd(string $cmd): array
@@ -59,7 +60,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
         foreach ($crawl_out as $line) {
             if (preg_match('/^RAW_PAGE_ID:(\d+)$/', $line, $m)) {
                 $raw_page_id = (int)$m[1];
-                break;
+            }
+            // The crawler prints "[SEEN]" when the URL was already in the database
+            if (str_contains($line, '[SEEN]')) {
+                $already_in_db = true;
             }
         }
 
@@ -228,6 +232,14 @@ function fmt_price(?int $price): string
             <?php foreach ($errors as $err): ?>
                 <div class="error"><?= esc($err) ?></div>
             <?php endforeach; ?>
+
+            <?php if ($already_in_db && $raw_page): ?>
+                <div class="notice-already-seen">
+                    This URL is already in our database — first crawled on
+                    <strong><?= esc((string)($raw_page['first_seen_at'] ?? '—')) ?></strong>.
+                    Showing existing data and searching for cross-portal duplicates below.
+                </div>
+            <?php endif; ?>
 
             <!-- URL input form -->
             <div class="tool-card user-tool-card">
