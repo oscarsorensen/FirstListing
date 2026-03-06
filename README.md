@@ -24,7 +24,7 @@ The main goal is to save time, reduce duplicate work, and improve transparency i
 - Crawl 5 working sites (proof-of-concept)
 - Store **raw HTML + text + JSON-LD** in MySQL
 - AI will later organize raw data into structured fields
-- Use SQL + VectorDB to find duplicates
+- Use SQL scoring + AI description comparison to find duplicates
 - “First seen” = first time the crawler saw a listing (proxy)
 
 ## Pipeline (MVP)
@@ -34,7 +34,7 @@ The main goal is to save time, reduce duplicate work, and improve transparency i
 2. **AI parser (next step) → ai_listings**
    - Extracts `price`, `sqm`, `rooms`, `address`, etc.
 3. **Duplicate detection**
-   - SQL candidate filter → VectorDB similarity
+   - SQL candidate scoring → AI description comparison (GPT-4.1-mini)
 
 ## Project structure
 

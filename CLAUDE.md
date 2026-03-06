@@ -20,7 +20,7 @@ The developer's name is **Oscar**.
 - **Frontend:** HTML5, CSS3, vanilla JavaScript — no frameworks
 - **Database:** MySQL / MariaDB
 - **AI:** OpenAI GPT-4.1-mini (via API)
-- **Vector DB:** ChromaDB (planned, not yet implemented)
+- **Duplicate comparison:** AI description comparison via GPT-4.1-mini
 
 ## Project Context
 
