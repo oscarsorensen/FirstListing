@@ -92,7 +92,7 @@ $title = "Why it helps — FirstListing";
         <div class="trust-card">
             <h2>Scalable path</h2>
             <p>
-                Start with 5 reliable sites, then scale using a hybrid of structured data, API
+                Start with reliable crawled sites, then scale using a hybrid of structured data, API
                 extraction, and AI classification.
             </p>
             <div class="tags">

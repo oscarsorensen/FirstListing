@@ -1,11 +1,11 @@
 # FirstListing
 FirstListing is a B2B-focused web application that identifies the original publisher of a real estate listing by matching the same property across multiple platforms and building a verified publication timeline.
 
-This repo contains the **School Project MVP** for a proof-of-concept with 5 sites.
+This repo contains the **School Project MVP** for a proof-of-concept.
 
 ## Project idea
 
-The user provides a link to a real estate advertisement.  
+The user provides a link to a real estate advertisement.
 The system extracts key information such as price, surface area, location, and images, and searches for the same property across multiple portals, agency websites, and private listings.
 
 All matching listings are grouped together and ordered by publication date, making it possible to identify the original publisher (private owner or agent) and distinguish them from later intermediaries.
@@ -21,26 +21,26 @@ The main goal is to save time, reduce duplicate work, and improve transparency i
 
 ## School MVP scope
 
-- Crawl 5 working sites (proof-of-concept)
+- Crawl working sites (proof-of-concept)
 - Store **raw HTML + text + JSON-LD** in MySQL
-- AI will later organize raw data into structured fields
-- Use SQL scoring + AI description comparison to find duplicates
-- “First seen” = first time the crawler saw a listing (proxy)
+- AI extracts raw data into structured fields
+- Use SQL scoring (threshold: score ≥ 10) + AI description comparison to find duplicates
+- "First seen" = first time the crawler saw a listing (proxy)
 
 ## Pipeline (MVP)
 
 1. **Crawler → raw_pages**
    - Stores `html_raw`, `text_raw`, `jsonld_raw`, `fetched_at`, `first_seen_at`
-2. **AI parser (next step) → ai_listings**
+2. **AI parser → ai_listings**
    - Extracts `price`, `sqm`, `rooms`, `address`, etc.
 3. **Duplicate detection**
-   - SQL candidate scoring → AI description comparison (GPT-4.1-mini)
+   - SQL candidate scoring (threshold: score ≥ 10) → AI description comparison (GPT-4.1-mini)
 
 ## Project structure
 
 - `public/` — user + admin pages
 - `public/css/` — styles
-- `python/` — crawlers and vector scripts
+- `python/` — crawler scripts
 - `data/html/` — local HTML fixtures
 - `data/sql/` — SQL schemas
 - `config/` — database config
@@ -70,9 +70,9 @@ The main goal is to save time, reduce duplicate work, and improve transparency i
 
 ## Status
 
-This project is currently in an early prototype stage (school MVP).
+Full pipeline implemented and working: crawl → AI parse → SQL scoring → AI description comparison → results shown in user dashboard with first-seen timestamps.
 
 ## License
 
-All rights reserved.  
+All rights reserved.
 This project is not open source.

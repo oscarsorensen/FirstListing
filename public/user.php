@@ -1,5 +1,10 @@
 <?php
 
+/*
+Frontend Test User
+OscarFrontend2
+123456
+*/ 
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -377,7 +382,7 @@ function fmt_price(?int $price): string
                     <p class="hint">Score = sum of matching fields (max 17). Hover AI badge for reason.</p>
 
                 <?php elseif ($submitted && $status_parsed): ?>
-                    <p class="muted-sm">No candidates scored 3 or higher. The listing may be unique in our database.</p>
+                    <p class="muted-sm">No candidates scored 10 or higher. The listing may be unique in our database.</p>
 
                 <?php else: ?>
                     <p class="hint">Submit a URL above to see duplicate candidates here.</p>

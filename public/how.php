@@ -37,7 +37,7 @@ $title = "How it works — FirstListing";
             <div class="meta">
                 <span>MySQL raw storage</span>
                 <span>AI field extraction</span>
-                <span>Vector similarity ranking</span>
+                <span>AI description comparison</span>
             </div>
         </div>
         <div class="hero-side">
@@ -72,8 +72,8 @@ $title = "How it works — FirstListing";
             </div>
             <div class="step">
                 <div class="num">04</div>
-                <h3>Vector match</h3>
-                <p>Vector similarity ranks true duplicates more precisely.</p>
+                <h3>AI compare</h3>
+                <p>AI compares listing descriptions to confirm true duplicates.</p>
             </div>
             <div class="step">
                 <div class="num">05</div>

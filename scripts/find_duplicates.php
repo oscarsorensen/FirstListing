@@ -43,7 +43,7 @@ if (!$base) {
 
 // Score each candidate by how many fields match the base listing.
 // reference_id=5, price=3, sqm=3, rooms=2, bathrooms=2, property_type=1, listing_type=1.
-// HAVING >= 3 filters out very weak matches. Excludes the base listing itself.
+// HAVING >= 10 filters out weak matches. Excludes the base listing itself.
 $sql = "
     SELECT
         ai.id,
@@ -73,7 +73,7 @@ $sql = "
     FROM ai_listings ai
     JOIN raw_pages rp ON rp.id = ai.raw_page_id
     WHERE ai.raw_page_id != :exclude
-    HAVING match_score >= 3
+    HAVING match_score >= 10
     ORDER BY match_score DESC
     LIMIT 20
 ";
