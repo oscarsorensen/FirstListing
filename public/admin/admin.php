@@ -94,7 +94,6 @@ function company_name(?string $domain): string
 
 // Basic setup — paths, database, and default values
 $target_db = 'test2firstlisting';
-$openai_model = 'gpt-4.1-mini';
 $project_root = realpath(__DIR__ . '/../../') ?: (__DIR__ . '/../../');
 $crawler_pid_file = '/tmp/firstlisting_crawler.pid';
 $crawler_log_file = '/tmp/firstlisting_crawler.log';
@@ -105,7 +104,8 @@ $parse_feedback = [];
 $crawler_feedback = $_SESSION['crawler_feedback'] ?? [];
 unset($_SESSION['crawler_feedback']);
 $selected_sites = ['jensenestate'];
-$crawl_max_listings = 50;
+// Use the last value the user ran the crawler with, fall back to 50
+$crawl_max_listings = (int)($_SESSION['crawl_max_listings'] ?? 50);
 $action = (string)($_POST['action'] ?? '');
 
 // Handle the "Parse selected" form — runs the AI parser on the chosen raw pages
@@ -125,23 +125,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'parse_selected') {
         // Remove the time limit — OpenAI calls can take more than 30 seconds
         set_time_limit(0);
 
+        // Release the session lock so other requests to this page are not blocked
+        // while the parse loop runs (PHP holds the session file locked by default)
+        session_write_close();
+
         // Run the parser script once for each selected ID
         foreach ($ids as $id) {
             $output = [];
             $code = 1;
             $cmd = $phpBin . ' ' . $scriptPath . ' --id=' . (int)$id . ' --limit=1 --force 2>&1';
             exec($cmd, $output, $code);
+            // Show the parser output for every ID (success or failure) so we can diagnose issues
+            $outputText = trim(implode(' | ', array_filter(array_map('trim', $output))));
             if ($code === 0) {
                 $ok++;
+                $parse_feedback[] = "ID {$id} OK: " . ($outputText ?: '(no output)');
             } else {
                 $failed++;
-                $firstLine = trim((string)($output[0] ?? 'Parser error'));
-                $parse_feedback[] = "ID {$id} failed: {$firstLine}";
+                $parse_feedback[] = "ID {$id} FAILED (exit {$code}): " . ($outputText ?: '(no output)');
             }
         }
 
         $parse_feedback[] = "Parse complete. Success: {$ok}, Failed: {$failed}.";
     }
+}
+
+// Handle the delete raw page form — removes a raw page and its AI listing
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete_raw') {
+    $deleteId = (int)($_POST['raw_id'] ?? 0);
+    if ($deleteId > 0) {
+        // Delete the AI listing first (references raw_page_id), then the raw page
+        $stmt = $pdo->prepare('DELETE FROM ai_listings WHERE raw_page_id = :id');
+        $stmt->execute([':id' => $deleteId]);
+        $stmt = $pdo->prepare('DELETE FROM raw_pages WHERE id = :id');
+        $stmt->execute([':id' => $deleteId]);
+        $_SESSION['crawler_feedback'] = ["Deleted raw page ID {$deleteId}."];
+    }
+    header('Location: admin.php');
+    exit;
 }
 
 // Handle the crawler control form (run / stop / clear log)
@@ -152,6 +173,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
     }
     $selected_sites = array_values(array_unique(array_map('strval', $selected_sites)));
     $crawl_max_listings = max(1, (int)($_POST['crawl_max_listings'] ?? 50));
+    // Remember this value for next time the page loads
+    $_SESSION['crawl_max_listings'] = $crawl_max_listings;
     $cmd = (string)($_POST['crawler_cmd'] ?? '');
 
     if ($cmd === 'run') {
@@ -209,6 +232,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
 
 $crawler_running = crawler_is_running($crawler_pid_file);
 $crawled_total = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages')->fetchColumn();
+
+// Count how many raw pages have been parsed by AI
+$parsed_total = (int)$pdo->query('SELECT COUNT(DISTINCT raw_page_id) FROM ai_listings')->fetchColumn();
+$unparsed_total = $crawled_total - $parsed_total;
+
+// Count registered users and total searches run
+$user_total    = (int)$pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+$search_total  = (int)$pdo->query('SELECT SUM(searches_used) FROM search_usage')->fetchColumn();
 
 $all_domains = $pdo->query('SELECT DISTINCT domain FROM raw_pages ORDER BY domain')->fetchAll(PDO::FETCH_COLUMN);
 
@@ -311,88 +342,104 @@ $ai_latest = $pdo->query("
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin dashboard v2</title>
+    <title>Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../css/admin.css">
 </head>
 <body>
 <div class="container">
-    <div style="text-align: right;">
-        <a href="../index.php">Back to homepage</a>
-    </div>
-    <h1>Admin dashboard v2</h1>
-    <div class="muted">Raw crawl overview + AI pipeline status</div>
-
-    <div class="row">
-        <div class="panel ai-test-panel" style="flex: 1;">
-            <h2>OpenAI Test Panel</h2>
-            <div class="ai-test-grid">
-                <div>
-                    <div class="muted">Simple OpenAI test (prompt -> response).</div>
-
-                    <form id="openai-test-form" class="ai-test-form">
-                        <div class="muted">Model: <strong><?= esc($openai_model) ?></strong></div>
-
-                        <div class="field">
-                            <label for="openai_prompt">Prompt</label>
-                            <textarea id="openai_prompt" name="openai_prompt" rows="5" placeholder="Ask something, e.g. extract fields from this HTML..."></textarea>
-                        </div>
-
-                        <div class="actions">
-                            <button type="submit">Run test</button>
-                        </div>
-                    </form>
-                </div>
-                <div>
-                    <label class="muted">Response</label>
-                    <pre id="openai-response-box" class="ai-output"></pre>
-                </div>
-            </div>
+    <div class="page-header">
+        <div>
+            <h1>Admin</h1>
+            <div class="subtitle">Raw crawl overview + AI pipeline status</div>
         </div>
-        <div class="panel" style="flex: 1;">
-            <h2>Crawler Control</h2>
-            <div class="muted">Status: <strong><?= $crawler_running ? 'Running' : 'Stopped' ?></strong></div>
-            <div class="muted">Log: <?= esc($crawler_log_file) ?></div>
-            <?php if ($crawler_feedback): ?>
-                <ul>
-                    <?php foreach ($crawler_feedback as $line): ?>
-                        <li><?= esc($line) ?></li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
+        <a href="../index.php" class="btn-ghost">Back to homepage</a>
+    </div>
 
-            <form method="post">
-                <input type="hidden" name="action" value="crawler_control">
-                <div class="field">
-                    <label>Sites to crawl</label>
-                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-                        <label class="check-label">
-                            <input type="checkbox" name="crawl_sites[]" value="jensenestate" <?= in_array('jensenestate', $selected_sites, true) ? 'checked' : '' ?>>
-                            Jensen Estate
-                        </label>
-                        <span class="muted">Crawled: <strong><?= $crawled_total ?> / 761</strong></span>
-                        <label class="check-label" for="crawl_max_listings" style="display:flex; gap:8px; align-items:center;">
-                            Max listings
-                            <input type="number" id="crawl_max_listings" name="crawl_max_listings" min="1" step="1" value="<?= (int)$crawl_max_listings ?>" style="width:90px;">
-                        </label>
-                    </div>
-                </div>
-                <div class="actions">
-                    <button type="submit" name="crawler_cmd" value="run">Run Crawler</button>
-                    <button type="submit" name="crawler_cmd" value="stop">Stop Crawler</button>
-                    <button type="submit" name="crawler_cmd" value="clear_log">Clear Log</button>
-                </div>
-            </form>
-
-            <div class="field">
-                <label for="crawler-log-box">Crawler log (live)</label>
-                <pre id="crawler-log-box" class="ai-output" style="min-height: 180px;">Loading log...</pre>
-            </div>
+    <!-- Stats cards -->
+    <div class="cards">
+        <div class="card">
+            <div class="label">Raw pages</div>
+            <div class="value"><?= $crawled_total ?></div>
+        </div>
+        <div class="card">
+            <div class="label">Parsed</div>
+            <div class="value"><?= $parsed_total ?></div>
+        </div>
+        <div class="card">
+            <div class="label">Unparsed</div>
+            <div class="value"><?= $unparsed_total ?></div>
+        </div>
+        <div class="card">
+            <div class="label">Users</div>
+            <div class="value"><?= $user_total ?></div>
+        </div>
+        <div class="card">
+            <div class="label">Searches run</div>
+            <div class="value"><?= $search_total ?></div>
         </div>
     </div>
 
-    <div class="filters">
-        <form method="get">
+    <div class="panel">
+        <h2>Crawler Control</h2>
+        <span class="badge <?= $crawler_running ? 'badge-running' : 'badge-stopped' ?>">
+            <?= $crawler_running ? 'Running' : 'Stopped' ?>
+        </span>
+        <?php if ($crawler_feedback): ?>
+            <ul style="margin-top: 10px;">
+                <?php foreach ($crawler_feedback as $line): ?>
+                    <li><?= esc($line) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <form method="post">
+            <input type="hidden" name="action" value="crawler_control">
             <div class="field">
+                <label>Sites to crawl</label>
+                <div class="crawler-options">
+                    <label class="check-label">
+                        <input type="checkbox" name="crawl_sites[]" value="jensenestate" <?= in_array('jensenestate', $selected_sites, true) ? 'checked' : '' ?>>
+                        Jensen Estate
+                    </label>
+                    <label class="check-label" for="crawl_max_listings">
+                        - Listings per run
+                        <input type="number" id="crawl_max_listings" name="crawl_max_listings" min="1" step="1" value="<?= (int)$crawl_max_listings ?>" style="width:80px; margin-left:6px;">
+                    </label>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit" name="crawler_cmd" value="run" id="run-crawler-btn">Run Crawler</button>
+                <button type="submit" name="crawler_cmd" value="stop" class="btn-danger">Stop Crawler</button>
+                <button type="submit" name="crawler_cmd" value="clear_log" class="btn-ghost">Clear Log</button>
+                <div id="crawl-loading" class="parse-loading-bar" style="display: none;">
+                    <span class="parse-spinner"></span>
+                    <span>Crawling...</span>
+                </div>
+            </div>
+        </form>
+
+        <div class="field">
+            <label for="crawler-log-box">Crawler log (live)</label>
+            <pre id="crawler-log-box" class="ai-output" style="min-height: 180px;">Loading log...</pre>
+        </div>
+    </div>
+
+    <div class="panel" id="raw-table">
+        <h2>Raw pages</h2>
+        <?php if ($parse_feedback): ?>
+            <ul>
+                <?php foreach ($parse_feedback as $line): ?>
+                    <li><?= esc($line) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+
+        <!-- Filters (GET form — changes the URL to filter the table below) -->
+        <form method="get" class="filter-row">
+            <div class="filter-field">
                 <label for="domain">Domain</label>
                 <select name="domain" id="domain">
                     <option value="">All</option>
@@ -403,43 +450,40 @@ $ai_latest = $pdo->query("
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="field">
+            <div class="filter-field">
                 <label for="status">HTTP status</label>
                 <input type="text" name="status" id="status" value="<?= esc($status_filter) ?>" placeholder="200">
             </div>
-            <div class="check">
-                <label class="check-label"><input type="checkbox" name="has_jsonld" <?= $has_jsonld ? 'checked' : '' ?>> Has JSON-LD</label>
+            <div class="filter-checks">
+                <label class="check-label"><input type="checkbox" name="has_jsonld" <?= $has_jsonld ? 'checked' : '' ?>> JSON-LD</label>
+                <label class="check-label"><input type="checkbox" name="has_html" <?= $has_html ? 'checked' : '' ?>> HTML</label>
+                <label class="check-label"><input type="checkbox" name="has_text" <?= $has_text ? 'checked' : '' ?>> Text</label>
             </div>
-            <div class="check">
-                <label class="check-label"><input type="checkbox" name="has_html" <?= $has_html ? 'checked' : '' ?>> Has HTML</label>
-            </div>
-            <div class="check">
-                <label class="check-label"><input type="checkbox" name="has_text" <?= $has_text ? 'checked' : '' ?>> Has text</label>
-            </div>
-            <div class="actions">
-                <button type="submit">Apply filters</button>
+            <div class="filter-submit">
+                <button type="submit">Apply</button>
             </div>
         </form>
-    </div>
 
-    <div class="panel" id="raw-table">
-        <h2>Raw pages (latest crawl data)</h2>
-        <?php if ($parse_feedback): ?>
-            <ul>
-                <?php foreach ($parse_feedback as $line): ?>
-                    <li><?= esc($line) ?></li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
+        <!-- Parse actions (POST form submit tied to the table below) -->
         <div class="actions">
             <button type="button" id="select-all-unparsed">Select all unparsed</button>
-            <button type="button" id="deselect-all-unparsed">Deselect all</button>
+            <button type="button" id="deselect-all-unparsed" class="btn-ghost">Deselect all</button>
             <button type="submit" id="parse-selected-btn" form="parse-unparsed-form">Parse selected</button>
-            <span id="parse-loading" class="muted" style="display: none;">Parsing</span>
+            <div id="parse-loading" class="parse-loading-bar" style="display: none;">
+                <span class="parse-spinner"></span>
+                <span id="parse-loading-text">Parsing...</span>
+                <span id="parse-eta" class="parse-eta-text"></span>
+            </div>
         </div>
     </div>
 
-    <div class="table-wrap" style="max-height: 800px; overflow: auto;">
+    <!-- Standalone delete form — outside the parse form to avoid nested form issues -->
+    <form method="post" id="delete-raw-form" style="display:none;">
+        <input type="hidden" name="action" value="delete_raw">
+        <input type="hidden" name="raw_id" id="delete-raw-id" value="">
+    </form>
+
+    <div class="table-wrap">
         <form method="post" id="parse-unparsed-form">
             <input type="hidden" name="action" value="parse_selected">
             <table>
@@ -460,13 +504,14 @@ $ai_latest = $pdo->query("
                     <th>HTML len</th>
                     <th>Text len</th>
                     <th>JSON-LD len</th>
+                    <th></th>
                 </tr>
                 <?php foreach ($raw_pages as $row): ?>
                     <?php $isParsed = (int)$row['is_parsed'] === 1; ?>
                     <tr>
                         <td class="nowrap">
                             <?php if ($isParsed): ?>
-                                Yes
+                                <span class="tag-parsed">Yes</span>
                             <?php else: ?>
                                 <label>
                                     No
@@ -484,11 +529,14 @@ $ai_latest = $pdo->query("
                         <td class="nowrap"><?= raw_len_link($row['id'], 'html', $row['html_len']) ?></td>
                         <td class="nowrap"><?= raw_len_link($row['id'], 'text', $row['text_len']) ?></td>
                         <td class="nowrap"><?= raw_len_link($row['id'], 'jsonld', $row['jsonld_len']) ?></td>
+                        <td class="nowrap">
+                            <button type="button" class="btn-danger btn-sm delete-btn" data-id="<?= (int)$row['id'] ?>">Delete</button>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 <?php if (!$raw_pages): ?>
                     <tr>
-                        <td colspan="11">No raw pages match the filters.</td>
+                        <td colspan="12">No raw pages match the filters.</td>
                     </tr>
                 <?php endif; ?>
             </table>
@@ -496,8 +544,8 @@ $ai_latest = $pdo->query("
     </div>
 
     <div class="panel" id="ai-table">
-        <h2>AI-parsed listings </h2>
-        <div class="table-wrap" style="max-height: 800px; overflow: auto;">
+        <h2>AI-parsed listings</h2>
+        <div class="table-wrap">
         <table>
             <?php
             $ai_sort_params = $_GET;
@@ -575,37 +623,6 @@ $ai_latest = $pdo->query("
 
 </div>
 <script>
-const openAiForm = document.getElementById('openai-test-form');
-const openAiPrompt = document.getElementById('openai_prompt');
-const openAiResponseBox = document.getElementById('openai-response-box');
-
-openAiForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const prompt = openAiPrompt.value.trim();
-    if (!prompt) {
-        openAiResponseBox.textContent = 'Write a prompt first.';
-        return;
-    }
-
-    openAiResponseBox.textContent = 'Loading...';
-
-    try {
-        const body = new URLSearchParams();
-        body.set('prompt', prompt);
-
-        const res = await fetch('openai_test.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body: body.toString()
-        });
-
-        const text = await res.text();
-        openAiResponseBox.textContent = text || 'No response returned.';
-    } catch (err) {
-        openAiResponseBox.textContent = 'Request failed.';
-    }
-});
-
 const selectAllUnparsedBtn = document.getElementById('select-all-unparsed');
 const deselectAllUnparsedBtn = document.getElementById('deselect-all-unparsed');
 selectAllUnparsedBtn.addEventListener('click', function () {
@@ -621,20 +638,58 @@ deselectAllUnparsedBtn.addEventListener('click', function () {
 
 const parseSelectedBtn = document.getElementById('parse-selected-btn');
 const parseLoading = document.getElementById('parse-loading');
-let parseLoadingTimer = null;
+const parseLoadingText = document.getElementById('parse-loading-text');
+const parseEta = document.getElementById('parse-eta');
+
 if (parseSelectedBtn && parseLoading) {
     parseSelectedBtn.addEventListener('click', function () {
-        parseLoading.style.display = 'inline';
-        let dots = 0;
-        parseLoading.textContent = 'Parsing';
-        parseLoadingTimer = setInterval(function () {
-            dots = (dots + 1) % 4;
-            parseLoading.textContent = 'Parsing' + '.'.repeat(dots);
-        }, 300);
+        const count = document.querySelectorAll('.parse-checkbox:checked').length;
+        if (count === 0) return;
+
+        // Roughly 4 seconds per item based on OpenAI API response time
+        let secondsLeft = count * 4;
+
+        parseLoading.style.display = 'inline-flex';
+        parseLoadingText.textContent = 'Parsing ' + count + ' item' + (count !== 1 ? 's' : '') + '...';
+
+        // Format seconds into a readable string
+        function formatTime(s) {
+            if (s >= 60) {
+                const m = Math.floor(s / 60);
+                const r = s % 60;
+                return m + 'm' + (r > 0 ? ' ' + r + 's' : '');
+            }
+            return s + 's';
+        }
+
+        parseEta.textContent = '~' + formatTime(secondsLeft) + ' left';
+
+        // Count down every second until done
+        const etaTimer = setInterval(function () {
+            secondsLeft--;
+            if (secondsLeft <= 0) {
+                parseEta.textContent = 'almost done...';
+                clearInterval(etaTimer);
+            } else {
+                parseEta.textContent = '~' + formatTime(secondsLeft) + ' left';
+            }
+        }, 1000);
     });
 }
 
+// Show the crawling animation when the Run Crawler button is clicked
+const runCrawlerBtn = document.getElementById('run-crawler-btn');
+const crawlLoading = document.getElementById('crawl-loading');
+if (runCrawlerBtn && crawlLoading) {
+    runCrawlerBtn.addEventListener('click', function () {
+        crawlLoading.style.display = 'inline-flex';
+    });
+}
+
+// Only poll the crawler log while the crawler is actually running
+const crawlerRunning = <?= $crawler_running ? 'true' : 'false' ?>;
 const crawlerLogBox = document.getElementById('crawler-log-box');
+
 async function refreshCrawlerLog() {
     if (!crawlerLogBox) return;
     try {
@@ -645,8 +700,24 @@ async function refreshCrawlerLog() {
         crawlerLogBox.textContent = 'Could not load log.';
     }
 }
+
 refreshCrawlerLog();
-setInterval(refreshCrawlerLog, 2500);
+if (crawlerRunning) {
+    setInterval(refreshCrawlerLog, 2500);
+}
+
+// Ask for confirmation before deleting a raw page, then submit the standalone delete form
+const deleteForm = document.getElementById('delete-raw-form');
+const deleteRawId = document.getElementById('delete-raw-id');
+document.querySelectorAll('.delete-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        const id = btn.dataset.id;
+        if (confirm('Delete raw page ID ' + id + '? This also removes its AI listing.')) {
+            deleteRawId.value = id;
+            deleteForm.submit();
+        }
+    });
+});
 </script>
 </body>
 </html>

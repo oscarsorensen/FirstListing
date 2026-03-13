@@ -104,5 +104,7 @@ $title = "How it works — FirstListing";
         <a href="index.php">Back to home</a>
     </footer>
 </div>
+
+<?php include __DIR__ . '/partials/chat_widget.php'; ?>
 </body>
 </html>

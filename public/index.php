@@ -179,5 +179,7 @@ $title = "FirstListing — Proof of Concept";
     </footer>
 </div>
 
+
+<?php include __DIR__ . '/partials/chat_widget.php'; ?>
 </body>
 </html>
