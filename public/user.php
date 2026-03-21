@@ -133,6 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
                      ON DUPLICATE KEY UPDATE searches_used = searches_used + 1'
                 );
                 $track->execute([':uid' => $_SESSION['user_id'], ':month' => date('Y-m')]);
+
             }
         }
     }

@@ -1,5 +1,6 @@
 import gzip
 import json
+import os
 import re
 import sys
 import time
@@ -31,6 +32,9 @@ HEADERS = {"User-Agent": "FirstListingBot/4.0 (+school MVP; allowed by Gitte, re
 REQUEST_DELAY = 1.5  # Seconds to wait between fetching listing pages
 TIMEOUT = 15         # Max seconds to wait for a response
 DEFAULT_MAX_LISTINGS = 50
+
+# Path to the JSONL log file — one line per newly crawled listing
+LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "crawl_log.jsonl")
 
 
 # === HELPERS ===
@@ -141,6 +145,52 @@ def read_single_url():
     return None
 
 
+# === CRAWL RESULT ===
+
+# Groups the data obtained from fetching one page into a single object.
+# This is used instead of passing 7 separate values between functions.
+class CrawlResult:
+    def __init__(self, url, domain, http_status, content_type, html_raw, text_raw, jsonld_raw):
+        self.url          = url
+        self.domain       = domain
+        self.http_status  = http_status
+        self.content_type = content_type
+        self.html_raw     = html_raw
+        self.text_raw     = text_raw
+        self.jsonld_raw   = jsonld_raw
+
+    # Returns the key fields as a plain dict — used when writing to the JSONL log
+    def to_dict(self):
+        return {
+            "url":         self.url,
+            "domain":      self.domain,
+            "http_status": self.http_status,
+        }
+
+
+# Appends one JSON line to crawl_log.jsonl for a newly inserted listing.
+# This is our non-relational data store: a flat file, no schema, append-only.
+def log_crawl_event(result, action, raw_page_id):
+    entry = result.to_dict()
+    entry["action"]      = action
+    entry["raw_page_id"] = raw_page_id
+    entry["timestamp"]   = datetime.now().isoformat()
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+# Appends one JSON line for a URL that was already in the database.
+# We don't have a full CrawlResult here (the page was not re-fetched), so we log just url + id.
+def log_seen_event(url, raw_page_id):
+    entry = {
+        "url":         url,
+        "action":      "seen",
+        "raw_page_id": raw_page_id,
+        "timestamp":   datetime.now().isoformat(),
+    }
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+
 # === DATABASE ===
 
 # Checks if a URL already exists in the database. Returns the row ID if found, so we can update the timestamp instead of inserting a duplicate.
@@ -155,7 +205,7 @@ def touch_last_seen(cur, url):
 
 
 # Inserts a new listing into the raw_pages table (only called when the URL is not already in the database).
-def insert_listing(cur, url, domain, http_status, content_type, html_raw, text_raw, jsonld_raw):
+def insert_listing(cur, result):
     now = datetime.now()
     cur.execute(
         """
@@ -165,7 +215,7 @@ def insert_listing(cur, url, domain, http_status, content_type, html_raw, text_r
         )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """,
-        (url, domain, now, now, http_status, content_type, html_raw, text_raw, jsonld_raw),
+        (result.url, result.domain, now, now, result.http_status, result.content_type, result.html_raw, result.text_raw, result.jsonld_raw),
     )
 
 
@@ -189,6 +239,7 @@ def run():
                 print(f"[SEEN]      {url}")
                 # PHP reads this line to get the row ID
                 print(f"RAW_PAGE_ID:{existing_id}")
+                log_seen_event(url, existing_id)
                 return
 
             # Fetch the page
@@ -201,22 +252,25 @@ def run():
 
             text_raw, jsonld_raw = extract_text_and_jsonld(response.content)
 
+            # Build a CrawlResult object from the fetched data
+            result = CrawlResult(
+                url=url,
+                domain=urlparse(url).netloc,
+                http_status=response.status_code,
+                content_type=response.headers.get("Content-Type", ""),
+                html_raw=response.text,
+                text_raw=text_raw,
+                jsonld_raw=jsonld_raw,
+            )
+
             try:
-                insert_listing(
-                    cur,
-                    url=url,
-                    domain=urlparse(url).netloc,
-                    http_status=response.status_code,
-                    content_type=response.headers.get("Content-Type", ""),
-                    html_raw=response.text,
-                    text_raw=text_raw,
-                    jsonld_raw=jsonld_raw,
-                )
+                insert_listing(cur, result)
                 conn.commit()
                 # cur.lastrowid gives the auto-increment ID of the row we just inserted
                 new_id = cur.lastrowid
                 print(f"[INSERTED]  {url}")
                 print(f"RAW_PAGE_ID:{new_id}")
+                log_crawl_event(result, "inserted", new_id)
             except mysql.connector.IntegrityError:
                 # Race condition: URL was inserted between our check and insert.
                 # Roll back and try to find the existing ID.
@@ -252,11 +306,13 @@ def run():
 
         for url in listing_urls:
             # Skip if already in the database, just update the timestamp
-            if url_exists(cur, url): #calling function
+            existing_id = url_exists(cur, url)
+            if existing_id:
                 touch_last_seen(cur, url)
                 conn.commit()
                 seen_count += 1
                 print(f"[SEEN]     {url}")
+                log_seen_event(url, existing_id)
                 continue
 
             # Fetch the listing page
@@ -269,20 +325,24 @@ def run():
 
             text_raw, jsonld_raw = extract_text_and_jsonld(response.content)
 
-            try: #calling function
-                insert_listing(
-                    cur,
-                    url=url,
-                    domain=urlparse(url).netloc,
-                    http_status=response.status_code,
-                    content_type=response.headers.get("Content-Type", ""),
-                    html_raw=response.text,
-                    text_raw=text_raw,
-                    jsonld_raw=jsonld_raw,
-                )
+            # Build a CrawlResult object from the fetched data
+            result = CrawlResult(
+                url=url,
+                domain=urlparse(url).netloc,
+                http_status=response.status_code,
+                content_type=response.headers.get("Content-Type", ""),
+                html_raw=response.text,
+                text_raw=text_raw,
+                jsonld_raw=jsonld_raw,
+            )
+
+            try:
+                insert_listing(cur, result)
                 conn.commit()
                 new_count += 1
+                new_id = cur.lastrowid
                 print(f"[INSERTED] {url}")
+                log_crawl_event(result, "inserted", new_id)
             except mysql.connector.IntegrityError:
                 # The URL already exists in the database (duplicate).
                 # This can happen if the URL was truncated in the DB and

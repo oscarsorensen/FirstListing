@@ -146,6 +146,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'parse_selected') {
             if ($code === 0) {
                 $ok++;
                 $parse_feedback[] = "ID {$id} OK: " . ($outputText ?: '(no output)');
+
+                // Log this listing to the JSONL file (non-relational, append-only record)
+                $rp = $pdo->prepare('SELECT url, domain FROM raw_pages WHERE id = :id LIMIT 1');
+                $rp->execute([':id' => $id]);
+                $rpRow = $rp->fetch(PDO::FETCH_ASSOC);
+                if ($rpRow) {
+                    $logEntry = json_encode([
+                        'timestamp'   => date('c'),
+                        'url'         => $rpRow['url'],
+                        'domain'      => $rpRow['domain'],
+                        'raw_page_id' => $id,
+                        'action'      => 'parsed',
+                    ], JSON_UNESCAPED_UNICODE) . "\n";
+                    file_put_contents($project_root . '/data/crawl_log.jsonl', $logEntry, FILE_APPEND | LOCK_EX);
+                }
             } else {
                 $failed++;
                 $parse_feedback[] = "ID {$id} FAILED (exit {$code}): " . ($outputText ?: '(no output)');
