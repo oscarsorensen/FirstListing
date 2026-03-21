@@ -169,7 +169,7 @@ $title = "FirstListing — Proof of Concept";
             </div>
             <div class="cta-row">
                 <a href="register.php" class="cta" lang-change="nav-register">Register</a>
-                <a href="login.php" class="ghost" lang-change="nav-login">Login</a>
+               
             </div>
         </div>
     </section>

@@ -1,78 +1,184 @@
 # FirstListing
-FirstListing is a B2B-focused web application that identifies the original publisher of a real estate listing by matching the same property across multiple platforms and building a verified publication timeline.
 
-This repo contains the **School Project MVP** for a proof-of-concept.
+FirstListing is a school MVP web application that identifies the original publisher of a real estate listing by matching the same property across multiple portals and building a verified publication timeline.
 
-## Project idea
+> **School project** — DAW (Desarrollo de Aplicaciones Web), first year. Proof-of-concept, not a production service.
 
-The user provides a link to a real estate advertisement.
-The system extracts key information such as price, surface area, location, and images, and searches for the same property across multiple portals, agency websites, and private listings.
+---
 
-All matching listings are grouped together and ordered by publication date, making it possible to identify the original publisher (private owner or agent) and distinguish them from later intermediaries.
+## What it does
 
-## Goal
+The user pastes a URL to a real estate listing. The system:
 
-The main goal is to save time, reduce duplicate work, and improve transparency in the real estate market by clearly identifying the first public listing of a property.
+1. Crawls and stores the raw page (HTML, text, JSON-LD)
+2. Uses AI to extract structured fields (price, m², rooms, address, etc.)
+3. Scores every listing in the database against the input using SQL
+4. Runs an AI description comparison on the top candidates
+5. Shows the results in the user dashboard — with match scores and "first seen" timestamps
 
-## Target users
+"First seen" = the earliest timestamp the crawler recorded for a listing. It is a proxy for the original publication date, not a legal claim.
 
-- Real estate agents and agencies (primary users)
-- Advanced private house-hunters (secondary users)
+---
 
-## School MVP scope
+## Tech stack
 
-- Crawl working sites (proof-of-concept)
-- Store **raw HTML + text + JSON-LD** in MySQL
-- AI extracts raw data into structured fields
-- Use SQL scoring (threshold: score ≥ 10) + AI description comparison to find duplicates
-- "First seen" = first time the crawler saw a listing (proxy)
+| Layer | Technology |
+|---|---|
+| Backend | PHP 7.4+ |
+| Crawler | Python 3 |
+| Database | MySQL / MariaDB |
+| AI | OpenAI GPT-4.1-mini |
+| Frontend | HTML5, CSS3, vanilla JavaScript |
 
-## Pipeline (MVP)
-
-1. **Crawler → raw_pages**
-   - Stores `html_raw`, `text_raw`, `jsonld_raw`, `fetched_at`, `first_seen_at`
-2. **AI parser → ai_listings**
-   - Extracts `price`, `sqm`, `rooms`, `address`, etc.
-3. **Duplicate detection**
-   - SQL candidate scoring (threshold: score ≥ 10) → AI description comparison (GPT-4.1-mini)
+---
 
 ## Project structure
 
-- `public/` — user + admin pages
-- `public/css/` — styles
-- `python/` — crawler scripts
-- `data/html/` — local HTML fixtures
-- `data/sql/` — SQL schemas
-- `config/` — database config
-- `docs/` — notes and drafts
+```
+public/
+  index.php          — Landing page
+  login.php          — User login
+  register.php       — User registration
+  logout.php         — Session destroy
+  user.php           — User dashboard + duplicate-check pipeline
+  how.php            — How it works (public)
+  helps.php          — Why it helps (public)
+  privacy.php        — Privacy Policy (GDPR)
+  legal.php          — Legal Notice (LSSI)
+  admin/
+    admin.php        — Admin dashboard (protected)
+    admin_ai.php     — AI listings viewer (protected)
+    admin_raw.php    — Raw crawl data viewer (protected)
+    crawler_log.php  — Live crawler log (protected)
+    admin_login.php  — Admin login page
+    admin_logout.php — Admin logout
+  css/
+    user.css         — Shared stylesheet
+    admin.css        — Admin stylesheet
+  js/
+    lang.js          — EN/ES language toggle
+  partials/
+    chat_widget.php  — AI chat widget (included in user pages)
 
-## How to run (crawler v4)
+python/
+  crawler_v4.py      — Sitemap crawler + single-URL mode (--url=...)
 
-1. Create DB and tables in `test2firstlisting`
-2. Update DB credentials in `python/crawler_v4.py`
-3. Run:
-   ```bash
-   python3 python/crawler_v4.py
-   ```
+scripts/
+  openai_parse_raw_pages.php      — AI parser (--id=N)
+  find_duplicates.php             — SQL duplicate scorer (--raw-id=N)
+  ai_compare_descriptions.php     — AI description comparator (--raw-id=N --candidates=id1,id2)
 
-## Admin
+config/
+  db.php             — PDO database connection
 
-- `public/admin.php` shows raw crawl stats + AI coverage
-- `public/admin_raw.php` shows raw HTML/text/JSON‑LD per row
+data/
+  sql/               — Database schema and migrations
+```
 
-## Technical scope (planned, real product)
+---
 
-- Web scraping
-- Database storage
-- Property matching algorithms
-- Publication date comparison
-- Optional image or location-based matching
+## Duplicate-check pipeline
 
-## Status
+The pipeline runs synchronously when a user submits a URL in the dashboard:
 
-Full pipeline implemented and working: crawl → AI parse → SQL scoring → AI description comparison → results shown in user dashboard with first-seen timestamps.
+```
+1. python3 crawler_v4.py --url=<URL>
+        → saves raw page, prints RAW_PAGE_ID:N
+
+2. php scripts/openai_parse_raw_pages.php --id=N
+        → extracts structured fields into ai_listings
+
+3. php scripts/find_duplicates.php --raw-id=N
+        → SQL scoring against all listings, returns JSON candidates (threshold: score ≥ 10)
+
+4. php scripts/ai_compare_descriptions.php --raw-id=N --candidates=id1,id2,...
+        → GPT-4.1-mini compares descriptions for top 5 SQL candidates
+```
+
+### Scoring system
+
+Fields and their weights (max score = 17):
+
+| Field | Weight |
+|---|---|
+| Reference ID | 5 |
+| Price | 3 |
+| m² | 3 |
+| Rooms | 2 |
+| Bathrooms | 2 |
+| Property type | 1 |
+| Listing type | 1 |
+
+---
+
+## How to run
+
+### Requirements
+
+- PHP 7.4+
+- Python 3
+- MySQL / MariaDB
+- OpenAI API key in environment
+
+### Setup
+
+1. Create the database and run the migrations in `data/sql/`
+2. Update credentials in `config/db.php`
+3. Set your OpenAI API key in the environment
+
+### Run the crawler
+
+```bash
+# Full sitemap crawl
+python3 python/crawler_v4.py
+
+# Single URL
+python3 python/crawler_v4.py --url=https://example.com/listing/123
+```
+
+### Run the pipeline manually
+
+```bash
+php scripts/openai_parse_raw_pages.php --id=N
+php scripts/find_duplicates.php --raw-id=N
+php scripts/ai_compare_descriptions.php --raw-id=N --candidates=id1,id2
+```
+
+---
+
+## Admin area
+
+The admin area is protected by a separate login (`admin/admin_login.php`).
+
+To create the admin account, insert a row into the `users` table:
+
+```bash
+php -r "echo password_hash('your_password', PASSWORD_BCRYPT);"
+```
+
+```sql
+INSERT INTO users (username, password_hash, role)
+VALUES ('admin', '<hash>', 'admin');
+```
+
+The admin dashboard shows:
+- Raw crawl stats and AI coverage
+- Full raw page viewer (HTML / text / JSON-LD)
+- AI listings viewer
+- Crawler controls and live log
+
+---
+
+## Features
+
+- Full EN/ES language toggle on all public pages
+- AI chat assistant (user area)
+- Monthly search usage tracking per user
+- GDPR-compliant Privacy Policy and Legal Notice (LSSI)
+- Responsive design
+
+---
 
 ## License
 
-All rights reserved.
-This project is not open source.
+All rights reserved. This project is not open source.

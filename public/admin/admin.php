@@ -2,6 +2,12 @@
 
 session_start();
 
+// Block access if not logged in as admin
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: admin_login.php');
+    exit;
+}
+
 // Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 
@@ -355,7 +361,10 @@ $ai_latest = $pdo->query("
             <h1>Admin</h1>
             <div class="subtitle">Raw crawl overview + AI pipeline status</div>
         </div>
-        <a href="../index.php" class="btn-ghost">Back to homepage</a>
+        <div style="display:flex;gap:10px;align-items:center;">
+            <a href="../index.php" class="btn-ghost">Back to homepage</a>
+            <a href="admin_logout.php" class="btn-ghost">Logout</a>
+        </div>
     </div>
 
     <!-- Stats cards -->

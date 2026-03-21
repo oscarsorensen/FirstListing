@@ -1,6 +1,13 @@
 <?php
 //the crawker
 
+session_start();
+
+// Block access if not logged in as admin
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: admin_login.php');
+    exit;
+}
 
 // Return plain text so the admin dashboard can display it in a <pre> box
 header('Content-Type: text/plain; charset=UTF-8');

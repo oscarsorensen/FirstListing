@@ -2,6 +2,14 @@
 
 //Raw data page. I could delete this like admin_ai, but i havnt done it yet. Its interesting to have.
 
+session_start();
+
+// Block access if not logged in as admin
+if (!isset($_SESSION['admin_id'])) {
+    header('Location: admin_login.php');
+    exit;
+}
+
 // Connect to the database
 require_once __DIR__ . '/../../config/db.php';
 
