@@ -41,7 +41,7 @@ var es = {
     "idx-trust1-p":     "El MVP favorece la exhaustividad. Mostramos duplicados probables con una puntuación de confianza y una marca de tiempo de \"primera vez visto\".",
     "idx-trust1-tag1":  "5 sitios objetivo",
     "idx-trust1-tag2":  "Extracción asistida por IA",
-    "idx-trust1-tag3":  "Similitud vectorial",
+    "idx-trust1-tag3":  "Comparación IA",
     "idx-trust2-h2":    "Qué ves",
     "idx-trust2-p":     "Una lista limpia de candidatos, con el anuncio más antiguo destacado y evidencia de los datos fuente brutos.",
     "idx-trust2-tag1":  "Primera vez visto",

@@ -67,7 +67,7 @@ $title = "FirstListing — Proof of Concept";
                 </div>
                 <div class="stat-tile">
                     <div class="stat-label" lang-change="idx-stat-match">Matching</div>
-                    <div class="stat-value">SQL + Vector similarity</div>
+                    <div class="stat-value">SQL + AI comparison</div>
                 </div>
             </div>
         </div>
@@ -141,7 +141,7 @@ $title = "FirstListing — Proof of Concept";
             <div class="tags">
                 <span lang-change="idx-trust1-tag1">5 target sites</span>
                 <span lang-change="idx-trust1-tag2">AI‑assisted extraction</span>
-                <span lang-change="idx-trust1-tag3">Vector similarity</span>
+                <span lang-change="idx-trust1-tag3">AI comparison</span>
             </div>
         </div>
         <div class="trust-card">
