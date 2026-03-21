@@ -1,4 +1,4 @@
-// Spanish translations — key is a short human-readable ID, value is the Spanish text.
+// Spanish translations — key is a short ID, value is the Spanish text.
 // English text lives in the HTML itself (not here).
 var es = {
     // Navigation (shared across all pages)
