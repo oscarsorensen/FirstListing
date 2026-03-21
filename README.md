@@ -6,6 +6,16 @@ FirstListing is a school MVP web application that identifies the original publis
 
 ---
 
+## URLs for testing
+
+- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/midealista-NBH-95679.html
+- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/fotohouse-NBH-43257.html
+- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/habitaclick-NBH-54359.html
+- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/pisofind-NBH-41009.html
+- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/inmoglobe-NEW.html
+
+---
+
 ## What it does
 
 The user pastes a URL to a real estate listing. The system:
@@ -41,6 +51,7 @@ public/
   register.php       — User registration
   logout.php         — Session destroy
   user.php           — User dashboard + duplicate-check pipeline
+  chat.php           — AI chat endpoint (used by chat widget)
   how.php            — How it works (public)
   helps.php          — Why it helps (public)
   privacy.php        — Privacy Policy (GDPR)
@@ -53,26 +64,29 @@ public/
     admin_login.php  — Admin login page
     admin_logout.php — Admin logout
   css/
-    user.css         — Shared stylesheet
+    user.css         — Shared stylesheet (all user + auth pages)
     admin.css        — Admin stylesheet
   js/
     lang.js          — EN/ES language toggle
   partials/
-    chat_widget.php  — AI chat widget (included in user pages)
+    chat_widget.php  — Floating AI chat widget (included in user pages)
 
 python/
   crawler_v4.py      — Sitemap crawler + single-URL mode (--url=...)
 
 scripts/
-  openai_parse_raw_pages.php      — AI parser (--id=N)
-  find_duplicates.php             — SQL duplicate scorer (--raw-id=N)
-  ai_compare_descriptions.php     — AI description comparator (--raw-id=N --candidates=id1,id2)
+  openai_parse_raw_pages.php   — AI parser (--id=N)
+  find_duplicates.php          — SQL duplicate scorer (--raw-id=N)
+  ai_compare_descriptions.php  — AI description comparator (--raw-id=N --candidates=id1,id2)
+  seed_fake_duplicates.php     — One-time seed script for test data
 
 config/
   db.php             — PDO database connection
 
 data/
-  sql/               — Database schema and migrations
+  sql/
+    test2firstlisting.sql      — Full database schema
+  demo-portal/                 — Fake portal pages for local testing
 ```
 
 ---
@@ -109,6 +123,15 @@ Fields and their weights (max score = 17):
 | Property type | 1 |
 | Listing type | 1 |
 
+### Reference ID matching
+
+If an agent uses the same reference ID on their own website and on a portal (e.g. Idealista), the reference ID can be used as a high-confidence match key without crawling the portal.
+
+- If `reference_id` matches across two listings → treat as same property (very high confidence)
+- If `reference_id` is missing or inconsistent → fallback to AI description comparison
+
+Important: do not fetch or copy data from third-party portals. Only store a reference ID if it appears on the agent's own site or is provided by the user.
+
 ---
 
 ## How to run
@@ -116,15 +139,21 @@ Fields and their weights (max score = 17):
 ### Requirements
 
 - PHP 7.4+
-- Python 3
+- Python 3 with `requests`, `lxml`, `mysql-connector-python`
 - MySQL / MariaDB
-- OpenAI API key in environment
+- OpenAI API key in environment (`OPENAI_API_KEY`)
 
 ### Setup
 
-1. Create the database and run the migrations in `data/sql/`
-2. Update credentials in `config/db.php`
-3. Set your OpenAI API key in the environment
+1. Create the database: `mysql -u root -p < data/sql/test2firstlisting.sql`
+2. Update credentials in `config/db.php` if needed
+3. Set your OpenAI API key: `export OPENAI_API_KEY=your_key_here`
+
+### Seed test data (optional)
+
+```bash
+php scripts/seed_fake_duplicates.php
+```
 
 ### Run the crawler
 
@@ -172,9 +201,10 @@ The admin dashboard shows:
 ## Features
 
 - Full EN/ES language toggle on all public pages
-- AI chat assistant (user area)
+- AI chat assistant (user area, floating widget)
 - Monthly search usage tracking per user
-- GDPR-compliant Privacy Policy and Legal Notice (LSSI)
+- GDPR-compliant Privacy Policy (`privacy.php`)
+- Legal Notice / LSSI (`legal.php`)
 - Responsive design
 
 ---

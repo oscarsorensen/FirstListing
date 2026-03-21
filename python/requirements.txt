@@ -1,4 +1,0 @@
-openai
-python-dotenv
-
-- im not using all of these atm.
