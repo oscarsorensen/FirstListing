@@ -1,5 +1,5 @@
 <?php
-//the crawker
+// Returns the last 12000 bytes of the crawler log file as plain text
 
 session_start();
 

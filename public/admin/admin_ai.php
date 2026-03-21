@@ -1,6 +1,6 @@
 <?php
 
-//description page. I could delete this now that it works every time. Maybe later.
+// Shows the full AI-extracted description for a single listing row
 
 session_start();
 

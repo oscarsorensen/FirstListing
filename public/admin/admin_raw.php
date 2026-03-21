@@ -1,6 +1,6 @@
 <?php
 
-//Raw data page. I could delete this like admin_ai, but i havnt done it yet. Its interesting to have.
+// Shows the raw stored content (html/text/jsonld) for a single raw_pages row
 
 session_start();
 
