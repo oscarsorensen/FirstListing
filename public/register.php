@@ -83,9 +83,12 @@ function esc(string $value): string
 </head>
 <body>
 <div class="page auth-wrap">
+    <div class="lang-bar">
+        <button id="lang-toggle" class="lang-btn">ES</button>
+    </div>
     <div class="auth-card">
-        <h1>Create Account</h1>
-        <p class="auth-sub">Simple signup for FirstListing users.</p>
+        <h1 lang-change="reg-h1">Create Account</h1>
+        <p class="auth-sub" lang-change="reg-sub">Simple signup for FirstListing users.</p>
 
         <?php if ($error !== ''): ?>
             <div class="error"><?= esc($error) ?></div>
@@ -93,25 +96,25 @@ function esc(string $value): string
 
         <form method="post" action="register.php">
             <div class="field">
-                <label for="username">Username</label>
+                <label for="username" lang-change="label-username">Username</label>
                 <!-- Keep the typed username in the field if the form fails -->
                 <input id="username" type="text" name="username" required minlength="3" value="<?= esc((string)($_POST['username'] ?? '')) ?>">
             </div>
-            <div class="hint">Use letters/numbers plus . _ -</div>
+            <div class="hint" lang-change="reg-hint">Use letters/numbers plus . _ -</div>
 
             <div class="field">
-                <label for="email">Email (optional)</label>
+                <label for="email" lang-change="label-email">Email (optional)</label>
                 <!-- Keep the typed email in the field if the form fails -->
                 <input id="email" type="email" name="email" value="<?= esc((string)($_POST['email'] ?? '')) ?>">
             </div>
 
             <div class="field">
-                <label for="password">Password</label>
+                <label for="password" lang-change="label-password">Password</label>
                 <input id="password" type="password" name="password" required minlength="6">
             </div>
 
             <div class="field">
-                <label for="role">Role</label>
+                <label for="role" lang-change="label-role">Role</label>
                 <select id="role" name="role">
                     <option value="agent">agent</option>
                     <option value="private">private</option>
@@ -119,11 +122,12 @@ function esc(string $value): string
             </div>
 
             <div class="actions">
-                <button class="btn" type="submit">Register</button>
-                <a href="login.php">Already have an account?</a>
+                <button class="btn" type="submit" lang-change="reg-btn">Register</button>
+                <a href="login.php" lang-change="reg-have-account">Already have an account?</a>
             </div>
         </form>
     </div>
 </div>
+<script src="js/lang.js"></script>
 </body>
 </html>

@@ -64,9 +64,12 @@ function esc(string $value): string
 </head>
 <body>
 <div class="page auth-wrap">
+    <div class="lang-bar">
+        <button id="lang-toggle" class="lang-btn">ES</button>
+    </div>
     <div class="auth-card">
-        <h1>Login</h1>
-        <p class="muted">Enter your user credentials.</p>
+        <h1 lang-change="login-h1">Login</h1>
+        <p class="muted" lang-change="login-sub">Enter your user credentials.</p>
 
         <?php if ($error !== ''): ?>
             <div class="error"><?= esc($error) ?></div>
@@ -74,22 +77,23 @@ function esc(string $value): string
 
         <form method="post" action="login.php">
             <div class="field">
-                <label for="username">Username</label>
+                <label for="username" lang-change="label-username">Username</label>
                 <!-- Keep the typed username in the field if the form fails -->
                 <input id="username" type="text" name="username" required value="<?= esc((string)($_POST['username'] ?? '')) ?>">
             </div>
 
             <div class="field">
-                <label for="password">Password</label>
+                <label for="password" lang-change="label-password">Password</label>
                 <input id="password" type="password" name="password" required>
             </div>
 
             <div class="actions">
-                <button class="btn" type="submit">Login</button>
-                <a href="register.php">Create account</a>
+                <button class="btn" type="submit" lang-change="login-btn">Login</button>
+                <a href="register.php" lang-change="login-create">Create account</a>
             </div>
         </form>
     </div>
 </div>
+<script src="js/lang.js"></script>
 </body>
 </html>

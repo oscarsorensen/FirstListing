@@ -90,6 +90,35 @@ body {
     box-shadow: 0 8px 18px rgba(22, 34, 58, 0.1);
 }
 
+/* The lang toggle button matches the nav link style */
+.lang-btn {
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(201, 214, 234, 0.85);
+    backdrop-filter: blur(8px);
+    transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.lang-btn:hover {
+    background: rgba(255, 255, 255, 0.92);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(22, 34, 58, 0.1);
+}
+
+/* Small lang bar used on pages without a top nav (login, register) */
+.lang-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 20px 0;
+}
+
 .nav .pill {
     background: linear-gradient(135deg, #eff5ff, #ffffff);
     border-color: #b7cbef;
@@ -453,6 +482,12 @@ body {
 .footer a {
     color: var(--text);
     text-decoration: none;
+}
+
+/* Group the footer links (Privacy Policy, Legal Notice) side by side */
+.footer-links {
+    display: flex;
+    gap: 16px;
 }
 
 /* User page (MVP frontend) */
@@ -1054,4 +1089,63 @@ th {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+}
+
+/* Legal pages (privacy.php, legal.php) */
+.legal-section {
+    max-width: 740px;
+    margin: 50px auto 60px;
+}
+
+/* Page title area */
+.legal-header {
+    margin-bottom: 36px;
+}
+
+.legal-header h1 {
+    margin: 6px 0 10px;
+    font-size: 2rem;
+}
+
+/* The .lead class is white for use on dark hero sections — override it for the light legal pages */
+.legal-header .lead {
+    color: var(--muted);
+}
+
+/* Each content block (one per section) */
+.legal-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 14px;
+}
+
+.legal-block h2 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.legal-block p {
+    margin: 0 0 6px;
+    line-height: 1.65;
+    color: var(--text);
+}
+
+.legal-block p:last-child {
+    margin-bottom: 0;
+}
+
+/* List inside a legal block */
+.legal-block ul {
+    margin: 10px 0 0;
+    padding-left: 20px;
+    line-height: 1.8;
+}
+
+/* Muted block for "last updated" type text */
+.legal-block-muted p {
+    color: var(--muted);
+    font-size: 13px;
 }
