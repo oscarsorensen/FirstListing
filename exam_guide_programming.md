@@ -12,7 +12,7 @@ Open python/crawler_v4.py and scroll slowly through the whole file, pausing at e
 Point to each section in order and name it. Imports at lines 1–13 — standard library first, then third-party. Constants and configuration at lines 15–38 — everything you might need to change is at the top. Helper functions at lines 44–145 — small, single-purpose. The CrawlResult class at lines 152–168. Database functions at lines 173–219. The run() function at lines 224–360 — the main logic. The entry point at lines 363–364 — the if __name__ == "__main__" guard means run() only executes when the file is run directly, not when imported.
 
 **GitHub link**
-python/crawler_v4.py
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -27,7 +27,7 @@ The class definition at lines 152–168: __init__ is the constructor — it runs
 The object is created at lines 256–264 and then passed to insert_listing() at line 267 and log_crawl_event() at line 273 — one object carries all the data through the pipeline instead of passing seven separate variables.
 
 **GitHub link**
-python/crawler_v4.py
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -44,7 +44,7 @@ for loop at lines 307–354 — iterates over every URL from the sitemap. Inside
 try/except at lines 266–285 — catches the IntegrityError when a UNIQUE constraint fails, calls conn.rollback() to undo the failed transaction, then does a recovery SELECT to find the existing row ID.
 
 **GitHub link**
-python/crawler_v4.py
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -59,7 +59,7 @@ CrawlResult at lines 152–168 bundles seven related values into one object — 
 insert_listing(cur, result) at lines 208–219 accesses result.url, result.domain, and so on — the function signature is one parameter instead of seven. log_crawl_event() at line 173 calls result.to_dict() to get the dict it needs before writing to the log file.
 
 **GitHub link**
-python/crawler_v4.py
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -76,7 +76,7 @@ Output to stdout — line 271 prints RAW_PAGE_ID:N. PHP captures this with exec(
 File output — log_crawl_event() at lines 173–179 opens the JSONL file in append mode ("a") and writes one JSON line per crawl event.
 
 **GitHub link**
-python/crawler_v4.py
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -93,8 +93,7 @@ Python lists and JSON — jsonld_items starts empty at line 67 and is built up w
 PHP arrays — in scripts/find_duplicates.php, fetchAll(PDO::FETCH_ASSOC) at line 93 returns an array of associative arrays (each row is an array keyed by column name). json_encode() at line 101 converts it for output.
 
 **GitHub link**
-python/crawler_v4.py
-scripts/find_duplicates.php
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -111,7 +110,7 @@ log_crawl_event() at lines 173–179 calls result.to_dict() to get the base dict
 The contrast: raw_pages is relational — fixed schema, SQL queries, constraint checks. crawl_log.jsonl is non-relational — no schema, readable with any text tool, always writable.
 
 **GitHub link**
-python/crawler_v4.py — log functions at lines 173–191
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ---
 
@@ -128,5 +127,4 @@ Integrity error handling in python/crawler_v4.py at lines 266–285 — when the
 Parameterized queries across all PHP scripts — in config/db.php line 14, PDO::ATTR_EMULATE_PREPARES is false, which forces real prepared statements. Values are bound with placeholders, never concatenated into SQL strings.
 
 **GitHub link**
-data/sql/test2firstlisting.sql
-python/crawler_v4.py — lines 266–285
+https://github.com/oscarsorensen/FirstListing/blob/main/data/sql/test2firstlisting.sql

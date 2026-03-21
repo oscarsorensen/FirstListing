@@ -12,7 +12,7 @@ Open a terminal, log into MySQL, run SHOW TABLES and SELECT COUNT(*) FROM raw_pa
 The project needs a database because it stores large amounts of data that must persist across requests and be queryable. Raw HTML is too big for flat files. Price, sqm, and rooms need to be filtered with SQL. User sessions need to survive between page loads. Read the opening comment in data/sql/test2firstlisting.sql — it states the design decision plainly.
 
 **GitHub link**
-data/sql/test2firstlisting.sql
+https://github.com/oscarsorensen/FirstListing/blob/main/data/sql/test2firstlisting.sql
 
 ---
 
@@ -31,7 +31,7 @@ ai_listings at lines 28–53 and the ALTER block at lines 78–83: one row per p
 users at lines 86–93: username and email are UNIQUE, password_hash is never plain text, role is an ENUM limited to three values.
 
 **GitHub link**
-data/sql/test2firstlisting.sql
+https://github.com/oscarsorensen/FirstListing/blob/main/data/sql/test2firstlisting.sql
 
 ---
 
@@ -46,7 +46,7 @@ The main query is in scripts/find_duplicates.php at lines 47–79. It uses IF ex
 Also point to the login query in public/login.php at lines 27–34 — a simple SELECT on users by username — as a contrast to show SELECT is used throughout the project, not just for complex queries.
 
 **GitHub link**
-scripts/find_duplicates.php
+https://github.com/oscarsorensen/FirstListing/blob/main/scripts/find_duplicates.php
 
 ---
 
@@ -65,7 +65,7 @@ INSERT with upsert — public/user.php lines 131–135: INSERT INTO search_usage
 DELETE — public/admin/admin.php lines 175–186: deletes from ai_listings first (it holds the foreign key), then from raw_pages.
 
 **GitHub link**
-public/user.php — the ON DUPLICATE KEY UPDATE at lines 131–135
+https://github.com/oscarsorensen/FirstListing/blob/main/public/user.php
 
 ---
 
@@ -80,7 +80,7 @@ The five tables and their relationships: users to subscriptions (one to one), us
 The foreign key constraints are at lines 50–52 for ai_listings, lines 100–103 for subscriptions, and lines 109–111 for search_usage. Explain normalization with the raw_pages / ai_listings split: keeping derived data in a separate table means you can re-run AI extraction without overwriting the original crawl data.
 
 **GitHub link**
-data/sql/test2firstlisting.sql
+https://github.com/oscarsorensen/FirstListing/blob/main/data/sql/test2firstlisting.sql
 
 ---
 
@@ -97,4 +97,4 @@ In python/crawler_v4.py, log_crawl_event() at lines 173–179 calls result.to_di
 The contrast: raw_pages is relational — fixed schema, SQL queries, constraint checks. crawl_log.jsonl is non-relational — no schema, readable with any text tool, always writable.
 
 **GitHub link**
-python/crawler_v4.py — log functions at lines 173–191
+https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py

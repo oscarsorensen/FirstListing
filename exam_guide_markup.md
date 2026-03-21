@@ -12,7 +12,7 @@ Open public/index.php in the editor on one side, the rendered homepage in the br
 HTML tags describe the structure and meaning of content — without them the browser shows a wall of unstyled text. Point to the document skeleton at the top of public/index.php: DOCTYPE, html, head (charset, viewport, title, link to stylesheet), body. Then point to the semantic tags in the body — header, nav, section, footer — these describe what the content is, not just how it looks. PHP runs on the server and generates the HTML dynamically; the browser never sees PHP.
 
 **GitHub link**
-public/index.php
+https://github.com/oscarsorensen/FirstListing/blob/main/public/index.php
 
 ---
 
@@ -27,7 +27,7 @@ The HTML in public/user.php runs from line 184 to 438 — header with navigation
 The CSS in public/css/user.css starts with custom properties on :root at lines 1–13 — colours and spacing stored as variables, changeable in one place. The class names in the HTML (tool-card, state-pill, score-badge) connect directly to rules in the CSS file.
 
 **GitHub link**
-public/css/user.css
+https://github.com/oscarsorensen/FirstListing/blob/main/public/css/user.css
 
 ---
 
@@ -44,7 +44,7 @@ applyLang() at lines 277–292 does the swap — it loops over all elements with
 The DOMContentLoaded listener at lines 295–311 ties it together: reads the saved language from localStorage, applies it, and wires the toggle button click.
 
 **GitHub link**
-public/js/lang.js
+https://github.com/oscarsorensen/FirstListing/blob/main/public/js/lang.js
 
 ---
 
@@ -61,8 +61,7 @@ In public/user.php, json_decode at lines 103–107 turns it back into a PHP arra
 The chain: SQL rows → json_encode → text → json_decode → PHP array → HTML table → browser.
 
 **GitHub link**
-scripts/find_duplicates.php
-public/user.php — lines 103–107 and 353–392
+https://github.com/oscarsorensen/FirstListing/blob/main/scripts/find_duplicates.php
 
 ---
 
@@ -77,4 +76,4 @@ The business problem: the same property appears on multiple portals listed by di
 The pipeline runs in public/user.php at lines 51–139: crawler fetches the URL, AI parser extracts structured fields, SQL scoring finds candidates, AI comparison checks descriptions. Point to the four run_cmd() calls and say what each one does for the user.
 
 **GitHub link**
-public/user.php
+https://github.com/oscarsorensen/FirstListing/blob/main/public/user.php
