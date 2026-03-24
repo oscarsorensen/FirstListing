@@ -1,6 +1,10 @@
 # Exam Guide — Databases
 6 questions · 15 minutes each
-
+Remember for each question do:
+   - 2.1. Introduction to the concept being presented
+   - 2.2. Technical aspects (code, to put it simply)
+   - 2.3. Overall use of what is being presented (what does it do for the end user)
+   - 2.4. Conclusion
 ---
 
 ## Q1 — Recognizes the elements of databases by analyzing their functions and assessing the usefulness of management systems.
@@ -41,7 +45,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/data/sql/test2firstlisti
 Run a duplicate check in the browser, then switch to the editor and show the SELECT queries that powered it.
 
 **What to explain**
-The main query is in scripts/find_duplicates.php at lines 47–79. It uses IF expressions inside a calculated match_score column — each matching field adds points. HAVING match_score >= 10 filters weak matches. It JOINs raw_pages to get the url and first_seen_at, orders by score, and limits to 20 results.
+The main query is in scripts/find_duplicates.php at lines 47–79. It uses IF expressions inside a calculated match_score column — each matching field adds points. HAVING match_score >= 5 filters weak matches. It JOINs raw_pages to get the url and first_seen_at, orders by score, and limits to 20 results.
 
 Also point to the login query in public/login.php at lines 27–34 — a simple SELECT on users by username — as a contrast to show SELECT is used throughout the project, not just for complex queries.
 
@@ -54,18 +58,18 @@ https://github.com/oscarsorensen/FirstListing/blob/main/scripts/find_duplicates.
 
 **Video**
 Show three actions: register a new user (INSERT), run a search on a URL already in the database (UPDATE), delete a raw page from the admin panel (DELETE).
+- admin login is : admin : 123456
 
 **What to explain**
 INSERT — public/register.php lines 38–49: hashes the password with password_hash(), then INSERT INTO users.
 
 UPDATE — python/crawler_v4.py touch_last_seen() at lines 203–204: UPDATE raw_pages SET fetched_at = NOW() for URLs already in the database.
 
-INSERT with upsert — public/user.php lines 131–135: INSERT INTO search_usage ON DUPLICATE KEY UPDATE searches_used = searches_used + 1. One query handles both the first search and every repeat — worth explaining as a clean pattern.
-
 DELETE — public/admin/admin.php lines 175–186: deletes from ai_listings first (it holds the foreign key), then from raw_pages.
 
-**GitHub link**
-https://github.com/oscarsorensen/FirstListing/blob/main/public/user.php
+**GitHub links**
+https://github.com/oscarsorensen/FirstListing/blob/main/public/register.php
+https://github.com/oscarsorensen/FirstListing/blob/main/public/admin/admin.php
 
 ---
 
@@ -92,7 +96,7 @@ Open data/crawl_log.jsonl and scroll through it — one JSON object per line, no
 **What to explain**
 The JSONL file is the non-relational store. Each line is a self-contained JSON object with no schema — fields can vary between lines. It is append-only, nothing is ever updated or deleted.
 
-In python/crawler_v4.py, log_crawl_event() at lines 173–179 calls result.to_dict() to get a base dict, adds action, raw_page_id, and timestamp, then writes one JSON line. CrawlResult.to_dict() at lines 163–168 is what converts the object to a plain dict that json.dumps() can handle.
+There are two log functions. log_crawl_event() at lines 173–179 fires when a new URL is inserted — it calls result.to_dict() to get the base dict, adds action, raw_page_id, and timestamp, then writes one JSON line. log_seen_event() at lines 183–189 fires when a URL was already in the database — it logs url, action: "seen", raw_page_id, and timestamp. Both write to the same file, so the JSONL records every URL the crawler touches, not just new ones.
 
 The contrast: raw_pages is relational — fixed schema, SQL queries, constraint checks. crawl_log.jsonl is non-relational — no schema, readable with any text tool, always writable.
 

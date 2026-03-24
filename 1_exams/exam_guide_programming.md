@@ -1,6 +1,10 @@
 # Exam Guide — Programming
 8 questions · 22.5 minutes each
-
+Remember for each question do:
+   - 2.1. Introduction to the concept being presented
+   - 2.2. Technical aspects (code, to put it simply)
+   - 2.3. Overall use of what is being presented (what does it do for the end user)
+   - 2.4. Conclusion
 ---
 
 ## Q1 — Recognizes the structure of a computer program, identifying and relating the elements of the programming language used.
@@ -105,7 +109,7 @@ Open data/crawl_log.jsonl and show its contents — flat file, one JSON object p
 **What to explain**
 The JSONL file is the non-relational store. Each line is a self-contained JSON object with no fixed schema. It is append-only — nothing is ever updated or deleted, which guarantees persistence of every event.
 
-log_crawl_event() at lines 173–179 calls result.to_dict() to get the base dict, adds action, raw_page_id, and timestamp, then writes it as one JSON line. CrawlResult.to_dict() at lines 163–168 is what makes the object serializable.
+There are two log functions. log_crawl_event() at lines 173–179 fires on new insertions — it calls result.to_dict() to get the base dict, adds action, raw_page_id, and timestamp, then writes one JSON line. log_seen_event() at lines 183–189 fires when a URL was already in the database — it logs url, action: "seen", raw_page_id, and timestamp. Both write to the same file, so the JSONL records every URL the crawler touches, not just new ones. CrawlResult.to_dict() at lines 163–168 is what makes the object serializable for log_crawl_event.
 
 The contrast: raw_pages is relational — fixed schema, SQL queries, constraint checks. crawl_log.jsonl is non-relational — no schema, readable with any text tool, always writable.
 

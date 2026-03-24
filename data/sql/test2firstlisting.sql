@@ -87,9 +87,15 @@ CREATE TABLE users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(80) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  role ENUM('agent','admin','private') DEFAULT 'agent',
+  role ENUM('agent','admin','private') DEFAULT 'agent',/*This is so you can only have one of these 3 roles. For security*/
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+SET @sql := IF(
+  @has_email = 0,
+  'ALTER TABLE users ADD COLUMN email VARCHAR(255) NULL UNIQUE AFTER username',
+  'SELECT "email column already exists"'
 );
 
 CREATE TABLE subscriptions (
@@ -121,11 +127,7 @@ SET @has_email := (
     AND COLUMN_NAME = 'email'
 );
 
-SET @sql := IF(
-  @has_email = 0,
-  'ALTER TABLE users ADD COLUMN email VARCHAR(255) NULL UNIQUE AFTER username',
-  'SELECT "email column already exists"'
-);
+
 
 PREPARE stmt FROM @sql;
 EXECUTE stmt;

@@ -73,7 +73,7 @@ $sql = "
     FROM ai_listings ai
     JOIN raw_pages rp ON rp.id = ai.raw_page_id
     WHERE ai.raw_page_id != :exclude
-    HAVING match_score >= 10
+    HAVING match_score >= 5
     ORDER BY match_score DESC
     LIMIT 20
 ";

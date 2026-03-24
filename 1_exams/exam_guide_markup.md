@@ -1,6 +1,10 @@
 # Exam Guide — Markup Languages
 5 questions · 18 minutes each
-
+Remember for each question do:
+   - 2.1. Introduction to the concept being presented
+   - 2.2. Technical aspects (code, to put it simply)
+   - 2.3. Overall use of what is being presented (what does it do for the end user)
+   - 2.4. Conclusion
 ---
 
 ## Q1 — Recognizes the characteristics of markup languages by analyzing and interpreting code fragments.
@@ -73,7 +77,7 @@ Full live demo: log in, paste a real listing URL, watch the four-step pipeline r
 **What to explain**
 The business problem: the same property appears on multiple portals listed by different agents, and there is no easy way to know who published it first. FirstListing crawls portals, timestamps them, and lets an agent check whether a listing already exists in the database and who had it first.
 
-The pipeline runs in public/user.php at lines 51–139: crawler fetches the URL, AI parser extracts structured fields, SQL scoring finds candidates, AI comparison checks descriptions. Point to the four run_cmd() calls and say what each one does for the user.
+The pipeline runs in public/user.php at lines 51–139: crawler fetches the URL, AI parser extracts structured fields, SQL scoring finds candidates, AI comparison checks descriptions. Point to the four run_cmd() calls and say what each one does for the user. (crawl, parse, sql comparison, description comparison)
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/public/user.php
