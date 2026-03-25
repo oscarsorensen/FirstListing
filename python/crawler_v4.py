@@ -152,6 +152,7 @@ def read_single_url():
 # OOP element inside the file structure. Before this class existed, every function passed 7 separate variables around.
 # __init__ = constructor
 # runs when you create a new CrawlResult and stores the 7 values.
+# This is a structural element. 
 class CrawlResult:
     def __init__(self, url, domain, http_status, content_type, html_raw, text_raw, jsonld_raw):
         self.url          = url
@@ -162,7 +163,9 @@ class CrawlResult:
         self.text_raw     = text_raw
         self.jsonld_raw   = jsonld_raw
 
-    # Returns the key fields as a plain dict — used when writing to the JSONL log
+    # Returns the key fields as a plain dict — used when writing to the JSONL log.
+    # This is serialization: converting the object into a format that can be saved.
+    # json.dumps() cannot write a custom object directly, but it can write a plain dict.
     def to_dict(self):
         return {
             "url":         self.url,

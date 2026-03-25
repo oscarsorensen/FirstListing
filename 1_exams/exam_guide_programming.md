@@ -5,6 +5,7 @@ Remember for each question do:
    - 2.2. Technical aspects (code, to put it simply)
    - 2.3. Overall use of what is being presented (what does it do for the end user)
    - 2.4. Conclusion
+   - make sure the very first sentence names the concept — "A control structure is..." or "Object-oriented programming is..."
 ---
 
 ## Q1 — Recognizes the structure of a computer program, identifying and relating the elements of the programming language used.
@@ -27,14 +28,15 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ## Q2 — Writes and tests simple programs, recognizing and applying the fundamentals of object-oriented programming.
 RA2. Escribe y prueba programas sencillos, reconociendo y aplicando los fundamentos de la programación orientada a objetos.
+Q2 = WHAT the class does and that it works — constructor, self, to_dict, test run.
 
 **Video**
-Open python/crawler_v4.py at the CrawlResult class (line 152), then scroll to line 256 to show where it is instantiated. Show both the definition and the usage. Also add video of run from BDD exam. 
+Open python/crawler_v4.py at the CrawlResult class (line 155). Then switch to user.php in the browser, paste a URL, run it, and show the duplicate results appearing. That is the test — the CrawlResult object is what carries the data through the whole pipeline.
 
 **What to explain**
-The class definition at lines 152–168: __init__ is the constructor — it runs when you create a new CrawlResult object and stores the seven parameters as instance variables using self. to_dict() is a method that converts the object to a plain dictionary, needed because json.dumps() cannot serialize a custom object directly.
-
-The object is created at lines 256–264 and then passed to insert_listing() at line 267 and log_crawl_event() at line 273 — one object carries all the data through the pipeline instead of passing seven separate variables.
+1. Class definition — lines 155–171 — `__init__` is the constructor, runs when you create a new CrawlResult and stores the 7 values using `self`. `to_dict()` converts the object to a plain dict so it can be serialized.
+2. Object created and used — lines 259–267 — one object carries all data through the pipeline. Passed to `insert_listing()` at line 270 and `log_crawl_event()` at line 276 — instead of passing 7 separate variables.
+3. Testing — submitting a URL in user.php and seeing the duplicate results appear confirms the class was created, populated, and passed correctly through the whole pipeline.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -45,14 +47,12 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 RA3. Escribe y depura código, analizando y utilizando las estructuras de control del lenguaje.
 
 **Video**
-Open python/crawler_v4.py and scroll through run() starting at line 224. Highlight the if/else branch, the for loop, and the try/except block.
+Open python/crawler_v4.py and scroll through run() starting at line 227. Pause at the if/else, the for loop, and the try/except.
 
 **What to explain**
-if/else at lines 229–289 — the entire function splits on whether --url= was given. The branch determines the whole behaviour of the program.
-
-for loop at lines 307–354 — iterates over every URL from the sitemap. Inside, another if/else skips URLs already in the database.
-
-try/except at lines 266–285 — catches the IntegrityError when a UNIQUE constraint fails, calls conn.rollback() to undo the failed transaction, then does a recovery SELECT to find the existing row ID.
+1. if/else — lines 232–292 — the whole function splits on whether `--url=` was given. That branch determines the entire behaviour of the program.
+2. for loop — lines 310–357 — iterates over every URL from the sitemap. Inside, another if/else skips URLs already in the database.
+3. try/except — lines 269–288 — catches IntegrityError when the UNIQUE constraint fails, calls `conn.rollback()`, then runs a recovery SELECT to find the existing row ID.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -61,14 +61,14 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 
 ## Q4 — Develops programs organized in classes, analyzing and applying the principles of object-oriented programming.
 RA4. Desarrolla programas organizados en clases analizando y aplicando los principios de la programación orientada a objetos.
+Q4 = WHY the class was designed that way — encapsulation, one parameter instead of seven.
 
 **Video**
-Open python/crawler_v4.py and show the CrawlResult class. Then show insert_listing() at line 208 receiving the object, and log_crawl_event() at line 173 calling result.to_dict(). Show the class being used, not just defined.
+Open python/crawler_v4.py at the CrawlResult class (line 155). Then show insert_listing() at line 211 receiving the object, and log_crawl_event() at line 176 calling result.to_dict(). Show the class being used the 3 places in the code, not just defined.
 
 **What to explain**
-CrawlResult at lines 152–168 bundles seven related values into one object — this is encapsulation. Before this class, those seven values were passed as separate arguments between functions.
-
-insert_listing(cur, result) at lines 208–219 accesses result.url, result.domain, and so on — the function signature is one parameter instead of seven. log_crawl_event() at line 173 calls result.to_dict() to get the dict it needs before writing to the log file.
+1. Encapsulation — CrawlResult at lines 155–171 bundles 7 related values into one object. Before this class, those 7 values were separate arguments passed between every function.
+2. Class in use — insert_listing(cur, result) at lines 211–222 takes one parameter instead of seven. log_crawl_event() at line 176 calls result.to_dict() to serialize it for the log file.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -79,14 +79,12 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 RA5. Realiza operaciones de entrada y salida de información, utilizando procedimientos específicos del lenguaje y librerías de clases.
 
 **Video**
-Run the crawler from the terminal with a --url= argument. Show the printed output (FETCHING, INSERTED, RAW_PAGE_ID:N). Then open data/crawl_log.jsonl to show the file that was written.
+Open python/crawler_v4.py and scroll through read_single_url() at line 141, then line 274 (print RAW_PAGE_ID), then log_crawl_event() at line 176. Then open data/crawl_log.jsonl and show the data.
 
 **What to explain**
-Input from sys.argv — read_single_url() at lines 141–145 loops over sys.argv[1:] and returns the value after --url=. This is Python's standard way of reading command-line arguments.
-
-Output to stdout — line 271 prints RAW_PAGE_ID:N. PHP captures this with exec() and scans for that line using preg_match in public/user.php at lines 60–73. That is the communication protocol between Python and PHP.
-
-File output — log_crawl_event() at lines 173–179 opens the JSONL file in append mode ("a") and writes one JSON line per crawl event.
+1. Input — read_single_url() at lines 141–145 loops over sys.argv[1:] and returns the value after `--url=`. Standard Python way of reading command-line arguments.
+2. Output to stdout — line 274 prints `RAW_PAGE_ID:N`. PHP captures this with exec() and reads it with preg_match in user.php lines 60–73. That is the communication protocol between Python and PHP.
+3. File output — log_crawl_event() at lines 176–182 opens the JSONL file in append mode `"a"` and writes one JSON line per crawl event.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -100,11 +98,8 @@ RA6. Escribe programas que manipulen información seleccionando y utilizando t
 Open python/crawler_v4.py and show DB_CONFIG and the jsonld_items list. Then open scripts/find_duplicates.php and show the $candidates array and json_encode.
 
 **What to explain**
-Python dicts — DB_CONFIG at lines 22–29 is passed directly to mysql.connector.connect. HEADERS at line 31 is used for every HTTP request.
-
-Python lists and JSON — jsonld_items starts empty at line 67 and is built up with extend() and append() as JSON-LD script tags are found in the HTML. json.dumps() at line 81 converts the list to a string for storing in the database. json.loads() at line 74 parses embedded JSON strings.
-
-PHP arrays — in scripts/find_duplicates.php, fetchAll(PDO::FETCH_ASSOC) at line 93 returns an array of associative arrays (each row is an array keyed by column name). json_encode() at line 101 converts it for output.
+1. Dict — a dictionary stores data as key-value pairs, like `"host": "localhost"`. DB_CONFIG at lines 22–29 is a dict with all the database connection settings — it gets passed directly into mysql.connector.connect(). Point to it and say: this is a dict, and the whole thing is passed as one argument to the connect function.
+2. List — a list is an ordered collection you can add to. jsonld_items at line 67 starts empty, then extend() and append() fill it as JSON-LD script tags are found in the page HTML. Once the list is complete, json.dumps() at line 81 converts it to a string so it can be stored in the database. Point to the empty list, then the append, then the json.dumps — that is the lifecycle of a list in this program. This shows that the program manipulates select information and uses advanced datatypes.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -118,11 +113,9 @@ RA8. Utiliza bases de datos orientadas a objetos, analizando sus característi
 Open data/crawl_log.jsonl and show its contents — flat file, one JSON object per line. Then open python/crawler_v4.py and show log_crawl_event() and CrawlResult.to_dict().
 
 **What to explain**
-The JSONL file is the non-relational store. Each line is a self-contained JSON object with no fixed schema. It is append-only — nothing is ever updated or deleted, which guarantees persistence of every event.
-
-There are two log functions. log_crawl_event() at lines 173–179 fires on new insertions — it calls result.to_dict() to get the base dict, adds action, raw_page_id, and timestamp, then writes one JSON line. log_seen_event() at lines 183–189 fires when a URL was already in the database — it logs url, action: "seen", raw_page_id, and timestamp. Both write to the same file, so the JSONL records every URL the crawler touches, not just new ones. CrawlResult.to_dict() at lines 163–168 is what makes the object serializable for log_crawl_event.
-
-The contrast: raw_pages is relational — fixed schema, SQL queries, constraint checks. crawl_log.jsonl is non-relational — no schema, readable with any text tool, always writable.
+1. What JSONL is — MongoDB stores records as JSON documents with no fixed schema. JSONL is the same concept as a flat file: each line is a self-contained JSON object, schema-less, serialized from a Python object. The teacher approved this for the project.
+2. How it works — log_crawl_event() at lines 176–182 calls result.to_dict() to get the base dict, adds action and timestamp, then writes one JSON line in append mode. Append-only means nothing is ever deleted — every crawl event is preserved.
+3. The contrast — raw_pages is relational: fixed schema, SQL queries, constraints. crawl_log.jsonl is non-relational: no schema, readable with any text tool, always writable.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -136,11 +129,9 @@ RA9. Gestiona información almacenada en bases de datos manteniendo la integri
 Open data/sql/test2firstlisting.sql and show the UNIQUE KEY and FOREIGN KEY lines. Then open python/crawler_v4.py and show the try/except IntegrityError block.
 
 **What to explain**
-Constraints in data/sql/test2firstlisting.sql — line 22 defines UNIQUE KEY on the url column of raw_pages, so MySQL rejects any duplicate URL at the database level. Lines 50–52 define the foreign key on ai_listings with ON DELETE CASCADE — deleting a raw_page automatically deletes its ai_listing.
-
-Integrity error handling in python/crawler_v4.py at lines 266–285 — when the INSERT fails because of the UNIQUE constraint, the except block catches IntegrityError, calls conn.rollback() to undo the failed transaction, and runs a recovery SELECT to continue cleanly.
-
-Parameterized queries across all PHP scripts — in config/db.php line 14, PDO::ATTR_EMULATE_PREPARES is false, which forces real prepared statements. Values are bound with placeholders, never concatenated into SQL strings.
+1. Schema constraints — data/sql/test2firstlisting.sql line 22: UNIQUE KEY on the url column means MySQL rejects any duplicate URL at the database level. Lines 50–52: FOREIGN KEY on ai_listings with ON DELETE CASCADE — deleting a raw_page automatically deletes its ai_listing.
+2. Error handling — python/crawler_v4.py lines 269–288: when INSERT fails on the UNIQUE constraint, IntegrityError is caught, conn.rollback() undoes the failed transaction, then a recovery SELECT finds the existing row ID so the pipeline continues cleanly.
+3. Parameterized queries — config/db.php line 14: PDO::ATTR_EMULATE_PREPARES = false forces real prepared statements. Values are never concatenated into SQL strings — prevents SQL injection.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/data/sql/test2firstlisting.sql
