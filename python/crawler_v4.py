@@ -149,6 +149,9 @@ def read_single_url():
 
 # Groups the data obtained from fetching one page into a single object.
 # This is used instead of passing 7 separate values between functions.
+# OOP element inside the file structure. Before this class existed, every function passed 7 separate variables around.
+# __init__ = constructor
+# runs when you create a new CrawlResult and stores the 7 values.
 class CrawlResult:
     def __init__(self, url, domain, http_status, content_type, html_raw, text_raw, jsonld_raw):
         self.url          = url

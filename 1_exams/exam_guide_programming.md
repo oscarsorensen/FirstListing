@@ -1,5 +1,5 @@
 # Exam Guide — Programming
-8 questions · 22.5 minutes each
+8 questions · 20 minutes each
 Remember for each question do:
    - 2.1. Introduction to the concept being presented
    - 2.2. Technical aspects (code, to put it simply)
@@ -8,12 +8,17 @@ Remember for each question do:
 ---
 
 ## Q1 — Recognizes the structure of a computer program, identifying and relating the elements of the programming language used.
-
+RA1. Reconoce la estructura de un programa informático, identificando y relacionando los elementos propios del lenguaje de programación utilizado.
 **Video**
 Open python/crawler_v4.py and scroll slowly through the whole file, pausing at each section.
 
 **What to explain**
-Point to each section in order and name it. Imports at lines 1–13 — standard library first, then third-party. Constants and configuration at lines 15–38 — everything you might need to change is at the top. Helper functions at lines 44–145 — small, single-purpose. The CrawlResult class at lines 152–168. Database functions at lines 173–219. The run() function at lines 224–360 — the main logic. The entry point at lines 363–364 — the if __name__ == "__main__" guard means run() only executes when the file is run directly, not when imported.
+One sentence each for every piece of code.
+1. Imports — lines 1–13 — the libraries the program depends on (standard library first, then third-party like requests and mysql.connector).
+2. Config/Constants — lines 15–38 — everything you might need to change (DB credentials, URLs, delays) is separated at the top, not buried in logic.
+3. CrawlResult class — lines 155–171 — the one data structure, bundles the seven values from a crawled page into a single object.
+4. run() function — lines 227–363 — the main logic; from here you can see it calling the helper and database functions defined earlier in the file.
+5. Entry point — line 366 — the `if __name__ == "__main__"` guard means run() only executes when the file is run directly, not when imported. Basically, means Start.
 
 **GitHub link**
 https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
@@ -21,9 +26,10 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q2 — Writes and tests simple programs, recognizing and applying the fundamentals of object-oriented programming.
+RA2. Escribe y prueba programas sencillos, reconociendo y aplicando los fundamentos de la programación orientada a objetos.
 
 **Video**
-Open python/crawler_v4.py at the CrawlResult class (line 152), then scroll to line 256 to show where it is instantiated. Show both the definition and the usage.
+Open python/crawler_v4.py at the CrawlResult class (line 152), then scroll to line 256 to show where it is instantiated. Show both the definition and the usage. Also add video of run from BDD exam. 
 
 **What to explain**
 The class definition at lines 152–168: __init__ is the constructor — it runs when you create a new CrawlResult object and stores the seven parameters as instance variables using self. to_dict() is a method that converts the object to a plain dictionary, needed because json.dumps() cannot serialize a custom object directly.
@@ -36,6 +42,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q3 — Writes and debugs code, analyzing and using the control structures of the language.
+RA3. Escribe y depura código, analizando y utilizando las estructuras de control del lenguaje.
 
 **Video**
 Open python/crawler_v4.py and scroll through run() starting at line 224. Highlight the if/else branch, the for loop, and the try/except block.
@@ -53,6 +60,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q4 — Develops programs organized in classes, analyzing and applying the principles of object-oriented programming.
+RA4. Desarrolla programas organizados en clases analizando y aplicando los principios de la programación orientada a objetos.
 
 **Video**
 Open python/crawler_v4.py and show the CrawlResult class. Then show insert_listing() at line 208 receiving the object, and log_crawl_event() at line 173 calling result.to_dict(). Show the class being used, not just defined.
@@ -68,6 +76,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q5 — Performs input and output operations, using language-specific procedures and class libraries.
+RA5. Realiza operaciones de entrada y salida de información, utilizando procedimientos específicos del lenguaje y librerías de clases.
 
 **Video**
 Run the crawler from the terminal with a --url= argument. Show the printed output (FETCHING, INSERTED, RAW_PAGE_ID:N). Then open data/crawl_log.jsonl to show the file that was written.
@@ -85,6 +94,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q6 — Writes programs that manipulate information by selecting and using advanced data types.
+RA6. Escribe programas que manipulen información seleccionando y utilizando tipos avanzados de datos.
 
 **Video**
 Open python/crawler_v4.py and show DB_CONFIG and the jsonld_items list. Then open scripts/find_duplicates.php and show the $candidates array and json_encode.
@@ -102,6 +112,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q8 — Uses object-oriented databases, analyzing their characteristics and applying techniques to maintain data persistence.
+RA8. Utiliza bases de datos orientadas a objetos, analizando sus características y aplicando técnicas para mantener la persistencia de la información. - me sirve log en texto, no tiene por qué ser Mongo - propongo jsonl para registros
 
 **Video**
 Open data/crawl_log.jsonl and show its contents — flat file, one JSON object per line. Then open python/crawler_v4.py and show log_crawl_event() and CrawlResult.to_dict().
@@ -119,6 +130,7 @@ https://github.com/oscarsorensen/FirstListing/blob/main/python/crawler_v4.py
 ---
 
 ## Q9 — Manages information stored in databases while maintaining data integrity and consistency.
+RA9. Gestiona información almacenada en bases de datos manteniendo la integridad y consistencia de los datos.
 
 **Video**
 Open data/sql/test2firstlisting.sql and show the UNIQUE KEY and FOREIGN KEY lines. Then open python/crawler_v4.py and show the try/except IntegrityError block.
