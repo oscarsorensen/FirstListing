@@ -19,6 +19,16 @@ The pipeline is the story. Each section of the presentation is one more step in 
 - If the URL is already in the database it prints `[SEEN]` — this is a feature, not a bug. Mention it if it happens.
 - Have these tabs open and ready: browser on the landing page logged out, editor with `test2firstlisting.sql`, `user.php`, `crawler_v4.py`, `find_duplicates.php`. No admin panel tab needed.
 - Print a one-page bullet outline to hold in your hand. This file is your preparation — not the thing you bring in.
+- the lastest crawl number are 80. So make sure to have a number higher than that when you go in. 
+
+
+USER FOR EXAM
+oscarexam
+exam123
+
+ADMIN FOR EXAM
+admin
+password
 
 ---
 

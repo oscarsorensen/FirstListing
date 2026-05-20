@@ -125,6 +125,7 @@ def discover_listing_urls(max_listings):
 # Reads the --max-listings=N argument from the command line, so we can limit how many listings to crawl.
 #This is just for me to have a count of how many listings there are. Only relevant for the presentation,
 #becuase generally i will be crawling all listings.
+# This doesnt work atm.
 def read_max_listings():
     for arg in sys.argv[1:]:
         if arg.startswith("--max-listings="):

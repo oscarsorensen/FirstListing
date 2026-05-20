@@ -78,7 +78,7 @@ FirstListing is a school MVP web application that identifies the original publis
 ## URLs for testing
 
 - http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/midealista-NBH-95679.html
-- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/fotohouse-NBH-43257.html
+- http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/fotohouse-NBH-43257.html (this works)
 - http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/habitaclick-NBH-54359.html
 - http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/pisofind-NBH-41009.html
 - http://localhost:8080/Projects/Project%20FirstListing/data/demo-portal/inmoglobe-NEW.html
