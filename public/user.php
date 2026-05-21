@@ -39,7 +39,8 @@ $candidates     = [];
 $ai_comparisons = [];    // keyed by raw_page_id
 $already_in_db  = false; // true if the submitted URL was already in raw_pages
 
-// Run a shell command, capture output lines and exit code
+// Run a shell command, capture output lines and exit code 
+############################################# EXECUTE COMMAND ###########################
 function run_cmd(string $cmd): array
 {
     exec($cmd . ' 2>&1', $output, $code);
@@ -57,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
     } else {
 
         // Step 1: Crawl the URL. The crawler prints "RAW_PAGE_ID:N" on success.
-        [$crawl_out, ] = run_cmd(
+        [$crawl_out, ] = run_cmd( ############### EXECUTE PAR CRAWLER ###########################
             $PYTHON3 . ' ' . escapeshellarg($ROOT . '/python/crawler_v4.py') . ' --url=' . escapeshellarg($input_url)
         );
 
@@ -79,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
             $status_crawled = true;
 
             // Step 2: Parse the crawled page with OpenAI
+            ############### EXECUTE PART PARSING ###########################
             run_cmd($PHP_BIN . ' ' . escapeshellarg($ROOT . '/scripts/openai_parse_raw_pages.php') . ' --id=' . $raw_page_id);
 
             $st = $pdo->prepare('SELECT * FROM ai_listings WHERE raw_page_id = :id LIMIT 1');
@@ -96,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
                 $status_parsed = true;
 
                 // Step 3: SQL duplicate scoring
+                ############### EXECUTE PART DUPLICATES ###########################
                 [$dupes_out, ] = run_cmd(
                     $PHP_BIN . ' ' . escapeshellarg($ROOT . '/scripts/find_duplicates.php') . ' --raw-id=' . $raw_page_id
                 );
@@ -115,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
                 }
 
                 if (!empty($cand_ids)) {
-                    [$ai_out, ] = run_cmd(
+                    [$ai_out, ] = run_cmd(   ############### EXECUTE PART AI DESCRIPTIONS COMPARISON ###########################
                         $PHP_BIN . ' ' . escapeshellarg($ROOT . '/scripts/ai_compare_descriptions.php') .
                         ' --raw-id=' . $raw_page_id . ' --candidates=' . escapeshellarg(implode(',', $cand_ids))
                     );

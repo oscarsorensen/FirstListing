@@ -154,6 +154,7 @@ def read_single_url():
 # __init__ = constructor
 # runs when you create a new CrawlResult and stores the 7 values.
 # This is a structural element. 
+###############################################################################################################################################
 class CrawlResult:
     def __init__(self, url, domain, http_status, content_type, html_raw, text_raw, jsonld_raw):
         self.url          = url
@@ -226,7 +227,7 @@ def insert_listing(cur, result):
     )
 
 
-# === MAIN ===
+# === MAIN === # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 def run():
     # Single-URL mode: crawl one specific page instead of the full sitemap.
@@ -294,6 +295,8 @@ def run():
             cur.close()
             conn.close()
         return
+    
+ # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
     # Normal sitemap mode (unchanged from before)
     max_listings = read_max_listings()
