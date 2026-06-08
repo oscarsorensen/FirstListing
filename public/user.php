@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['listing_url'])) {
                 $status_parsed = true;
 
                 // Step 3: SQL duplicate scoring
-                ############### EXECUTE PART DUPLICATES ###########################
+                ############### EXECUTE PART DUPLICATES ########################### SQL QUIRIES !!!
                 [$dupes_out, ] = run_cmd(
                     $PHP_BIN . ' ' . escapeshellarg($ROOT . '/scripts/find_duplicates.php') . ' --raw-id=' . $raw_page_id
                 );
