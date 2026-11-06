@@ -156,7 +156,7 @@ It is not enough to state that a need exists. Whenever possible, justify why you
 
 **ANSWER**
 
-The clearest and most frequently demanded need in this sector is **knowing whether a listing is the original or a copy**.
+The clearest and most frequently demanded need in this sector is knowing whether a listing is the original or a copy.
 
 Working in a real agency, I noticed that it is often very difficult to tell whether a property advertisement is genuinely the original or simply a republished copy. It is extremely common to see the same property on several websites with the same photos and very similar information, but with small differences in price, description or contact person. The cause is structural rather than accidental: agencies publish to multiple portals at once, listings are distributed through XML feeds, and co-brokering agreements mean several agencies legitimately market the same property. The result is that the same flat can appear five or six times under different references and different prices.
 
