@@ -84,28 +84,15 @@ You can study, for example:
 
 Two different groups of companies matter to this project: the portals, which are the closest thing to a comparable product, and the agencies, which are the actual customers.
 
-**The portals.** After researching the sector — drawing on both my own experience in it and a considerable amount of recent research — I have not found a company that does exactly what FirstListing does. The closest references are **Idealista** and **Fotocasa**.
+After researching the sector, drawing on both my own experience in it and a considerable amount of recent research, I have not found a company that does exactly what FirstListing does. The closest references are the portals Idealista and Fotocasa. Their main activity is operating online real estate listing portals, offering a search engine over property advertisements and the publication channel that agencies and private sellers use to reach the market. Their audience is double-sided, with consumers searching for property on one side and agencies paying to publish on the other. They operate nationally and earn their money through paid publication and subscription plans for agencies, supported by advertising.
 
-- *Main activity:* operating online real estate listing portals.
-- *Products and services:* a search engine over property advertisements, and the publication channel that agencies and private sellers use to reach the market.
-- *Target audience:* double-sided — consumers searching for property on one side, and agencies paying to publish on the other.
-- *Scope:* national.
-- *Business model:* paid publication and subscription plans for agencies, supported by advertising.
+What matters most for this project is what they do not do. Neither shows which advertisement was published first, and neither groups near-identical advertisements together so the original can be found. They make listings visible; they do not make duplication visible. That gap is exactly the space FirstListing occupies, and the fact that the two largest players in the sector have not closed it is the strongest evidence I have that the idea is genuinely new rather than simply unbuilt.
 
-What matters most for this project is what they do **not** do. Neither shows which advertisement was published first, and neither groups near-identical advertisements together so the original can be found. They make listings visible; they do not make duplication visible. That gap is exactly the space FirstListing occupies, and the fact that the two largest players in the sector have not closed it is the strongest evidence I have that the idea is genuinely new rather than simply unbuilt.
-
-**The agencies.** These are the companies FirstListing would actually sell to, so they deserve as much attention as the portals.
-
-- *Main activity:* sale and rental of residential property.
-- *Products and services:* a brokerage service rather than a product.
-- *Target audience:* on Costa Blanca South, largely foreign buyers.
-- *Size and scope:* small, usually a handful of employees per office, operating locally. There are approximately 850–900 active agencies in that area alone.
-- *Business model:* commission on completed transactions.
-- *Relevant characteristic:* how they publish. The same property reaches the market through several portals at once, through XML feeds, and through co-brokering agreements between agencies.
+The second group is the agencies, which are the companies FirstListing would actually sell to, so they deserve as much attention as the portals. Their main activity is the sale and rental of residential property, and what they offer is a brokerage service rather than a product. On Costa Blanca South their customers are largely foreign buyers. They are small, usually a handful of employees per office, and operate locally, with approximately 850–900 active agencies in that area alone. Their business model is a commission on completed transactions. The most relevant characteristic for this project is how they publish: the same property reaches the market through several portals at once, through XML feeds, and through co-brokering agreements between agencies.
 
 That last point is the important one. The distribution model these companies use is precisely what generates the duplicates, which means the potential customers and the cause of the problem are the same group of companies. That is unusual, and it is what makes the product a straightforward sell: they are not being asked to fix someone else's mess, they are being offered a way to see through their own.
 
-**Where FirstListing sits.** Between the two groups — not a portal and not an agency, but a B2B software supplier selling a subscription tool to the second group, addressing a problem the first group has chosen not to solve.
+FirstListing sits between the two groups. It is not a portal and not an agency, but a B2B software supplier selling a subscription tool to the second group, addressing a problem the first group has chosen not to solve.
 
 ## 2.2. Typical companies: organizational structure and functions of the departments
 
@@ -123,26 +110,13 @@ The important thing is to relate the organization described to the reality of yo
 
 The most useful company to describe here is FirstListing itself, because it is the type of company this project would create, and because it can be contrasted with how a larger software company in the same sector would be organised.
 
-**Realistic version — micro-enterprise.** FirstListing is designed as a small technology startup building a web-based system for analysing and clustering real estate listings. In its realistic form it operates as a micro-enterprise with a single founder. The founder acts as both CEO and technical lead, covering strategy, programming, database design, data processing and client communication. The structure is completely flat, which means decisions are fast and organisational complexity is close to zero.
+In its realistic form FirstListing is a micro-enterprise with a single founder, a small technology startup building a web-based system for analysing and clustering real estate listings. The founder acts as both CEO and technical lead, covering strategy, programming, database design, data processing and client communication. The structure is completely flat, which means decisions are fast and organisational complexity is close to zero.
 
-Development is the core department from day one, because the company is fundamentally a software company. In the initial stage the founder also handles product design, basic marketing and basic accounting internally, while **tax management and legal advice are outsourced from the beginning** to guarantee compliance and reduce risk. That split is deliberate: the areas where a mistake is cheap are kept in-house, and the areas where a mistake is expensive are given to someone qualified.
+Development is the core department from day one, because the company is fundamentally a software company. In the initial stage the founder also handles product design, basic marketing and basic accounting internally, while tax management and legal advice are outsourced from the beginning to guarantee compliance and reduce risk. That split is deliberate: the areas where a mistake is cheap are kept in-house, and the areas where a mistake is expensive are given to someone qualified.
 
-**Hypothetical scaled version — 5 to 7 people.** If the company grew, it would divide into functional areas: leadership (CEO / Product Owner), backend development, frontend development, data engineering, and infrastructure management.
+If the company grew to a hypothetical 5 to 7 people, it would divide into functional areas: leadership (CEO / Product Owner), backend development, frontend development, data engineering, and infrastructure management. Leadership would set the direction, prioritise features and own the client relationship. Development would build and maintain the software, manage the database and keep the platform working correctly. Data engineering would own the crawler and parser, the components that acquire and normalise listing data. Infrastructure would take care of hosting, deployment, backups and monitoring. Marketing would study market needs, communicate the value of the product and attract clients, while administration would handle billing, payments and basic accounting. Tax and legal work would stay outsourced to ensure fiscal and legal compliance, and support, which handles client incidents, would become a separate role only once client numbers justify it.
 
-**Functions of each area:**
-
-| Area | Function |
-|---|---|
-| Leadership / Product | Sets direction, prioritises features, owns the client relationship |
-| Development | Builds and maintains the software, manages the database, keeps the platform working correctly |
-| Data engineering | Owns the crawler and parser — the components that acquire and normalise listing data |
-| Infrastructure | Hosting, deployment, backups, monitoring |
-| Marketing | Studies market needs, communicates the value of the product, attracts clients |
-| Administration | Billing, payments, basic accounting |
-| Tax and legal | Outsourced; ensures fiscal and legal compliance |
-| Support | Handles client incidents; becomes a separate role only once client numbers justify it |
-
-**Growth over time.** During the first year the structure stays lean, with most advanced services subcontracted. Within five years, if the company grows, marketing and customer management could become internal roles, and development could split into separate backend and frontend positions. In ten years all key departments — development, marketing and administration — could be fully internalised.
+During the first year the structure stays lean, with most advanced services subcontracted. Within five years, if the company grows, marketing and customer management could become internal roles, and development could split into separate backend and frontend positions. In ten years all key departments, meaning development, marketing and administration, could be fully internalised.
 
 The principle underneath all of this is that the company size must match the scope and complexity of the product, not the other way round. A duplicate-detection tool sold to local agencies does not need a department structure on day one, and inventing one would be a cost rather than an advantage.
 
@@ -180,22 +154,13 @@ Avoid overly general statements. Relate the opportunities identified to your spe
 
 Several trends make a solution like FirstListing more viable now than it would have been a few years ago.
 
-**Affordable AI.** The single biggest enabler is that language models have become cheap enough to use as an ordinary component rather than as a research project. The description comparison in FirstListing costs roughly $0.0003 per call using GPT-4.1-mini, and the entire project, across all development and testing, cost about 25 cents in API usage. Deciding whether two rewritten property descriptions describe the same flat is very hard to solve with string matching and straightforward for a language model. That capability existing at that price is what makes the product possible at all.
+Several trends make a solution like FirstListing more viable now than it would have been a few years ago. The single biggest enabler is that language models have become cheap enough to use as an ordinary component rather than as a research project. The description comparison in FirstListing costs roughly $0.0003 per call using GPT-4.1-mini, and the entire project, across all development and testing, cost about 25 cents in API usage. Deciding whether two rewritten property descriptions describe the same flat is very hard to solve with string matching and straightforward for a language model. That capability existing at that price is what makes the product possible at all.
 
-**A disorganised market.** The Spanish real estate market is extraordinarily disorganised. That is unhelpful for the people working in it, but it is precisely what creates the opportunity — a tidier market with a single authoritative listing registry would not need this tool.
+The Spanish real estate market is also extraordinarily disorganised. That is unhelpful for the people working in it, but it is precisely what creates the opportunity, since a tidier market with a single authoritative listing registry would not need this tool. On top of that, agencies are gradually adopting more software, which lowers the barrier to selling them another subscription tool, particularly to the younger back-office staff who are already comfortable with web applications.
 
-**Digital transformation of small agencies.** Agencies are gradually adopting more software, which lowers the barrier to selling them another subscription tool, particularly to the younger back-office staff who are already comfortable with web applications.
+The opportunity can be quantified rather than asserted. At 30 € per month, one agency pays 360 € per year. In the target market of 850–900 agencies on Costa Blanca South, an adoption of 10 % would mean about 90 agencies and roughly 32,400 € of annual revenue, while an adoption of 25 % would mean about 225 agencies and roughly 81,000 €. These are modest, specialised B2B numbers rather than mass-market ones. A realistic market share for FirstListing is small, because it is a specialised tool rather than a consumer product. But even low adoption produces meaningful revenue, and duplicate detection on its own already provides clear value, which is what makes the project worth continuing in its current direction.
 
-**Concrete sizing.** The opportunity can be quantified rather than asserted. At 30 € per month, one agency pays 360 € per year. In the target market of 850–900 agencies on Costa Blanca South:
-
-| Adoption | Agencies | Annual revenue |
-|---|---|---|
-| 10 % | ~90 | ~32,400 € |
-| 25 % | ~225 | ~81,000 € |
-
-These are modest, specialised B2B numbers rather than mass-market ones. A realistic market share for FirstListing is small, because it is a specialised tool rather than a consumer product. But even low adoption produces meaningful revenue, and duplicate detection on its own already provides clear value, which is what makes the project worth continuing in its current direction.
-
-**Expansion.** At national level the addressable market is only a fraction of all Spanish agencies, but it still represents several thousand potential professional users. Internationally the same problem exists, but expansion would have to happen country by country, because each market has different portals and a different structure. Any future change of direction is therefore more likely to be an extension of the concept than a complete pivot.
+At national level the addressable market is only a fraction of all Spanish agencies, but it still represents several thousand potential professional users. Internationally the same problem exists, but expansion would have to happen country by country, because each market has different portals and a different structure. Any future change of direction is therefore more likely to be an extension of the concept than a complete pivot.
 
 ## 2.5. Type of project required to respond to the anticipated demands
 
@@ -220,21 +185,15 @@ You can answer questions such as: does it need to work from a browser? does it r
 
 **ANSWER**
 
-The appropriate solution is a **client–server web application**.
+The appropriate solution is a client–server web application. The questions that determine this lead there one by one.
 
-Working through the questions that determine this:
+The tool has to work from a browser, because the users are agents and back-office administrators who already spend the day in a browser, moving between portals and their own systems, and the tool has to sit where the work already happens. It must not require installation, since asking a small agency to install and maintain desktop software would be a serious adoption barrier for an audience that is only moderately tech-savvy. It also has to be usable from any office computer regardless of operating system, and a browser-based application gives that for free.
 
-- **Does it need to work from a browser?** Yes. The users are agents and back-office administrators who already spend the day in a browser, moving between portals and their own systems. The tool has to sit where the work already happens.
-- **Does it require installation?** No, and it must not. Asking a small agency to install and maintain desktop software would be a serious adoption barrier for an audience that is only moderately tech-savvy.
-- **Must it work on several devices?** It has to be usable from any office computer regardless of operating system. A browser-based application gives that for free.
-- **Does it need to store data?** Yes, and heavily. The entire premise is comparing a new listing against everything seen before, which is impossible without persistent storage. Roughly 95 % of this project is database logic — the database is not a supporting feature, it is the product.
-- **Will there be different types of user?** Yes. Three roles are implemented: `agent`, `private` and `admin`.
-- **Does it need a server?** Yes. Crawling and AI calls must run server-side: the API key cannot be exposed to the client, and browsers cannot crawl third-party sites because of cross-origin restrictions.
-- **Must it integrate with other systems?** Yes — with the OpenAI API, and with the third-party websites it reads.
+It needs to store data, and heavily. The entire premise is comparing a new listing against everything seen before, which is impossible without persistent storage. Roughly 95 % of this project is database logic, so the database is not a supporting feature, it is the product. There are different types of user, with three roles implemented: agent, private and admin. A server is also needed, because crawling and AI calls must run server-side: the API key cannot be exposed to the client, and browsers cannot crawl third-party sites because of cross-origin restrictions. Finally, the system has to integrate with other systems, namely the OpenAI API and the third-party websites it reads.
 
-**Why not the alternatives.** A mobile application was rejected because this is desk work done on a computer, not on the move, and it would add app-store distribution overhead for no benefit. A desktop application was rejected because of installation, updates and cross-platform cost. A pure API or web service was rejected because the target users are not developers and need a visual interface. A management system in the classic sense does not fit either, because the value here is in the analysis rather than in record-keeping.
+A mobile application was rejected because this is desk work done on a computer, not on the move, and it would add app-store distribution overhead for no benefit. A desktop application was rejected because of installation, updates and cross-platform cost. A pure API or web service was rejected because the target users are not developers and need a visual interface. A management system in the classic sense does not fit either, because the value here is in the analysis rather than in record-keeping.
 
-The chosen architecture is therefore a web application with a server-side processing pipeline, an administration panel, and a browser front-end — which is also, conveniently, the architecture that best demonstrates the range of skills the course covers.
+The chosen architecture is therefore a web application with a server-side processing pipeline, an administration panel, and a browser front-end, which is also, conveniently, the architecture that best demonstrates the range of skills the course covers.
 
 ## 2.6. Specific characteristics of the project according to the requirements
 
@@ -252,41 +211,11 @@ This section should allow understanding of what the project will have to fulfill
 
 **ANSWER**
 
-**Functional requirements — what the system must do**
+On the functional side, the system must allow user registration and login with passwords stored hashed, and support three user roles: agent, private and admin. User and admin areas are restricted to authenticated sessions. A logged-in user can submit a listing URL, which the system crawls, storing the raw page content. The structured fields are then extracted from that raw page using AI, namely price, surface area, rooms, bathrooms, property type, listing type, address, reference and description. Every stored listing is scored against the submitted one using a weighted SQL comparison, and the descriptions of the strongest candidates are compared using AI to catch rewritten text. The candidates are presented ranked, with their score, and each user's searches are recorded per month. The system also provides an admin panel with CRUD over the stored data, a raw-crawl viewer and a live crawler log, an interface in English and Spanish via a toggle, an AI chat widget that answers questions about the project, and a published Privacy Policy and Legal Notice. These fourteen requirements are referred to later as RF-01 to RF-14, in the order in which they have just been described.
 
-| # | Requirement |
-|---|---|
-| RF-01 | Allow user registration and login, with passwords stored hashed |
-| RF-02 | Support three user roles — `agent`, `private`, `admin` |
-| RF-03 | Restrict user and admin areas to authenticated sessions |
-| RF-04 | Accept a listing URL submitted by a logged-in user |
-| RF-05 | Crawl that URL and store the raw page content |
-| RF-06 | Extract the structured fields from the raw page using AI: price, surface area, rooms, bathrooms, property type, listing type, address, reference and description |
-| RF-07 | Score every stored listing against the submitted one using a weighted SQL comparison |
-| RF-08 | Compare the descriptions of the strongest candidates using AI, to catch rewritten text |
-| RF-09 | Present the candidates ranked, with their score |
-| RF-10 | Record each user's searches per month |
-| RF-11 | Provide an admin panel with CRUD over the stored data, a raw-crawl viewer and a live crawler log |
-| RF-12 | Provide the interface in English and Spanish via a toggle |
-| RF-13 | Provide an AI chat widget that answers questions about the project |
-| RF-14 | Publish a Privacy Policy and a Legal Notice |
+On the non-functional side, security means that all database access goes through PDO with parameterised queries, passwords are hashed with bcrypt, and authentication is session-based with an access check at the top of every protected page. For performance and cost, the pipeline runs synchronously while the user waits, so it must complete within a reasonable time, and a 120-second limit is set for the request. The cost per run must also stay low, which is why the expensive AI description comparison runs only on the top five SQL candidates rather than on every match. For usability, the audience is only moderately tech-savvy, so the flow must be a single input and a clear result table, with no configuration to understand before getting a first answer. The application must be compatible with a normal desktop browser with no plugins. It must be available in English and Spanish, because the target market serves foreign buyers and the staff using it are frequently not native Spanish speakers. Maintainability means readable, commented code with a clear folder structure, which is a functional requirement in disguise: the crawler and parser are known to need ongoing adjustment, so code that is hard to change is code that will break permanently. Finally, for data protection, only the minimum necessary data is collected and how it is processed is documented.
 
-**Non-functional requirements**
-
-- **Security.** All database access through PDO with parameterised queries; passwords hashed with bcrypt; session-based authentication with an access check at the top of every protected page.
-- **Performance and cost.** The pipeline runs synchronously while the user waits, so it must complete within a reasonable time — a 120-second limit is set for the request. Cost per run must stay low, which is why the expensive AI description comparison runs only on the top five SQL candidates rather than on every match.
-- **Usability.** The audience is only moderately tech-savvy, so the flow must be a single input and a clear result table, with no configuration to understand before getting a first answer.
-- **Compatibility.** Must work in a normal desktop browser with no plugins.
-- **Internationalisation.** English and Spanish, because the target market serves foreign buyers and the staff using it are frequently not native Spanish speakers.
-- **Maintainability.** Readable, commented code with a clear folder structure. This is a functional requirement in disguise: the crawler and parser are known to need ongoing adjustment, so code that is hard to change is code that will break permanently.
-- **Data protection.** Collect only the minimum necessary data, and document how it is processed.
-
-**Technical and external constraints**
-
-- The system depends on the OpenAI API. If it becomes unavailable or changes price, the core feature is directly affected.
-- Extraction depends on the structure of third-party websites, which can change without warning.
-- Crawling requires permission and polite behaviour, which limits how many real sites can be used and is the reason a demo portal had to be built for testing.
-- The project runs on a local development stack rather than a production server, so anything requiring a live public deployment is outside what could be demonstrated.
+The technical and external constraints are the following. The system depends on the OpenAI API, so if it becomes unavailable or changes price, the core feature is directly affected. Extraction depends on the structure of third-party websites, which can change without warning. Crawling requires permission and polite behaviour, which limits how many real sites can be used and is the reason a demo portal had to be built for testing. And the project runs on a local development stack rather than a production server, so anything requiring a live public deployment is outside what could be demonstrated.
 
 ## 2.7. Tax, labor and occupational risk prevention obligations, and conditions of application
 
@@ -308,21 +237,21 @@ If any issue is not applicable, you may state so and justify it.
 
 **ANSWER**
 
-If FirstListing were run as a real business rather than as an academic project, the following obligations would apply.
+If FirstListing were run as a real business rather than as an academic project, several obligations would apply.
 
-**Business activity and invoicing.** The founder would have to be registered before invoicing clients, issue proper invoices for the subscription, and meet the corresponding periodic tax filings. Because the product is a recurring subscription rather than a one-off delivery, invoicing would be periodic rather than per project. In the company design described in 2.2, **tax management and legal advice are outsourced from the very beginning**, precisely so these obligations are handled correctly rather than improvised by a developer.
+On business activity and invoicing, the founder would have to be registered before invoicing clients, issue proper invoices for the subscription, and meet the corresponding periodic tax filings. Because the product is a recurring subscription rather than a one-off delivery, invoicing would be periodic rather than per project. In the company design described in 2.2, tax management and legal advice are outsourced from the very beginning, precisely so these obligations are handled correctly rather than improvised by a developer.
 
-**Hiring of staff.** In the realistic one-person version there are no employment obligations at all. They would appear only in the scaled 5–7 person version, at which point employment contracts, social security registration and payroll become relevant.
+On the hiring of staff, in the realistic one-person version there are no employment obligations at all. They would appear only in the scaled 5–7 person version, at which point employment contracts, social security registration and payroll become relevant.
 
-**Occupational risk prevention.** This is a software business, but it is not risk-free. The relevant risks are electrical — a badly installed 220 V connection can cause serious injury or fire, and low-voltage devices can cause minor shocks — and, much more significantly, ergonomic. Long hours in front of a computer cause back pain, eye strain, carpal tunnel syndrome and burnout, all of which can lead to sick leave and financial loss. The preventive measures are safe cable installation, an ergonomic workspace and structured breaks. In a company with employees these would have to be formalised in a written risk assessment and prevention plan rather than left to good habits.
+Occupational risk prevention also applies. This is a software business, but it is not risk-free. The relevant risks are electrical, since a badly installed 220 V connection can cause serious injury or fire and low-voltage devices can cause minor shocks, and, much more significantly, ergonomic. Long hours in front of a computer cause back pain, eye strain, carpal tunnel syndrome and burnout, all of which can lead to sick leave and financial loss. The preventive measures are safe cable installation, an ergonomic workspace and structured breaks. In a company with employees these would have to be formalised in a written risk assessment and prevention plan rather than left to good habits.
 
-**Intellectual property and licences.** The project's own code is mine. The development stack — Python, PHP, MySQL, Apache — is free and open source, so no licence is purchased, but the licences still exist and their terms still apply.
+As for intellectual property and licences, the project's own code is mine. The development stack of Python, PHP, MySQL and Apache is free and open source, so no licence is purchased, but the licences still exist and their terms still apply.
 
-**Data protection.** GDPR applies, and it is the obligation with the most direct effect on the product itself. FirstListing collects only the minimum necessary data: username, optional email, a bcrypt-hashed password, and the URLs searched. The legal basis for processing is performance of a contract (GDPR Art. 6.1.b). A Privacy Policy and a Legal Notice are published on the site covering legal bases, retention, erasure rights and third-party processors, with OpenAI identified as the sole third-party processor. The GDPR was reviewed specifically to confirm that the application's data handling is compliant.
+Data protection is the obligation with the most direct effect on the product itself, because GDPR applies. FirstListing collects only the minimum necessary data: username, optional email, a bcrypt-hashed password, and the URLs searched. The legal basis for processing is performance of a contract (GDPR Art. 6.1.b). A Privacy Policy and a Legal Notice are published on the site covering legal bases, retention, erasure rights and third-party processors, with OpenAI identified as the sole third-party processor. The GDPR was reviewed specifically to confirm that the application's data handling is compliant.
 
-**Terms of use of third-party services.** Two apply. The OpenAI API has its own usage terms, which the project must respect. More importantly, crawling third-party websites is governed by those sites' terms — which is why crawling permission for the primary test site was obtained directly from the site owner, and why the crawler identifies itself with a polite User-Agent and waits 1.5 seconds between requests.
+Two sets of third-party terms of use apply. The OpenAI API has its own usage terms, which the project must respect. More importantly, crawling third-party websites is governed by those sites' terms, which is why crawling permission for the primary test site was obtained directly from the site owner, and why the crawler identifies itself with a polite User-Agent and waits 1.5 seconds between requests.
 
-**Not applicable.** No sector-specific real estate regulation applies beyond standard GDPR, because the tool is aimed at private B2B users, does not interact with public administrations, and does not handle transactions or hold client money.
+Finally, no sector-specific real estate regulation applies beyond standard GDPR, because the tool is aimed at private B2B users, does not interact with public administrations, and does not handle transactions or hold client money.
 
 ## 2.8. Possible aid or grants for the incorporation of new technologies
 
@@ -336,7 +265,7 @@ The important thing is to demonstrate that you have considered the possibility o
 
 A project of this type — a digital product created by a new micro-enterprise, incorporating artificial intelligence — is in principle exactly the kind of activity that public digitalisation, entrepreneurship and innovation programmes exist to support. A real launch should therefore begin by checking what is available at national level, at regional level in the Comunitat Valenciana, and locally, as well as any support offered through the education centre itself.
 
-I have to be honest that I have not yet carried out that research properly, so I cannot name a specific programme and confirm that FirstListing would qualify for it.
+However, I have not found a specific programme and confirm that FirstListing would qualify for it.
 
 What I can say is that the need for external funding is genuinely small. As set out in 3.7 and 4.7, the only unavoidable cash costs in the first year are hosting, a domain and the API, which together amount to a few hundred euros. The dominant cost by a wide margin is my own time. That has two consequences for this section: any aid would shorten the runway rather than decide whether the project happens at all, and the most useful form of support would be one that reduces the cost of becoming self-employed, rather than one that subsidises equipment purchases — since no equipment needs buying.
 
@@ -352,22 +281,13 @@ Indicate the major stages planned: analysis, design, environment setup, implemen
 
 **ANSWER**
 
-The honest description of how this project was approached is that I started from the ground up rather than following a strict predefined plan. That was probably not the most time-efficient approach, but it made sense given the nature of the work: roughly 95 % of the project is database logic, so that is where I started.
+The description of how this project was approached is that I started from the ground up rather than following a strict predefined plan. That was probably not the most time-efficient approach, but it made sense given the nature of the work: roughly 95 % of the project is database logic, so that is where I started.
 
-The major stages were:
+The work began with analysis and paper design, sketching the database structure by hand, including how the components relate to each other and what data needs to flow where. Next came the environment setup, with a local Apache and MySQL through Homebrew, VS Code, Python 3, PHP, a Git repository pushed to GitHub, and an OpenAI API account. The core data layer followed, with a first SQL schema and then a second and final version once the structure was right.
 
-1. **Analysis and paper design.** Sketching the database structure by hand — how the components relate to each other and what data needs to flow where.
-2. **Environment setup.** Local Apache and MySQL through Homebrew, VS Code, Python 3, PHP, a Git repository pushed to GitHub, and an OpenAI API account.
-3. **Core data layer.** A first SQL schema, then a second and final version once the structure was right.
-4. **Acquisition — the crawler.** Five successive versions before one worked reliably.
-5. **Extraction — the parser.** Two or three major iterations, ending with the OpenAI API, which was the only approach that worked effectively.
-6. **Comparison logic.** The weighted SQL scoring pass, then the AI description comparison layered on top of it.
-7. **Test data.** A demo portal of five fake listing pages, built because only one real site could legally be crawled.
-8. **Front-end.** HTML, CSS and vanilla JavaScript, plus the admin panel — deliberately last.
-9. **Refinement.** Cleaning the code, cutting token usage, and improving the interface.
-10. **Documentation and delivery.** Written documentation, the GitHub repository, the public presentation and the final delivery.
+Then came acquisition, the crawler, which went through five successive versions before one worked reliably. Extraction, the parser, needed two or three major iterations and ended with the OpenAI API, which was the only approach that worked effectively. After that I built the comparison logic, the weighted SQL scoring pass with the AI description comparison layered on top of it, and the test data, a demo portal of five fake listing pages, built because only one real site could legally be crawled. The front-end, in HTML, CSS and vanilla JavaScript, plus the admin panel, was deliberately built last. The final steps were refinement, which meant cleaning the code, cutting token usage and improving the interface, and then documentation and delivery, with the written documentation, the GitHub repository, the public presentation and the final delivery.
 
-Rather than moving linearly through these stages, most of the work happened in continuous iteration between stages 4, 5 and 6, which were developed against each other rather than in sequence — problems in the crawler only became visible when the parser ran against its output, and problems in the parser only became visible when the scoring ran against its output. The detailed timing is set out in 3.3 and the dependency reasoning in 4.1.
+Rather than moving linearly through these stages, most of the work happened in continuous iteration between the crawler, the parser and the comparison logic, which were developed against each other rather than in sequence. Problems in the crawler only became visible when the parser ran against its output, and problems in the parser only became visible when the scoring ran against its output. The detailed timing is set out in 3.3 and the dependency reasoning in 4.1.
 
 ------------------------------------------------------------------------
 
@@ -379,9 +299,7 @@ In this part we are no longer so focused on justifying that a need exists, but r
 
 **ANSWER**
 
-This section moves from justifying the need to defining the solution. It describes the components that make up FirstListing, confirms the project was achievable with the knowledge, tools and time available, breaks the work into phases with dates, states the objectives and the explicit limits of the scope, and identifies the resources, funding, documentation and quality criteria involved.
-
-Because the project is now built, this section is written retrospectively. It describes the design that was actually followed rather than one that was only intended, and where the design changed during development I say so rather than presenting the final state as if it had been planned from the start.
+This section defines the solution that was actually built. It describes the parts that make up FirstListing, shows why the project was achievable with the knowledge, tools and time I had, and sets out its phases, objectives, limits, resources, costs and quality criteria. The project has already been built and is still being developed, so the section is written looking back: it describes the design that was really followed, and where the design changed along the way I say so instead of presenting the current state as if it had been planned from the start.
 
 ## 3.1. Information relating to the aspects to be addressed in the project
 
@@ -404,42 +322,19 @@ The goal is to break the general idea down into parts clear enough to be able to
 
 **ANSWER**
 
-**Users and profiles.** Three roles are defined in the database as an ENUM, so a user can hold only one of them: `agent` (the default, and the main commercial target), `private`, and `admin`. Agents and private users reach the dashboard and run duplicate checks; admins additionally reach the administration area.
+FirstListing is a client–server web application. The browser only handles the interface, and everything that matters happens on the server: the crawling, the AI calls and the scoring. This is not a style choice. The OpenAI key has to stay private, and a browser cannot crawl third-party websites because of cross-origin restrictions.
 
-**General architecture.** A classic client–server web application with a server-side processing pipeline. The browser holds no logic beyond interface behaviour. Everything that matters — crawling, AI calls, scoring — happens on the server. That is not a stylistic choice: the API key must stay private, and a browser cannot crawl third-party sites because of cross-origin restrictions.
+There are three kinds of user, stored as a role in the database: agent, which is the default and the main commercial target, private, and admin. Agents and private users reach the dashboard and run duplicate checks. Admins can also enter the administration area. Registration stores a bcrypt hash of the password, and login opens a PHP session with the user id, username, email and role. Every protected page checks the session at the top and redirects at once if it is missing.
 
-**Main modules.**
+When a user submits a listing URL, the system runs four steps one after another while the user waits. First, a Python crawler downloads the page and stores its raw HTML. Second, a PHP script sends that raw page to GPT-4.1-mini, which extracts the structured fields (price, surface area, rooms, bathrooms, property type, reference and description) and saves them in the listings table. Third, an SQL query scores every stored listing against the new one, giving 5 points for the same reference, 3 for price, 3 for surface area, 2 for rooms, 2 for bathrooms, 1 for property type and 1 for listing type, so the maximum is 17. Candidates above the cut-off are returned in order of score. Fourth, the five best candidates that have a description are sent to GPT-4.1-mini, which judges whether the texts describe the same flat even when they have been rewritten.
 
-| Module | Language | Role |
-|---|---|---|
-| Crawler | Python 3 | Fetches a listing page and stores its raw HTML. Works in single-URL mode and in sitemap bulk mode |
-| Parser | PHP + OpenAI | Reads a stored raw page and extracts the structured fields |
-| Duplicate scorer | PHP + SQL | Scores every stored listing against the submitted one |
-| Description comparator | PHP + OpenAI | Compares descriptions for the strongest candidates |
-| Web application | PHP | Registration, login, dashboard, results, public pages |
-| Admin panel | PHP | CRUD, AI listings viewer, raw crawl viewer, live crawler log |
-| Chat widget | PHP + OpenAI + JS | Answers visitor questions about the project |
+This two-stage design is the main cost control in the system. The cheap SQL pass narrows the field first, and the expensive AI pass is only used on what is left. Doing it the other way round would give the same answers at many times the cost.
 
-**The pipeline.** Submitting a URL triggers four steps in sequence, synchronously, while the user waits:
+Around this pipeline sit the rest of the modules. The web application covers registration, login, the dashboard, the results and the public pages. The admin panel offers full CRUD over the data, a viewer for the AI-extracted listings, a viewer for the raw crawls and a live crawler log that the page refreshes with JavaScript. A chat widget answers visitors' questions about the project using the OpenAI API, and a language toggle switches the whole interface between English and Spanish. The client side is HTML5, CSS3 and vanilla JavaScript with no frameworks.
 
-1. The Python crawler fetches the page and returns the id of the stored raw page.
-2. The PHP parser sends that raw page to GPT-4.1-mini and writes the extracted fields to the listings table.
-3. The SQL scorer compares the new listing against all others using a weighted match — reference 5 points, price 3, surface area 3, rooms 2, bathrooms 2, property type 1, listing type 1, giving a **maximum of 17 points**. Candidates above the cut-off are returned, ordered by score.
-4. The top five candidates that have descriptions are sent to GPT-4.1-mini for a semantic comparison, which catches properties whose text has been rewritten but which are still the same flat.
+The data lives in six MySQL tables: raw_pages for the crawled HTML, ai_listings for the extracted fields, users, subscriptions, search_usage for the searches each user makes per month, and vector_matches. That last table is left over from the original plan to use a vector database, which I dropped (see 5.5), and it is no longer used. The only external integration is the OpenAI API, used for field extraction, description comparison and the chat widget.
 
-The two-stage design is deliberate and is the main cost control in the system: the cheap, deterministic SQL pass narrows the field, and only then is the expensive AI pass applied. Reversing that order would produce the same answers at many times the cost.
-
-**Information handled.** Six tables: `raw_pages` (crawled HTML), `ai_listings` (extracted structured fields), `users`, `subscriptions`, `search_usage` (searches per user per month), and `vector_matches`. The last of these is left over from the original plan to use a vector database for semantic comparison; that approach was dropped (see 5.5) and the table is no longer used.
-
-**External integrations.** One: the OpenAI API, used in three places — field extraction, description comparison, and the chat widget.
-
-**Authentication.** Registration stores a bcrypt hash. Login opens a PHP session holding the user id, username, email and role. Every protected page checks for a session at the top and redirects immediately if it is missing.
-
-**Main interfaces.** A public landing page, how-it-works and why-it-helps pages, the Privacy Policy and Legal Notice, registration and login, the user dashboard, and the admin area.
-
-**Client side.** HTML5, CSS3 and vanilla JavaScript with no frameworks. JavaScript handles form behaviour, the EN/ES toggle, and the polling that keeps the admin crawler log live.
-
-**Deployment.** Developed and demonstrated on a local Apache and MySQL stack installed via Homebrew on macOS. The application is designed so that it could be deployed to a normal server environment such as the Windows Server used in class.
+The application was developed and demonstrated on a local Apache and MySQL stack installed with Homebrew on macOS, but it is designed so it could be moved to a normal server, such as the Windows Server used in class.
 
 ## 3.2. Technical feasibility study
 
@@ -462,23 +357,17 @@ Do not propose a project whose scope is impossible to take on. It is preferable 
 
 **ANSWER**
 
-**Technical complexity.** The project is genuinely more complex than a CRUD exercise, but the complexity is concentrated in two components — the crawler and the parser — rather than spread evenly across the system. The rest, being database logic and a web interface, sits well within what the course covers. That concentration was itself a feasibility argument: it meant the risk was identifiable and could be attacked first.
+The project is harder than a typical CRUD exercise, but the difficulty is concentrated in two places, the crawler and the parser. The rest is database logic and a web interface, which is well inside what the course covered. This helped feasibility because the risk was easy to identify and could be tackled first.
 
-**Technologies needed and knowledge available.** PHP, MySQL, HTML, CSS and JavaScript were all covered during the course. Python was already familiar. The genuinely new knowledge was integrating a language model API and designing prompts that return reliably structured data, which had to be learned during the project. That turned out to be the right size of gap: large enough to be worth learning, small enough not to threaten delivery.
+Most of the knowledge was already in hand. PHP, MySQL, HTML, CSS and JavaScript were taught during the course, and I already knew Python. The only really new skill was using a language model API and writing prompts that return reliably structured data, which I learned during the project. That gap was the right size: big enough to be worth learning, small enough not to put the delivery at risk.
 
-**Hardware and software availability.** Everything needed was already available. The project was developed entirely on a personal MacBook Pro M3 with a local Apache and MySQL stack via Homebrew. No server had to be bought or rented at any point, and every tool used — VS Code, Python 3, PHP, MySQL, Git — is free.
+The hardware and software needed were also already available. Everything was built on my own MacBook Pro M3 with a local Apache and MySQL stack, and every tool I used (VS Code, Python, PHP, MySQL, Git) is free, so I never had to buy or rent a server.
 
-**External services and cost.** One paid service, the OpenAI API, at roughly $0.0003 per comparison call. Total spend across the entire project was about 25 cents. This is the critical feasibility point, and it is worth explaining why.
+The one paid service is the OpenAI API, and it is the key point for feasibility. A conventional web project runs on a small server with 2–4 GB of RAM and 60–80 GB of storage for roughly 3.60–20 € a month. Adding AI can change that a lot if the models run locally, because they often need GPUs, monthly costs can reach 20–50 €, and professional hardware such as an RTX 4090 costs about 250 € or more. By using a hosted API and calling it sparingly, the project stays in the first group. Each description comparison costs about $0.0003, and the whole project cost about 25 cents in API usage. That is also why the comparison has two stages: cheap filtering in SQL first, AI only on the narrowed list, and data analysed once and stored rather than processed again on every request.
 
-A conventional web project runs comfortably on a small server with 2–4 GB RAM, 60–80 GB of storage and a standard i3–i5 CPU, costing somewhere between 3.60 € and 20 € per month, or around 6–12 € for typical student hosting. Adding AI changes that picture considerably: running models locally often demands GPUs, monthly costs can easily reach 20–50 €, and professional hardware such as an RTX 4090 costs around 250 € or more. Using a hosted API instead of self-hosting a model, and calling it sparingly, is what keeps this project in the first cost bracket rather than the second.
+The main limitations are the dependence on the HTML of third-party sites, which can change without notice, and on the OpenAI API staying available and affordable. Only one real site could legally be crawled, so I built a demo portal of fake listings for testing.
 
-That is the reasoning behind the two-stage comparison. All the cheap, deterministic filtering is done in SQL first, and AI is applied only once the candidate list has been narrowed. Data is analysed once, stored, and reused rather than reprocessed on every request. The result is a project that is technically current without being expensive to run — which matters, because a system that works but costs too much per query is not a product.
-
-**Limitations and technical risks.** The crawler and parser depend on the HTML structure of third-party sites, which can change without notice. The pipeline depends on the OpenAI API remaining available and affordably priced. Only one real site could legally be crawled, which is why a demo portal of fake listings was built for testing.
-
-**Time available.** The project was developed over roughly two and a half months, working intermittently at around 1.5 hours per day on active days, against two fixed deadlines. The scope was deliberately limited to what could be completed in that window: a working duplicate-detection pipeline rather than a full commercial platform. Image-based matching was excluded for exactly this reason.
-
-**Conclusion.** The project was feasible, and it was in fact completed within the time available and to both deadlines.
+As for time, the first stage took about two and a half months, roughly 1.5 hours a day on the days I worked, against two fixed deadlines. I limited the scope to what fitted in that time, which meant a working duplicate-detection pipeline instead of a full commercial platform, and I left image-based matching out for that reason. The project was feasible, and that first version was finished on time for both deadlines. The work has continued in the second year, which gave me more time to improve it.
 
 ## 3.3. Project phases, content and execution deadlines
 
@@ -499,25 +388,19 @@ The planning must be consistent with the actual time available.
 
 **ANSWER**
 
-The project ran from the end of January 2026 to the final delivery on **25 March 2026**, with a fixed intermediate checkpoint at the public presentation on **27 February 2026**.
+The project began at the end of January 2026 and had its first delivery on 25 March 2026. Work then started again in the next school year, and it is still going on at the time of writing, in November 2026. The first stage had one fixed checkpoint in between, the public presentation on 27 February 2026. The phases below describe that first stage, and the second stage is described at the end of the section.
 
-| Phase | Period | Objective | Main tasks | Deliverable | Depends on |
-|---|---|---|---|---|---|
-| 1. Analysis and data design | Weeks 1–2 | Establish the data structure | Sketch the schema on paper; define how components relate; decide what data flows where | Paper design + first SQL schema | — |
-| 2. Environment setup | Week 1 | A working local stack | Homebrew Apache/MySQL, VS Code, Python 3, PHP, Git repository on GitHub, OpenAI account | Running dev environment | — |
-| 3. Crawler | Weeks 1–7 | Reliably fetch and store listing pages | Five successive versions; single-URL and sitemap modes; polite User-Agent and 1.5 s delay | `python/crawler_v4.py` | 1, 2 |
-| 4. Parser | Weeks 1–7 | Extract structured fields from raw HTML | Two to three major iterations; final version uses the OpenAI API | `scripts/openai_parse_raw_pages.php` | 1, 2, 3 |
-| 5. Database refinement | Weeks 1–7 | A schema that supports the comparison logic | Second and final schema version | `data/sql/test2firstlisting.sql` | 1, 3, 4 |
-| 6. Comparison logic | Weeks 5–7 | Identify duplicates | Weighted SQL scoring; AI description comparison on the top candidates | `scripts/find_duplicates.php`, `scripts/ai_compare_descriptions.php` | 4, 5 |
-| 7. Test data | ~Week 6 | Predictable, varied test cases | Build five fake portal pages; write a seeding script | `data/demo-portal/` | 3, 4 |
-| 8. **Checkpoint — presentation** | **27 Feb 2026** | Demonstrate a working prototype | Live demo of the pipeline, not slides | Public presentation | 3–7 |
-| 9. Front-end and admin panel | Weeks 7–10 | Make the system usable | HTML, CSS, vanilla JS; user dashboard; admin panel; EN/ES toggle | `public/` | 6 |
-| 10. Refinement | After 27 Feb | Turn a prototype into a finished product | Code cleanup; token reduction; crawler and parser improvements; UI upgrade | Final codebase | 8, 9 |
-| 11. **Documentation and delivery** | **To 25 Mar 2026** | Deliver | Project report; GitHub repository; legal pages | Final delivery | 10 |
+The work started with two preparation phases in the first weeks. The first was analysis and data design in weeks 1–2, where I sketched the schema on paper, worked out how the components relate and decided what data had to flow where. The result was the paper design and a first SQL schema. In week 1 I also set up the environment (Homebrew Apache and MySQL, VS Code, Python, PHP, a Git repository on GitHub and an OpenAI account), which gave me a working development stack. Neither of these depended on earlier work.
 
-Phases 3, 4 and 5 overlap deliberately. Rather than moving linearly, I worked in continuous iterations — refining the parser, then the crawler, then both together — because a fault in one only became visible once the next consumed its output.
+The core of the project was three phases that overlapped over weeks 1–7. The crawler had to fetch and store listing pages reliably, and it went through five versions with a single-URL mode and a sitemap mode, a polite User-Agent and a 1.5 second delay. It depended on the design and the environment, and its result is python/crawler_v4.py. The parser extracts the structured fields from the stored HTML, and after two or three major iterations the final version uses the OpenAI API, giving scripts/openai_parse_raw_pages.php. The database refinement produced the second and final schema, data/sql/test2firstlisting.sql, once the real extracted data showed what the first one was missing. I worked on these three phases in constant iteration instead of one after another, because a fault in one only appeared when the next one used its output.
 
-By around **20 February**, three weeks into the project, the core pipeline existed in rough form and could run end to end: a basic crawler, a basic parser, and a first iteration of the MySQL database. Nothing was polished, but it worked, and that was the state taken into the presentation. Between the presentation and the final delivery the work shifted entirely to refinement rather than new features.
+In weeks 5–7 I built the comparison logic, which depends on the parser and the final schema. It is made of the weighted SQL scoring and the AI description comparison on the best candidates, and it lives in scripts/find_duplicates.php and scripts/ai_compare_descriptions.php. Around week 6 I also built the test data, five fake portal pages and a seeding script in data/demo-portal/, so that there were predictable and varied cases to test against.
+
+All of this had to be ready for the presentation on 27 February, where I gave a live demo of the pipeline instead of showing slides. By about 20 February, three weeks into the project, the core pipeline already ran end to end in rough form, with a basic crawler, a basic parser and a first version of the MySQL database. Nothing was polished, but it worked, and that was what I took to the presentation.
+
+After the presentation I built the front-end and admin panel over weeks 7–10, using HTML, CSS and vanilla JavaScript for the dashboard, the admin area and the language toggle, all inside public/. From then until the delivery the work was refinement and not new features: cleaning the code, reducing token usage, improving the crawler and parser, and upgrading the interface. The last part of the first stage, up to 25 March, was documentation and delivery, with the written report, the GitHub repository and the legal pages.
+
+The second stage started with the new school year and is still running. Its aim has not been to add large new features but to smooth out and streamline what already existed, with updates to the code, the interface and the documentation, and a first version of this final report. It depends on everything above, because it works on the finished first version, and more updates are planned. This means the project is no longer a closed delivery but a product that keeps improving, and the improvements I still plan are listed in section 6.
 
 ## 3.4. Objectives and scope
 
@@ -531,33 +414,15 @@ Defining the boundaries is important to prevent the project from growing uncontr
 
 **ANSWER**
 
-**Objectives.** Each is stated so that it can be verified by inspection of the delivered system rather than judged by impression.
+The objectives are written so that each one can be checked on the delivered system. The project had to provide authentication with three user roles, which I check by registering and logging in as agent, private and admin and confirming that non-admins are rejected from the admin area. It had to store all data in a relational database, which I check by finding the six tables present and filled after a run. It had to crawl any listing URL and keep its raw content, checked by submitting a URL and finding the new raw page row, and extract structured fields from the raw HTML with AI, checked by the listings row with price, surface area, rooms, bathrooms, type and reference.
 
-| # | Objective | How it is verified |
-|---|---|---|
-| O-1 | Implement authentication with three distinct user roles | Register and log in as `agent`, `private` and `admin`; confirm the admin area rejects non-admins |
-| O-2 | Store all project data persistently in a relational database | Six tables present and populated after a run |
-| O-3 | Crawl an arbitrary listing URL and store its raw content | Submit a URL; confirm a new raw page row containing the HTML |
-| O-4 | Extract structured fields from raw HTML using AI | Confirm a listings row with price, surface area, rooms, bathrooms, type and reference |
-| O-5 | Score stored listings against a submitted one using weighted SQL | Confirm scored candidates ordered by score against the 17-point maximum |
-| O-6 | Compare descriptions semantically using AI for the strongest candidates | Rewrite a description and confirm the listing is still matched |
-| O-7 | Present results ranked in a usable interface | Submit a URL and read the results table |
-| O-8 | Provide an admin panel with full CRUD | Create, read, update and delete records from the admin area |
-| O-9 | Provide the interface in at least two languages | Toggle EN/ES and confirm the interface changes |
-| O-10 | Keep AI cost per run low enough to be commercially plausible | Token usage per run measured at 2,000–5,000, down from 15,000–20,000 |
-| O-11 | Maintain the project under version control with visible history | Commit history in the public GitHub repository |
-| O-12 | Comply with GDPR in the data the application collects and stores | Privacy Policy and Legal Notice published; minimum data collected; passwords hashed |
+It also had to score the stored listings against a submitted one with weighted SQL, checked by seeing the candidates ordered by score against the 17-point maximum, and compare descriptions with AI for the best candidates, checked by rewriting a description and confirming the listing is still matched. The results had to appear ranked in a usable interface, which I check by submitting a URL and reading the table, and there had to be an admin panel with full CRUD, checked by creating, reading, updating and deleting records. The interface had to exist in at least two languages, checked with the EN/ES toggle.
 
-**Scope — included.** The full pipeline from URL to ranked duplicate list; three user roles; the user dashboard; the administration panel with CRUD, raw-data viewer and live crawler log; the bilingual interface; the AI chat widget; the legal pages; a demo portal of five fake listing pages for testing; and the project documentation and public repository.
+Three more objectives concern how the project is run. The AI cost per run had to be low enough to be commercially plausible, and I measured token use per run at 2,000–5,000, down from 15,000–20,000. The project had to be under version control with a visible history, which the public GitHub commits show. And it had to comply with GDPR in the data it collects, which I check through the published Privacy Policy and Legal Notice, the minimum data collected and the hashed passwords. In total there are twelve objectives, which I refer to later as O-1 to O-12 in this order.
 
-**Scope — explicitly excluded.** Defining these boundaries is what kept the project deliverable.
+The scope includes the full pipeline from URL to ranked duplicate list, the three user roles, the user dashboard, the administration panel with CRUD, raw-data viewer and live crawler log, the bilingual interface, the AI chat widget, the legal pages, the demo portal of five fake listings, and the documentation and public repository.
 
-- **Image-based matching.** Comparing photographs to identify the same property was considered at the outset and deliberately left out. It would add significant complexity and cost for a benefit that text and numeric comparison already largely delivers.
-- **Genuine publication dates.** The system orders by when the crawler first encountered a listing, not by when it was actually published. Recovering true publication dates would require data the portals do not reliably expose. This is the single most important limitation to state honestly, because "which came first" is the product's headline claim.
-- **Large-scale crawling of live portals.** Only one real site could legally be crawled, so the system was tested against that site plus a purpose-built demo portal.
-- **Production deployment.** The project runs on a local stack. It is designed to be deployable, but a live public deployment with firewall configuration, automated backups and server hardening was not part of the scope.
-- **Payment processing.** A `subscriptions` table exists, but no billing integration was built.
-- **A mobile application**, for the reasons given in 2.5.
+I left several things out on purpose, and that is what kept the project deliverable. Image-based matching was considered at the start and dropped, because it would add a lot of complexity and cost for a benefit that text and number comparison already mostly gives. The system also does not know real publication dates. It orders listings by when the crawler first saw them, and the portals do not reliably show the real date, so this is the most important limitation to state honestly, since "which came first" is the headline claim of the product. I did not crawl live portals at scale, because only one real site could legally be crawled. I did not deploy to production, so firewall configuration, automated backups and server hardening were not done. A subscriptions table exists, but I built no payment or billing, and I did not build a mobile app, for the reasons in 2.5.
 
 ## 3.5. Activities necessary for development
 
@@ -581,19 +446,11 @@ Indicate only those activities that are relevant to your project.
 
 **ANSWER**
 
-These are preparatory activities rather than functional phases of the software.
+Before writing any code I had to prepare the working environment. I used my own MacBook Pro M3, so no hardware was bought. I installed Apache and MySQL with Homebrew, together with PHP and Python 3, so the application could run locally with no external server, and I installed VS Code and Git. I created a Git repository and pushed it to GitHub, which the course also required. I opened an OpenAI account and got an API key, which I keep in a local environment file outside version control. I then wrote and applied the SQL schema, and revised it once when the first structure turned out to be insufficient.
 
-- **Prepare the development machine.** A personal MacBook Pro M3 was used; no additional hardware was acquired.
-- **Install the local stack.** Apache and MySQL through Homebrew, plus PHP and Python 3, so the application could run locally without any external server.
-- **Install the development tools.** VS Code as the editor, Git for version control.
-- **Set up the repository.** A Git repository created and pushed to GitHub, which was also a requirement of the course.
-- **Create the OpenAI account and obtain an API key.** The key is held in a local environment file kept out of version control.
-- **Design and create the database.** Writing and applying the SQL schema, then revising it once when the first structure proved insufficient.
-- **Obtain crawling permission.** Permission for the primary test site was requested from, and granted by, the site owner. This was a genuine prerequisite rather than a formality — without it there would have been no real site to test against at all.
-- **Build the demo portal.** Five fake listing pages were written specifically for testing, because one real site could not produce the varied near-duplicates the system is designed to detect.
-- **Seed test data.** A one-off seeding script was written to populate the database with known duplicates, so the scoring logic could be checked against expected outcomes rather than guessed at.
+Some activities were prerequisites and not formalities. I asked the owner of the main test site for crawling permission and received it, and without it I would have had no real site to test against. I then built the demo portal, five fake listing pages, because a single real site cannot produce the varied near-duplicates the system is meant to detect. Finally I wrote a one-off script that fills the database with known duplicates, so the scoring could be checked against expected results instead of guessed.
 
-Activities that appear on the general list but are **not** applicable to this project: no server was hired, no domain was registered, no paid licences were bought, and no graphic or multimedia resources were needed beyond the company logo, which was generated with AI tools.
+Some usual preparatory activities did not apply: I did not rent a server, register a domain or buy any licence, and the only graphic resource I needed was the company logo, which I generated with AI tools.
 
 ## 3.6. Material and personnel resources required
 
@@ -620,23 +477,9 @@ Even if you use free or open-source software, it is still a resource and should 
 
 **ANSWER**
 
-| Resource | Detail | Cost |
-|---|---|---|
-| Development computer | MacBook Pro M3 (personal) | Already owned; ~1,500 € to acquire |
-| Server | None — local Apache via Homebrew | 0 € during development |
-| Operating system | macOS | Included with the hardware |
-| Web server | Apache (Homebrew) | Free / open source |
-| Database | MySQL / MariaDB | Free / open source |
-| Languages and runtimes | PHP, Python 3 | Free / open source |
-| Editor | Visual Studio Code | Free |
-| Version control | Git, repository hosted on GitHub | Free |
-| External API | OpenAI GPT-4.1-mini | ~$0.0003 per call; ~0.25 € total across the whole project |
-| Hosting and domain | Not used during development | 0 € now; 500–1,000 € per year in a real launch |
-| Graphic resources | Company logo, generated with AI tools | 0 € |
+The development computer was my own MacBook Pro M3, which I already owned and which would cost about 1,500 € to buy new, and it runs macOS. There was no server, because Apache runs locally through Homebrew, so the cost during development was 0 €. The web server (Apache), the database (MySQL/MariaDB), the languages (PHP and Python 3), the editor (Visual Studio Code) and version control (Git, with the repository on GitHub) are all free or open source. The only paid resource is the OpenAI GPT-4.1-mini API, at about $0.0003 per call and about 0.25 € across the whole project. I used no hosting or domain during development, which would cost 500–1,000 € a year in a real launch, and the logo was made with AI tools at no cost.
 
-Everything except the OpenAI API is free or open source. That does not make these resources cost-free in a real setting — they still have to be installed, configured and maintained — which is why they are listed here even though no money changed hands.
-
-In a commercial launch the additional recurring costs would be hosting and cloud services (500–1,000 € per year) and utilities such as internet, electricity and software tools (roughly 250 € per month, about 3,000 € per year). With telework there is no office rent, giving a realistic total of around **7,000–7,500 € of material cost in the first year**, and less in the second unless growth demanded more.
+Free software is still a resource, because it has to be installed, configured and maintained, which is why I list it even though no money was spent. In a commercial launch there would also be recurring costs for hosting and cloud services (500–1,000 € a year) and for internet, electricity and software tools (about 250 € a month, or 3,000 € a year). With telework there is no rent, so the material cost of the first year would be around 7,000–7,500 €.
 
 ### Personnel resources
 
@@ -646,24 +489,11 @@ If the academic project is carried out by a single person, you may state so, but
 
 **ANSWER**
 
-In practice the project required exactly one person. I carried out every role: analysis, database design, crawler development, AI integration, backend, frontend, admin panel, testing, documentation and the public presentation.
+In practice the project needed exactly one person, and I did every role: analysis, database design, crawler, AI integration, backend, frontend, admin panel, testing, documentation and the public presentation.
 
-In a real professional setting the same product would require the following profiles:
+A real company would need several profiles to build the same product. A project manager or Product Owner, part-time, would set the scope and priorities and handle the client. A full-time backend developer would build the web application, the database access and the pipeline. A data engineer would build the crawler and the parser, which are the hardest and most fragile parts, and would be needed full-time during the acquisition work. A part-time frontend developer would do the interface, admin panel and translations. A database designer would be needed briefly at the start, a part-time QA tester throughout, and a part-time systems or DevOps person mainly at deployment. Legal and tax advice would be outsourced. In the micro-enterprise version from 2.2, one founder covers the first seven of these and only the legal and tax work is outsourced.
 
-| Profile | Responsibility | Realistic dedication |
-|---|---|---|
-| Project manager / Product Owner | Scope, priorities, client relationship | Part-time |
-| Backend developer | Web application, database access, pipeline orchestration | Full-time |
-| Data engineer | Crawler and parser — the hardest and most fragile components | Full-time during acquisition work |
-| Frontend developer | Interface, admin panel, internationalisation | Part-time |
-| Database designer | Schema design and optimisation | Short, concentrated at the start |
-| QA / tester | Functional and regression testing | Part-time throughout |
-| Systems / DevOps | Deployment, backups, monitoring | Part-time, mainly at deployment |
-| Legal and tax adviser | GDPR compliance, contracts, invoicing | Outsourced |
-
-In the realistic micro-enterprise version described in 2.2, one founder covers the first seven of these and the last is outsourced from the beginning.
-
-The exercise is worth doing even though the project was individual, because it shows where the workload actually concentrates. The data engineer role spans almost the entire project and owns the two most fragile components; the frontend role is compressed into the final quarter. That is why a second hire in a scaled company would sensibly be a second data engineer rather than a frontend developer. For costing purposes a single full-time equivalent is assumed at a gross annual cost of **24,000 €**, which is the minimum realistic personnel expense even in a one-person company.
+Doing this exercise is useful even for an individual project, because it shows where the work really is. The data engineer role covers almost the whole project and owns the two most fragile components, while the frontend work is squeezed into the last stretch. That is why the first extra hire in a growing company should be a second data engineer and not a frontend developer. For costing I assume one full-time person at a gross annual cost of 24,000 €, the minimum realistic personnel expense even in a one-person company.
 
 ## 3.7. Financing needs
 
@@ -685,25 +515,13 @@ If the project can be launched with a small investment, explain it. If it does n
 
 **ANSWER**
 
-**During development: essentially none.** The project was built on hardware I already owned, using free and open-source software, on a local stack with no server or domain, and the only external service cost about 25 cents in total. No financing was required to reach a working product.
+I did not need any financing to build the project. I used hardware I already owned, free and open-source software, a local stack with no server or domain, and the only external cost was about 25 cents of API usage.
 
-**To launch commercially: yes, but not a large amount.** The realistic first-year figures are:
+Launching it commercially would need money, but not a lot. The realistic cost of the first year is about 31,500 €: a gross founder salary of 24,000 €, computer equipment of 1,500 €, hosting and cloud services of 500–1,000 €, and 3,000 € for internet, electricity and software tools. There is no rent because of telework, and the OpenAI cost is negligible at the current volume.
 
-| Item | First-year cost |
-|---|---|
-| Founder salary (gross) | 24,000 € |
-| Computer equipment | 1,500 € |
-| Hosting and cloud services | 500–1,000 € |
-| Internet, electricity, software tools (~250 €/month) | 3,000 € |
-| Office rent (telework) | 0 € |
-| OpenAI API | Negligible at current volume |
-| **Total** | **≈ 31,500 €** |
+At 30 € a month each client pays 360 € a year, so about 88 paying clients are needed to break even. That is about 10 % of the 850–900 agencies in the target area, which is ambitious for a first year. A more realistic 40–60 clients would bring in 14,400–21,600 €, so the first year would probably make a loss if I drew a full salary.
 
-Against that, at 30 € per month each client pays 360 € per year, so roughly **88 paying clients** are needed to break even — about 10 % of the 850–900 agencies in the target area, which is ambitious for a first year. A more realistic first-year scenario of 40–60 clients produces 14,400–21,600 €, meaning a first-year loss.
-
-**Conclusion.** FirstListing would probably not be profitable in year one if a full salary is drawn. But the salary is the overwhelming majority of the cost and it is also the most flexible part: I would not be working on this full time, so I would not need a full salary from it. Stripping the salary out leaves roughly 7,500 € of genuine cash requirement, which is low enough to self-finance or to cover with a modest amount of external support.
-
-The project therefore does not depend on raising significant capital. It depends on how much of my own unpaid time I am willing to invest before revenue arrives — which is a different kind of risk, and one I can actually control.
+The salary is nearly all of the cost, though, and it is also the most flexible part. I would not work on this full time, so I would not need a full salary from it. Without the salary the real cash requirement is about 7,500 €, which is small enough to pay myself or cover with a modest amount of external support. The project therefore does not depend on raising capital. It depends on how much unpaid time I am willing to invest before revenue arrives, which is a risk I can actually control.
 
 ## 3.8. Documentation needed for the design
 
@@ -726,23 +544,13 @@ The purpose of this section is to demonstrate that the design is not carried out
 
 **ANSWER**
 
-**Documentation consulted**
+For the design I used the official documentation of the tools: the PHP, Python, MySQL and Apache documentation for syntax, standard library behaviour and local configuration, and the OpenAI API documentation for request formats, model choice and token counting. The token documentation in particular drove the cost optimisation. I also read the GDPR to check that the application's data handling is compliant, to choose the correct legal basis (Article 6.1.b) and to understand the obligations about retention, erasure and third-party processors, and I read the Spanish LSSI to know what the Legal Notice must contain.
 
-- **Technical documentation for the languages and tools used** — PHP, Python 3, MySQL and Apache, for syntax, standard library behaviour and local configuration.
-- **OpenAI API documentation** — request and response formats, model selection, and token accounting. The token documentation in particular directly drove the cost optimisation work.
-- **GDPR** — reviewed specifically to confirm the application's data handling is compliant, to identify the correct legal basis (Art. 6.1.b), and to understand the obligations around retention, erasure and third-party processors.
-- **Spanish LSSI requirements** — for the required content of the Legal Notice.
-- **The structure of real listing pages.** A significant and easily overlooked part of the design work was reading the HTML and JSON-LD of actual listing pages to establish what could reliably be extracted and what could not. The schema was shaped by that reading rather than by an idealised model of what a property record should contain.
+An important and easily forgotten part of the design work was reading the HTML and JSON-LD of real listing pages to see what could reliably be extracted and what could not. The database schema was shaped by that reading and not by an idealised idea of what a property record should contain.
 
-**Documentation produced**
+The documents I produced are the requirements and scope (this report plays that role, since there was no client brief, see 5.7), the database model, first on paper and then as an SQL schema, the design of the four-step pipeline with the scoring weights, and the Privacy Policy and Legal Notice published on the site. I also generated technical documentation of the code automatically from the project directory, with AI summaries of each file and folder, producing a Markdown report with the directory tree, all the source code and a summary of each component, which is published in the GitHub repository.
 
-- The requirements and scope definition. In the absence of a client brief, this report serves that role (see 5.7).
-- The database model — sketched on paper first, then written as an SQL schema.
-- The design of the four-step pipeline, and the field weightings used in the scoring.
-- The Privacy Policy and Legal Notice published on the site.
-- Technical documentation of the codebase, generated automatically from the project directory with AI summaries of each file and folder, producing a Markdown report containing the full directory tree, all source code, and inline summaries of each component. This is published in the GitHub repository.
-
-The purpose of listing this is to show that the design was not done purely by intuition. The two decisions that most shaped the project — using a hosted AI model rather than a self-hosted one, and filtering in SQL before calling AI at all — both came directly out of reading cost and token documentation, not out of guesswork.
+This shows that the design was not done by intuition. The two decisions that shaped the project most, using a hosted AI model instead of a self-hosted one and filtering in SQL before calling the AI at all, both came directly from reading cost and token documentation.
 
 ## 3.9. Aspects that must be controlled to guarantee quality
 
@@ -767,27 +575,13 @@ The indicators must be verifiable afterward.
 
 **ANSWER**
 
-For a project of this size built by one person, a full SCRUM or Kanban setup would have been overkill. Quality was managed instead through consistent personal organisation, a physical notebook, Git, and disciplined testing. The criteria used to judge it were:
+For a one-person project of this size, a full Scrum or Kanban setup would have been too much. I managed quality with personal organisation, a paper notebook, Git and careful testing, and I judged it against the following criteria.
 
-**Compliance with requirements.** Every objective in 3.4 has a stated means of verification, and the project is judged against that list rather than against a general impression of completeness.
+The first criterion is compliance with the requirements: every objective in 3.4 has a way of being verified, so I judge the project against that list and not against a general impression. The second is correct operation. After writing each function I tested it on its own and then as part of the whole system, and every major component (crawler, parser, SQL scoring and AI comparison) was checked both in isolation and in the full pipeline. Because only one real site could be crawled, I built the demo portal of five fake local listings so that the tests had known, predictable results. Without it, the question "does the matching really work?" would have had no objective answer.
 
-**Correct operation and absence of serious errors.** Code quality was maintained through rigorous daily testing. After every function was implemented it was tested — first independently, then integrated with the rest of the system. Each major component (crawler, parser, SQL scoring, AI comparison) was verified both in isolation and as part of the full pipeline.
+Code quality and maintainability mean a clear folder structure, consistent names, commented code and parameterised database queries everywhere. Readability matters here because the crawler and parser will need constant adjustment. I used Git throughout and committed every meaningful change with a message, so I could review the history and go back after a mistake. My commit messages are not always as descriptive as they should be, and I want to improve that in future projects.
 
-**Predictable test conditions.** Because only one real site could legally be crawled, a demo portal of five fake local listing pages was built specifically for testing. This provided a controlled set of known listings producing predictable and varied results, simulating how the crawler and duplicate detection would behave in a real scenario. Without it, "does the matching actually work?" would have had no objective answer.
-
-**Code quality and maintainability.** A clear folder structure, consistent naming, commented code, and parameterised database access throughout. Readability is a real requirement here rather than a nicety, because the crawler and parser are known to need ongoing adjustment.
-
-**Traceable history.** Git was used throughout. Every meaningful change was committed with a message, making it possible to review the history, roll back a break, and keep a record of what was done and when. One honest note: the commit messages are not always as descriptive as they should be, which is something to improve in future projects.
-
-**Cost efficiency.** Token usage per run is a genuine quality measure for this project, because an accurate system that is too expensive to run is not a viable product. It was reduced from 15,000–20,000 tokens per run to 2,000–5,000.
-
-**Security.** PDO with parameterised queries, bcrypt password hashing, and session-based authentication checked at the top of every protected page.
-
-**Meeting deadlines.** Two fixed dates — the presentation on 27 February and the final delivery on 25 March — acted as natural checkpoints that forced each phase to reach a functional state before the next began.
-
-**Documentation.** A complete repository report covering the directory tree, the source code, and per-component summaries.
-
-All of these are verifiable after the fact, which is the point: each corresponds to an indicator in 5.2 with a measured result rather than a claim.
+Cost is also a quality measure in this project, because an accurate system that is too expensive to run is not a viable product, so I reduced token use per run from 15,000–20,000 to 2,000–5,000. For security I used PDO with parameterised queries, bcrypt for passwords and a session check at the top of every protected page. The two fixed dates, the presentation on 27 February and the delivery on 25 March, acted as checkpoints that forced each phase to be working before the next one started. Finally, the documentation is a complete repository report with the directory tree, the code and a summary of each component. All of these criteria can be checked afterwards, and each one has a measured result in 5.2.
 
 ------------------------------------------------------------------------
 
@@ -815,23 +609,9 @@ The sequence must respond to real dependencies, not simply to an arbitrary order
 
 The sequence was driven by genuine dependencies, not by preference. The core constraint is that every later stage consumes the output of an earlier one: you cannot extract fields from a page you have not fetched, you cannot compare listings you have not extracted, and you cannot display results you have not computed.
 
-**Sequential chain — each step blocks the next:**
+The sequential chain, in which each step blocks the next, starts with designing the data model. Everything downstream writes into it, so getting the structure roughly right first avoided reworking every other component later. Creating the database comes second, because the crawler needs somewhere to write raw pages before it can be tested meaningfully. The crawler is third and produces the raw HTML the parser consumes, so nothing downstream can be tested without real stored pages. The parser is fourth and converts raw HTML into structured fields, since the scoring logic is meaningless without populated, comparable rows. The SQL scoring comes fifth and produces the ranked candidate list. The AI description comparison is sixth and runs on the output of the scoring. It is deliberately last in the pipeline because it operates only on the narrowed candidate set, and that ordering is the cost control described in 3.1. The front-end is seventh and presents the results of the previous steps. It was built last, and correctly so, because there was no point designing a results table before knowing what the results actually looked like. The final step is integrating and testing the whole pipeline end to end.
 
-1. **Design the data model.** Everything downstream writes into it, so getting the structure roughly right first avoided reworking every other component later.
-2. **Create the database.** The crawler needs somewhere to write raw pages before it can be tested meaningfully.
-3. **Build the crawler.** Produces the raw HTML the parser consumes. Nothing downstream can be tested without real stored pages.
-4. **Build the parser.** Converts raw HTML into structured fields. The scoring logic is meaningless without populated, comparable rows.
-5. **Build the SQL scoring.** Produces the ranked candidate list.
-6. **Add the AI description comparison.** Runs on the output of step 5. It is deliberately last in the pipeline because it operates only on the narrowed candidate set — that ordering is the cost control described in 3.1.
-7. **Build the front-end.** Presents the results of steps 1–6. Built last, and correctly so: there was no point designing a results table before knowing what the results actually looked like.
-8. **Integrate and test the whole pipeline end to end.**
-
-**Work that ran in parallel or iteratively:**
-
-- Steps 3, 4 and 5 were not completed once each and then left alone. They were developed against each other in continuous iteration — refining the parser, then the crawler, then both together — because faults in one only became visible when the next consumed its output. The crawler went through five versions and the parser through two or three before either was satisfactory.
-- The demo portal was built alongside steps 3 and 4, as soon as it became clear that one real site was insufficient for testing.
-- Documentation and Git commits ran continuously throughout.
-- Refinement of the crawler, parser and interface continued after the presentation checkpoint, in parallel with each other.
+Some of the work ran in parallel or iteratively. The crawler, the parser and the scoring were not completed once each and then left alone. They were developed against each other in continuous iteration, refining the parser, then the crawler, then both together, because faults in one only became visible when the next consumed its output. The crawler went through five versions and the parser through two or three before either was satisfactory. The demo portal was built alongside the crawler and the parser, as soon as it became clear that one real site was insufficient for testing. Documentation and Git commits ran continuously throughout, and refinement of the crawler, parser and interface continued after the presentation checkpoint, in parallel with each other.
 
 The one deviation from a textbook order is that the database schema was revised once mid-project. That is less a planning failure than an acknowledgement that the right schema only became fully clear after the parser revealed what the extracted data actually looked like in practice.
 
@@ -845,22 +625,11 @@ The question you must answer is: **what do I need to have ready in order to corr
 
 **ANSWER**
 
-| Task | What had to be ready before it could start |
-|---|---|
-| Data model design | Pen and paper; an understanding of what a real listing page contains |
-| Database creation | Local MySQL running via Homebrew |
-| Crawler development | Python 3; a target site; **written crawling permission from the site owner**; the raw pages table |
-| Parser development | Stored raw pages; an OpenAI account and API key; the listings table |
-| SQL scoring | A populated listings table with several comparable records; seeded test duplicates |
-| AI description comparison | Extracted descriptions; the candidate list from the scoring step; API credentials |
-| Testing the matching logic | The demo portal of five fake listing pages with known relationships |
-| Front-end and admin panel | Local Apache serving PHP; working pipeline output to display |
-| Live crawler log | The crawler writing to a log file the admin page can poll |
-| Internationalisation | Finished interface text to translate |
-| Version control and delivery | Git installed; GitHub repository created and connected |
-| Legal pages | GDPR and LSSI requirements reviewed |
+Each task needed certain things to be ready before it could start. Designing the data model needed only pen and paper and an understanding of what a real listing page contains, and creating the database needed the local MySQL running via Homebrew. Developing the crawler needed Python 3, a target site, written crawling permission from the site owner, and the raw pages table. The parser needed stored raw pages, an OpenAI account and API key, and the listings table. The SQL scoring needed a populated listings table with several comparable records and seeded test duplicates, and the AI description comparison needed the extracted descriptions, the candidate list from the scoring step, and API credentials. Testing the matching logic needed the demo portal of five fake listing pages with known relationships.
 
-Two of these were genuine blockers rather than routine setup. The **crawling permission** had to be obtained before any real data could be collected at all. The **demo portal** had to exist before duplicate detection could be tested properly, because a single real site cannot produce the varied near-duplicates the system is designed to find. Both were resolved early enough not to delay the project, but neither was optional, and both are easy to overlook when planning because neither is a line of code.
+The front-end and admin panel needed local Apache serving PHP and working pipeline output to display, while the live crawler log needed the crawler to write to a log file the admin page can poll. Internationalisation needed finished interface text to translate. Version control and delivery needed Git installed and a GitHub repository created and connected, and the legal pages needed the GDPR and LSSI requirements to have been reviewed.
+
+Two of these were genuine blockers rather than routine setup. The crawling permission had to be obtained before any real data could be collected at all. The demo portal had to exist before duplicate detection could be tested properly, because a single real site cannot produce the varied near-duplicates the system is designed to find. Both were resolved early enough not to delay the project, but neither was optional, and both are easy to overlook when planning because neither is a line of code.
 
 Notably absent from this list: no server had to be rented, no domain registered, no paid licences acquired, and no external team coordinated. The logistics of this project were unusually light, which is one of the reasons the scope was achievable in the time available.
 
@@ -883,19 +652,13 @@ You must not claim that a specific authority must authorize a data processing op
 
 **ANSWER**
 
-**Crawling permission — required and obtained.** This is the only permission the project genuinely needed. Reading and storing pages from a third-party website is governed by that site's terms, so permission for the primary test site was requested from, and granted directly by, the site owner. Alongside the permission the crawler behaves politely: it identifies itself with a clear User-Agent and waits 1.5 seconds between requests, so it places no meaningful load on the site. This constraint is also why the demo portal exists — rather than crawl sites I had no permission for, I built five fake listing pages to test against.
+The only permission the project genuinely needed was crawling permission, and it was obtained. Reading and storing pages from a third-party website is governed by that site's terms, so permission for the primary test site was requested from, and granted directly by, the site owner. Alongside the permission the crawler behaves politely: it identifies itself with a clear User-Agent and waits 1.5 seconds between requests, so it places no meaningful load on the site. This constraint is also why the demo portal exists. Rather than crawl sites I had no permission for, I built five fake listing pages to test against.
 
-**OpenAI API credentials — required and obtained.** A standard commercial account. The API key is stored in a local environment file excluded from version control.
+OpenAI API credentials were also required and obtained, through a standard commercial account. The API key is stored in a local environment file excluded from version control.
 
-**Data protection — obligations, not authorisations.** This distinction matters and is easy to get wrong. No authority has to approve FirstListing's data processing, and there is no registration or prior authorisation requirement for processing of this kind. What exists are **obligations** under GDPR, which the project meets by collecting only the minimum necessary data (username, optional email, bcrypt-hashed password, and the URLs searched), by processing on the legal basis of performance of a contract (Art. 6.1.b), by publishing a Privacy Policy and Legal Notice covering legal bases, retention and erasure rights, and by identifying OpenAI as the sole third-party processor.
+Data protection is a matter of obligations, not authorisations, a distinction that is easy to get wrong. No authority has to approve FirstListing's data processing, and there is no registration or prior authorisation requirement for processing of this kind. What exist are obligations under GDPR, which the project meets by collecting only the minimum necessary data (username, optional email, bcrypt-hashed password, and the URLs searched), by processing on the legal basis of performance of a contract (Art. 6.1.b), by publishing a Privacy Policy and Legal Notice covering legal bases, retention and erasure rights, and by identifying OpenAI as the sole third-party processor.
 
-**Not required.**
-
-- No permission to access any company's internal systems — the project reads only public web pages.
-- No app store or publication approval, since this is a web application.
-- No consent for user testing, because no testing with real users was carried out (see 5.6).
-- No paid licences, since the entire stack is free and open source.
-- No sector-specific real estate authorisation, because the tool is a B2B analysis product aimed at private users, does not interact with public administrations, and does not handle transactions.
+Several other permits are not required. No permission is needed to access any company's internal systems, because the project reads only public web pages. No app store or publication approval is needed, since this is a web application. No consent for user testing was needed, because no testing with real users was carried out (see 5.6). No paid licences are needed, since the entire stack is free and open source, and no sector-specific real estate authorisation applies, because the tool is a B2B analysis product aimed at private users, does not interact with public administrations, and does not handle transactions.
 
 ## 4.4. Procedures for carrying out the tasks
 
@@ -918,23 +681,15 @@ Not all projects need the same procedures. Select the ones that add value to you
 
 **ANSWER**
 
-**Version control.** Git throughout, with the repository on GitHub. Every meaningful change was committed with a message, so the history can be reviewed and a broken change rolled back. I worked directly on the main branch rather than using a branching strategy — with a single developer and no concurrent work, branches would have added ceremony without benefit. One weakness I will name openly: the commit messages are not always as descriptive as they should be.
+For version control I used Git throughout, with the repository on GitHub. Every meaningful change was committed with a message, so the history can be reviewed and a broken change rolled back. I worked directly on the main branch rather than using a branching strategy, because with a single developer and no concurrent work, branches would have added ceremony without benefit. One weakness I will name openly is that the commit messages are not always as descriptive as they should be.
 
-**Backups.** The GitHub remote is the backup. Pushing regularly means the project exists in at least two places at all times, which matters given that hardware failure is one of the identified risks.
+The GitHub remote is the backup. Pushing regularly means the project exists in at least two places at all times, which matters given that hardware failure is one of the identified risks. Secrets are handled by keeping the API key in a local environment file excluded from version control, so credentials never reach the repository.
 
-**Secret handling.** The API key lives in a local environment file excluded from version control, so credentials never reach the repository.
+The central discipline of the project was testing before integrating. After every function was implemented it was tested, first in isolation and then integrated with the rest of the system, and each major component was verified on its own and again as part of the full pipeline. This is the reason a fragile system that went through five crawler versions and three parser versions never ended up in an unknown state. The demo portal of five fake listing pages provided a known, repeatable set of inputs, so a change to the scoring could be judged against expected results rather than estimated by eye.
 
-**Testing before integrating.** The central discipline of the project. After every function was implemented it was tested — first in isolation, then integrated with the rest of the system. Each major component was verified on its own and again as part of the full pipeline. This is the reason a fragile system that went through five crawler versions and three parser versions never ended up in an unknown state.
+On naming and structure, I used consistent file and folder naming, with a clear separation between public/, scripts/, python/, config/ and data/, and commented code throughout. For task tracking I used a physical notebook rather than Trello or a project management tool. Writing down ideas, structures and what needed doing next was sufficient, and it was particularly useful in the early stages for sketching timelines and thinking through how the components should fit together. With clear deadlines, one developer and regular commits, a notebook and Git served the same purpose a formal tool would have. Deliverables were validated through the two fixed deadlines, the presentation on 27 February and the final delivery on 25 March, which acted as checkpoints, each requiring the system to be in a demonstrable state rather than merely in progress.
 
-**Controlled test data.** The demo portal of five fake listing pages provided a known, repeatable set of inputs, so a change to the scoring could be judged against expected results rather than estimated by eye.
-
-**Naming and structure.** Consistent file and folder naming, with a clear separation between `public/`, `scripts/`, `python/`, `config/` and `data/`, and commented code throughout.
-
-**Task tracking.** A physical notebook rather than Trello or a project management tool. Writing down ideas, structures and what needed doing next was sufficient, and it was particularly useful in the early stages for sketching timelines and thinking through how the components should fit together. With clear deadlines, one developer and regular commits, a notebook and Git served the same purpose a formal tool would have.
-
-**Deliverable validation.** The two fixed deadlines — the presentation on 27 February and the final delivery on 25 March — acted as checkpoints, each requiring the system to be in a demonstrable state rather than merely in progress.
-
-**Procedures deliberately not used.** No code review (there was no second developer), no formal branching strategy, no CI pipeline, and no formal release versioning. These add real value on a team; on a solo project of this length they would have been overhead without benefit.
+Some procedures were deliberately not used: there was no code review because there was no second developer, no formal branching strategy, no CI pipeline, and no formal release versioning. These add real value on a team, but on a solo project of this length they would have been overhead without benefit.
 
 ## 4.5. Risks inherent to execution and prevention plan
 
@@ -954,24 +709,19 @@ For each relevant risk you can indicate its probability, impact, preventive meas
 
 **ANSWER**
 
-| # | Risk | Prob. | Impact | Prevention | Response if it occurs |
-|---|---|---|---|---|---|
-| R-01 | A target site changes its HTML structure and the crawler breaks | High | High | Keep crawler logic isolated and readable; avoid over-fitting to one layout | Adjust extraction for that site; the demo portal confirms the rest still works |
-| R-02 | Adding a new site is harder than expected — different structures, different amounts of raw text, different JSON-LD implementations | High | Medium | Use AI extraction rather than per-site hardcoded rules | Tune the prompt; accept slower per-site onboarding |
-| R-03 | OpenAI API becomes unavailable or changes pricing | Low | Very high | Keep AI calls concentrated in two scripts so the provider can be swapped | Substitute another provider; pure-code parsing is not a realistic fallback |
-| R-04 | Token usage climbs and cost becomes unviable | Medium | Medium | Filter in SQL before calling AI; cap the AI comparison at the top 5 candidates; monitor tokens per run | Re-optimise prompts — already done once, from 15,000–20,000 down to 2,000–5,000 |
-| R-05 | SQL injection | Low | High | PDO with parameterised queries everywhere | Patch and review all query construction |
-| R-06 | Session hijacking or unauthorised access | Low | High | Session-based auth with a check at the top of every protected page; bcrypt password hashing | Invalidate sessions; review authentication |
-| R-07 | Data loss or hardware failure | Low | High | Regular commits and pushes to GitHub | Restore from the remote repository |
-| R-08 | Data growth and corruption — stored HTML is currently 20,000–25,000 characters per page and could reach 100,000 if crawler scope widened | Medium | Medium | Keep the crawler scope tight; store only what is needed | Trim stored content; introduce retention limits |
-| R-09 | Schedule slip against the two fixed deadlines | Medium | High | Deliberately limited scope; front-end left until last so the core pipeline was proven first | Cut scope rather than move the deadline — image matching was excluded for exactly this reason |
-| R-10 | Electrical risk from badly installed cabling | Low | High | Safe cable installation; a 220 V connection can cause serious injury or fire, and low-voltage devices can cause minor shocks | Standard electrical safety and first aid procedure |
-| R-11 | Ergonomic risk — back pain, eye strain, carpal tunnel syndrome, burnout | High | Medium | Ergonomic workspace, correct screen height, regular structured breaks | Adjust the workstation and reduce session length; untreated, these lead to sick leave and financial loss |
-| R-12 | Loss or theft of the development machine | Low | High | The remote repository holds the code | Restore from GitHub onto replacement hardware |
+I identified twelve risks, which I refer to as R-01 to R-12. The first is that a target site changes its HTML structure and the crawler breaks. The probability is high and so is the impact. Prevention consists of keeping the crawler logic isolated and readable and avoiding over-fitting to one layout, and the response is to adjust extraction for that site, with the demo portal confirming that the rest still works. The second is that adding a new site is harder than expected, because of different structures, different amounts of raw text and different JSON-LD implementations. The probability is high and the impact medium. It is prevented by using AI extraction rather than per-site hardcoded rules, and the response is to tune the prompt and accept slower per-site onboarding.
 
-The two weakest points in the system are the crawler and the parser, since they are by far the most complex parts of the project. **R-01 and R-02 are therefore the risks most likely to actually materialise**, and they would be the main scaling problem if the project grew beyond its current set of sites. R-03 is the opposite profile — unlikely, but it would break the core feature outright, which is why it is worth naming even though nothing in the current design mitigates it fully.
+The third risk is that the OpenAI API becomes unavailable or changes pricing. The probability is low but the impact is very high. AI calls are kept concentrated in two scripts so the provider can be swapped, and if it happens another provider would be substituted, since pure-code parsing is not a realistic fallback. The fourth is that token usage climbs and cost becomes unviable, with medium probability and medium impact. Prevention is to filter in SQL before calling AI, cap the AI comparison at the top 5 candidates and monitor tokens per run, and the response is to re-optimise prompts, which was already done once, from 15,000–20,000 tokens down to 2,000–5,000.
 
-On IT security specifically: because the project runs locally rather than on a live server, measures such as firewall configuration and server updates are not directly applicable at this stage. If the project were deployed to production they would become standard requirements — keeping the operating system and dependencies updated, configuring a firewall, and setting up regular automated backups.
+On security, the fifth risk is SQL injection, with low probability and high impact, prevented with PDO and parameterised queries everywhere, and answered by patching and reviewing all query construction. The sixth is session hijacking or unauthorised access, also low probability and high impact, prevented with session-based authentication checked at the top of every protected page and bcrypt password hashing, and answered by invalidating sessions and reviewing authentication.
+
+The seventh risk is data loss or hardware failure, low probability and high impact, prevented by regular commits and pushes to GitHub and answered by restoring from the remote repository. The eighth is data growth and corruption, since stored HTML is currently 20,000–25,000 characters per page and could reach 100,000 if the crawler scope widened. Its probability and impact are both medium, it is prevented by keeping the crawler scope tight and storing only what is needed, and the response is to trim stored content and introduce retention limits. The ninth is a schedule slip against the two fixed deadlines, with medium probability and high impact. It is prevented through a deliberately limited scope and by leaving the front-end until last so the core pipeline was proven first, and the response is to cut scope rather than move the deadline, which is why image matching was excluded.
+
+The last three are the risks inherent to working with computer equipment. The tenth is electrical risk from badly installed cabling, with low probability and high impact, because a 220 V connection can cause serious injury or fire and low-voltage devices can cause minor shocks. It is prevented by safe cable installation and answered with standard electrical safety and first aid procedure. The eleventh is ergonomic risk, meaning back pain, eye strain, carpal tunnel syndrome and burnout, with high probability and medium impact. It is prevented with an ergonomic workspace, correct screen height and regular structured breaks, and the response is to adjust the workstation and reduce session length, since untreated these lead to sick leave and financial loss. The twelfth is loss or theft of the development machine, low probability and high impact, which is covered by the remote repository holding the code and answered by restoring from GitHub onto replacement hardware.
+
+The two weakest points in the system are the crawler and the parser, since they are by far the most complex parts of the project. R-01 and R-02 are therefore the risks most likely to actually materialise, and they would be the main scaling problem if the project grew beyond its current set of sites. R-03 is the opposite profile: unlikely, but it would break the core feature outright, which is why it is worth naming even though nothing in the current design mitigates it fully.
+
+On IT security specifically, because the project runs locally rather than on a live server, measures such as firewall configuration and server updates are not directly applicable at this stage. If the project were deployed to production they would become standard requirements: keeping the operating system and dependencies updated, configuring a firewall, and setting up regular automated backups.
 
 ## 4.6. Allocation of material and human resources according to execution timing
 
@@ -983,23 +733,13 @@ Even though the academic project is individual, this exercise allows you to demo
 
 **ANSWER**
 
-| Phase | Approx. period | Human resource (professional equivalent) | Material resources |
-|---|---|---|---|
-| Analysis and data design | Weeks 1–2 | Database designer + Product Owner | Pen and paper; computer |
-| Environment setup | Week 1 | DevOps / systems | MacBook, Homebrew stack, VS Code, Git, GitHub, OpenAI account |
-| Crawler | Weeks 1–7 | Data engineer | Python 3; target site with permission; MySQL |
-| Parser | Weeks 1–7 | Data engineer + AI integration | PHP; OpenAI API; stored raw pages |
-| Database refinement | Weeks 1–7 | Database designer | MySQL |
-| Comparison logic | Weeks 5–7 | Backend developer | PHP, MySQL, OpenAI API |
-| Demo portal and test data | ~Week 6 | QA / tester | HTML; seeding script |
-| Front-end and admin panel | Weeks 7–10 | Frontend developer | HTML, CSS, JS; local Apache |
-| Refinement and optimisation | After 27 Feb | Backend + data engineer | Full stack |
-| Documentation and delivery | To 25 Mar | Technical writer + Product Owner | Documentation tooling; GitHub |
-| Legal and compliance | Throughout | Outsourced legal adviser | GDPR and LSSI reference material |
+In the first two weeks, analysis and data design would be handled by a database designer together with a Product Owner, using pen and paper and a computer. The environment setup in week 1 would fall to DevOps / systems, with the MacBook, the Homebrew stack, VS Code, Git, GitHub and the OpenAI account. The crawler (weeks 1–7) belongs to a data engineer, who needs Python 3, a target site with permission and MySQL. The parser (weeks 1–7) belongs to a data engineer with AI integration skills, using PHP, the OpenAI API and the stored raw pages, and the database refinement over the same weeks belongs to a database designer working in MySQL.
 
-In reality one person — me — filled every column. The exercise of assigning professional profiles is still worth doing, because it makes visible where the workload actually concentrates: the **data engineer** role spans almost the entire project and owns the two most fragile components, while the **frontend** role is compressed into the final quarter. In a real team that is where the staffing would go, and it is also why a second hire in a scaled company would sensibly be a second data engineer rather than a frontend developer.
+The comparison logic (weeks 5–7) would be the work of a backend developer using PHP, MySQL and the OpenAI API. The demo portal and test data, around week 6, would be done by a QA / tester with HTML and the seeding script. The front-end and admin panel (weeks 7–10) belong to a frontend developer working in HTML, CSS and JS on the local Apache. After 27 February, the refinement and optimisation would involve a backend developer and a data engineer on the full stack. Documentation and delivery, up to 25 March, would be handled by a technical writer and the Product Owner using the documentation tooling and GitHub, and legal and compliance throughout would be an outsourced legal adviser working from GDPR and LSSI reference material.
 
-Total effort is estimated at around **375 hours** — roughly five months at an average of 1.5 hours per day, covering the two and a half months already spent plus an estimated further two and a half months to reach genuine production quality.
+In reality one person, me, filled every one of these roles. The exercise of assigning professional profiles is still worth doing, because it makes visible where the workload actually concentrates: the data engineer role spans almost the entire project and owns the two most fragile components, while the frontend role is compressed into the final quarter. In a real team that is where the staffing would go, and it is also why a second hire in a scaled company would sensibly be a second data engineer rather than a frontend developer.
+
+I have not estimated the total hours of effort. The work was done in two separate periods with a long break between them, so a figure based on hours per day would not mean anything. What matters for the plan is that the first version took about two and a half months, and that the second year has been spent improving it.
 
 ## 4.7. Economic assessment
 
@@ -1024,36 +764,13 @@ Explain the criteria used to carry out the calculations.
 
 **ANSWER**
 
-**Criteria used.** The figures below assume the project is developed in a professional context rather than as a student exercise, so my own time is costed at a market rate even though no money changed hands. Development effort is estimated at 1.5 hours per day over five months — the two and a half months already invested plus an estimated further two and a half months to reach real production value — giving roughly 375 hours. Equipment is costed at acquisition value rather than amortised, since the project spans less than a year. Hosting and utilities are included at realistic market rates even though the project actually ran locally at zero cost.
+The figures below assume the project is developed in a professional context rather than as a student exercise, so the costs are the ones a real launch would have, even though no money changed hands. I have not put a price on the hours I worked, because the project was done in two separate periods with a long break between them and the total time cannot be measured reliably. The only cost of my own time that I include is the founder salary below. Equipment is costed at acquisition value rather than amortised. Hosting and utilities are included at realistic market rates even though the project actually ran locally at zero cost.
 
-**Development cost (one-off)**
+The first-year operating cost is made up of the founder salary (gross), at 24,000 €, which is the minimum realistic annual personnel expense; computer equipment (a MacBook at acquisition value), at 1,500 €; hosting and cloud services, at 500–1,000 € annually; and internet, electricity and software tools, at about 250 € per month or 3,000 € per year. Office rent is 0 € because of telework, and the OpenAI API, at about $0.0003 per comparison call, is negligible at current volume. The materials subtotal is approximately 7,000–7,500 €, and adding the salary gives a total first-year cost of approximately 31,500 €.
 
-| Item | Basis | Cost |
-|---|---|---|
-| Development effort | 375 h × 20 €/h | **7,500 €** |
+For revenue and break-even, at 30 € per month each client pays 360 € per year, so 31,500 € divided by 360 € gives about 88 clients. Break-even at roughly 88 clients, about 10 % of the market, brings in around 31,680 € a year and covers the costs. A realistic first year of 40–60 clients brings in 14,400–21,600 € and results in a loss, while 25 % penetration, about 225 clients, would bring in around 81,000 € and a comfortable profit.
 
-**First-year operating cost**
-
-| Item | Basis | Cost |
-|---|---|---|
-| Founder salary (gross) | Minimum realistic annual personnel expense | 24,000 € |
-| Computer equipment | MacBook, acquisition value | 1,500 € |
-| Hosting and cloud services | Annual | 500–1,000 € |
-| Internet, electricity, software tools | ~250 €/month | 3,000 € |
-| Office rent | Telework | 0 € |
-| OpenAI API | ~$0.0003 per comparison call | Negligible at current volume |
-| **Materials subtotal** | | **≈ 7,000–7,500 €** |
-| **Total first year** | Salary + materials | **≈ 31,500 €** |
-
-**Revenue and break-even.** At 30 € per month each client pays 360 € per year, so 31,500 € ÷ 360 € ≈ 88 clients.
-
-| Scenario | Clients | Annual revenue | Result |
-|---|---|---|---|
-| Break-even | ~88 (≈10 % of market) | ~31,680 € | Costs covered |
-| Realistic year one | 40–60 | 14,400–21,600 € | Loss |
-| 25 % penetration | ~225 | ~81,000 € | Comfortable profit |
-
-**Interpretation.** The dominant cost is labour: salary alone is roughly 76 % of the first-year total, and development effort at market rate accounts for a further 7,500 €. Actual cash spent on this project to date is close to zero — hardware already owned, free and open-source software, no server, and about 25 cents of API usage.
+The dominant cost is labour: salary alone is roughly 76 % of the first-year total. Actual cash spent on this project to date is close to zero, since the hardware was already owned, the software is free and open source, there is no server, and API usage cost about 25 cents.
 
 The gap between 31,500 € and approximately nothing is entirely the value of my own unpaid time. That is the honest conclusion of the economic assessment: FirstListing is cheap to build and expensive to staff, and its viability in year one depends less on the market than on whether the founder needs to draw a full salary from it.
 
@@ -1078,21 +795,11 @@ This is not about repeating the entire report, but about identifying the documen
 
 **ANSWER**
 
-The documents that genuinely support execution, as opposed to restating this report:
+The documents that genuinely support execution, as opposed to restating this report, start with the requirements and scope definition: the functional and non-functional requirements in 2.6 and the objectives in 3.4, used as the checklist for deciding when something is finished. The data model is the SQL schema file, which is the authoritative description of the six tables and what every new component is written against. The pipeline specification describes the four ordered steps, what each consumes and produces, and the exact commands used to invoke them, since the web application calls the crawler and the scripts directly. The scoring specification records the field weightings and the cut-off, documented separately from the code because they are tuning parameters that are expected to change. The planning is covered by the phase table in 3.3 and the task sequence and dependencies in 4.1.
 
-- **Requirements and scope definition** — the functional and non-functional requirements in 2.6 and the objectives in 3.4, used as the checklist for deciding when something is finished.
-- **Data model** — the SQL schema file, which is the authoritative description of the six tables and what every new component is written against.
-- **Pipeline specification** — the four ordered steps, what each consumes and produces, and the exact commands used to invoke them, since the web application calls the crawler and the scripts directly.
-- **Scoring specification** — the field weightings and the cut-off, documented separately from the code because they are tuning parameters that are expected to change.
-- **Planning** — the phase table in 3.3 and the task sequence and dependencies in 4.1.
-- **OpenAI API documentation** — consulted continuously during parser and comparator work, particularly for token accounting.
-- **Deployment and setup instructions** — how to install the local stack, create the database from the schema, and configure the API key. Needed by anyone rebuilding the environment from scratch, including me on a new machine.
-- **Test plan and test data** — the demo portal pages and the seeding script, together with a record of which listings are expected to match which.
-- **Incident and change record** — the physical notebook and the Git history (see 5.3 and 5.5).
-- **Technical documentation of the codebase** — generated automatically from the project directory with AI summaries of each file and folder, producing a Markdown report containing the full directory tree, all source code and inline summaries. Published in the GitHub repository.
-- **Legal documentation** — the Privacy Policy and Legal Notice.
+The OpenAI API documentation was consulted continuously during parser and comparator work, particularly for token accounting. Deployment and setup instructions explain how to install the local stack, create the database from the schema, and configure the API key, and are needed by anyone rebuilding the environment from scratch, including me on a new machine. The test plan and test data consist of the demo portal pages and the seeding script, together with a record of which listings are expected to match which. The incident and change record is the physical notebook and the Git history (see 5.3 and 5.5). The technical documentation of the codebase was generated automatically from the project directory with AI summaries of each file and folder, producing a Markdown report containing the full directory tree, all source code and inline summaries, and it is published in the GitHub repository. The legal documentation is the Privacy Policy and Legal Notice.
 
-Two manuals complete the set. A **developer manual** covering system requirements, local environment setup (Apache, MySQL, Python 3 and PHP via Homebrew), creating the database from the provided schema, configuring the OpenAI API key, the project structure, the four-step pipeline in detail, the database schema and the reasoning behind key design decisions, and how to run the crawler in both single-URL and sitemap bulk modes. And a **user manual**, much simpler and aimed at non-technical agents, covering how to register and log in, how to submit a listing URL and understand the results, what the duplicate score means, what the AI confidence badges indicate, and the known limitations of the system — particularly that "first seen" refers to when the crawler first encountered the listing, not when it was originally published.
+Two manuals complete the set. A developer manual covers system requirements, local environment setup (Apache, MySQL, Python 3 and PHP via Homebrew), creating the database from the provided schema, configuring the OpenAI API key, the project structure, the four-step pipeline in detail, the database schema and the reasoning behind key design decisions, and how to run the crawler in both single-URL and sitemap bulk modes. And a user manual, much simpler and aimed at non-technical agents, covers how to register and log in, how to submit a listing URL and understand the results, what the duplicate score means, what the AI confidence badges indicate, and the known limitations of the system, particularly that "first seen" refers to when the crawler first encountered the listing, not when it was originally published.
 
 That last point is the single most important line in the user manual. A user who reads "first seen" as the genuine publication date will draw a wrong conclusion from a correctly functioning system, so the documentation has to carry a limitation the software cannot yet remove.
 
@@ -1106,7 +813,7 @@ A professional project does not end with an initial plan. During its development
 
 **ANSWER**
 
-This section describes how progress and quality were actually monitored during the project. It is deliberately honest about the difference between what a professional process would look like and what a single student developer working for two and a half months actually did. Where the real process was informal, I say so and set out what the formal equivalent would be, rather than describing a procedure I did not follow.
+This section describes how progress and quality were actually monitored during the project. It is deliberately honest about the difference between what a professional process would look like and what a single student developer working on and off over two school years actually did. Where the real process was informal, I say so and set out what the formal equivalent would be, rather than describing a procedure I did not follow.
 
 ## 5.1. Procedure for evaluating the activities carried out
 
@@ -1126,26 +833,15 @@ For each important task there should be some objective way of deciding whether i
 
 **ANSWER**
 
-**The general rule.** A task was considered finished when the component it produced worked in isolation and then continued to work as part of the full pipeline. This two-stage check was applied after every function was implemented, and it is the single procedure that kept a fragile system stable across five crawler versions and three parser versions.
+The general rule is that a task was considered finished when the component it produced worked in isolation and then continued to work as part of the full pipeline. This two-stage check was applied after every function was implemented, and it is the single procedure that kept a fragile system stable across five crawler versions and three parser versions.
 
-**Acceptance criteria by component.**
+The acceptance criteria differ by component. The database schema is finished when all tables create cleanly and the pipeline can write to every one of them. The crawler is finished when, given a URL, it fetches the page, stores the HTML and returns a usable raw page id, for both the permitted real site and the demo portal. The parser is finished when, given a stored raw page, it produces a listings row with the expected fields correctly populated. The SQL scoring is finished when, given a seeded set of known duplicates, it returns the expected candidates with the expected scores, and the AI comparison when it correctly identifies a rewritten description as the same property. The full pipeline is finished when a single URL submission runs all four steps and displays a result within the time limit. For the front-end, every page must render, forms must behave, the EN/ES toggle must work, and protected pages must reject unauthenticated access, and for the admin panel, create, read, update and delete must all work and the raw viewer and live crawler log must display correctly.
 
-| Component | Considered finished when |
-|---|---|
-| Database schema | All tables create cleanly and the pipeline can write to every one of them |
-| Crawler | Given a URL it fetches the page, stores the HTML, and returns a usable raw page id — for both the permitted real site and the demo portal |
-| Parser | Given a stored raw page it produces a listings row with the expected fields correctly populated |
-| SQL scoring | Given a seeded set of known duplicates it returns the expected candidates with the expected scores |
-| AI comparison | It correctly identifies a rewritten description as the same property |
-| Full pipeline | A single URL submission runs all four steps and displays a result within the time limit |
-| Front-end | Every page renders, forms behave, the EN/ES toggle works, and protected pages reject unauthenticated access |
-| Admin panel | Create, read, update and delete all work; the raw viewer and live crawler log display correctly |
+The demo portal exists precisely so that "did the matching work?" has an objective answer. Five fake listing pages with known relationships mean there is an expected result to compare against, instead of a subjective judgement about whether two properties look similar. This is the difference between testing and hoping.
 
-**Predictable verification data.** The demo portal exists precisely so that "did the matching work?" has an objective answer. Five fake listing pages with known relationships mean there is an expected result to compare against, instead of a subjective judgement about whether two properties look similar. This is the difference between testing and hoping.
+The two fixed deadlines also functioned as formal acceptance points. The 27 February presentation required a working prototype demonstrated live rather than described in slides, which is a considerably harder test than a written status report. The 25 March delivery required the finished first version. Each forced the project into a demonstrable state at a known date. In the second year there is no fixed deadline of that kind apart from this report, so I decide when an update is ready by applying the same acceptance rule as before: the change must work on its own and then in the full pipeline.
 
-**Checkpoint demonstrations.** The two fixed deadlines functioned as formal acceptance points. The 27 February presentation required a working prototype demonstrated live rather than described in slides, which is a considerably harder test than a written status report. The 25 March delivery required the finished system. Each forced the project into a demonstrable state at a known date.
-
-**Honest limitation.** These criteria were applied consistently, but they were held in a notebook and in my head rather than written as a formal signed-off acceptance document. On a team project, or one with a client, they would need to be written down per task and agreed in advance.
+As an honest limitation, these criteria were applied consistently, but they were held in a notebook and in my head rather than written as a formal signed-off acceptance document. On a team project, or one with a client, they would need to be written down per task and agreed in advance.
 
 ## 5.2. Quality indicators
 
@@ -1167,30 +863,15 @@ It is not necessary to use all of these indicators. Choose the ones that make se
 
 **ANSWER**
 
-| Indicator | Target / criterion | Actual result |
-|---|---|---|
-| Requirements implemented | All functional requirements in 2.6 delivered | All 14 delivered |
-| Objectives achieved | All objectives in 3.4 verifiable on the delivered system | All 12 verifiable |
-| Pipeline success rate | A submitted URL completes all four steps and returns a result | Achieved for the permitted real site and all five demo portal pages |
-| Duplicate detection accuracy | Known seeded duplicates are found; unrelated listings are not returned | Verified against the demo portal's known relationships |
-| Response time | Full pipeline completes within the 120-second request limit | Within limit |
-| **Token usage per run** | As low as possible without losing accuracy | Reduced from 15,000–20,000 to **2,000–5,000** |
-| **AI cost per comparison** | Low enough to be commercially viable | ~$0.0003 per call; ~0.25 € total across the whole project |
-| Stored HTML per page | Kept bounded | 20,000–25,000 characters |
-| Deadlines met | Both fixed dates | Presentation 27 Feb and delivery 25 Mar both met |
-| Version control coverage | Every meaningful change committed | Full history in the public repository |
-| Security conventions | Parameterised queries, hashed passwords, auth check on every protected page | Applied throughout |
-| Internationalisation | At least two languages | English and Spanish |
-| Documentation coverage | Every file and folder documented | Full automated report with per-component summaries |
-| Code conventions | Consistent naming, clear structure, commented code | Applied; commit message quality is the known weak point |
+The indicators I chose, with their targets and actual results, are the following. For requirements implemented, the target was all functional requirements in 2.6 and all 14 were delivered. For objectives achieved, the target was all objectives in 3.4 verifiable on the delivered system, and all 12 are verifiable. The pipeline success rate target was that a submitted URL completes all four steps and returns a result, which was achieved for the permitted real site and all five demo portal pages. For duplicate detection accuracy the target was that known seeded duplicates are found and unrelated listings are not returned, and this was verified against the demo portal's known relationships. The response time target was a full pipeline within the 120-second request limit, and it stays within it.
 
-**Why these indicators.** Two deserve emphasis because they are specific to this project rather than generic.
+Token usage per run was to be as low as possible without losing accuracy, and it was reduced from 15,000–20,000 to 2,000–5,000. The AI cost per comparison had to be low enough to be commercially viable, and it is about $0.0003 per call, around 0.25 € across the whole project. The stored HTML per page was to be kept bounded, and it stands at 20,000–25,000 characters. Both fixed deadlines were met, the presentation on 27 February and the delivery on 25 March. For version control coverage, every meaningful change was to be committed, and the full history is in the public repository. Security conventions, namely parameterised queries, hashed passwords and an auth check on every protected page, were applied throughout. The internationalisation target of at least two languages was met with English and Spanish. For documentation coverage, every file and folder is documented in a full automated report with per-component summaries. Finally, the code conventions of consistent naming, clear structure and commented code were applied, with commit message quality as the known weak point.
 
-**Token usage per run** is a quality indicator here in a way it would not be for an ordinary web application. An accurate system that costs too much per query is not a sellable product, so reducing consumption from 15,000–20,000 to 2,000–5,000 tokens is a quality improvement rather than merely an optimisation — it is what moves the product from technically working to commercially plausible.
+Two of these indicators deserve emphasis because they are specific to this project rather than generic. Token usage per run is a quality indicator here in a way it would not be for an ordinary web application. An accurate system that costs too much per query is not a sellable product, so reducing consumption from 15,000–20,000 to 2,000–5,000 tokens is a quality improvement rather than merely an optimisation, and it is what moves the product from technically working to commercially plausible.
 
-**Detection accuracy against known duplicates** is the indicator that actually measures whether the product does its job, and it is only measurable at all because the demo portal provides a ground truth to compare against. Without that, every other indicator in the table could be green while the core feature quietly failed.
+Detection accuracy against known duplicates is the indicator that actually measures whether the product does its job, and it is only measurable at all because the demo portal provides a ground truth to compare against. Without that, every other indicator could be green while the core feature quietly failed.
 
-**Indicators deliberately not used.** Accessibility compliance was not formally measured. Incidents detected by users were not measurable, because there were no real users (see 5.6). Automated test coverage was not measured, because testing was manual rather than through a test suite — a reasonable choice at this scale, but one that would not survive the project growing.
+Some indicators were deliberately not used. Accessibility compliance was not formally measured. Incidents detected by users were not measurable, because there were no real users (see 5.6). Automated test coverage was not measured, because testing was manual rather than through a test suite, which was a reasonable choice at this scale but one that would not survive the project growing.
 
 ## 5.3. Logging and evaluation of incidents
 
@@ -1214,33 +895,13 @@ The goal is for incidents not to be resolved informally without leaving a record
 
 **ANSWER**
 
-**What actually happened.** Incidents were recorded informally, through two mechanisms. The **physical notebook** held problems, ideas and what needed doing next, and was especially useful in the early stages. The **Git history** is the more durable record: every meaningful change was committed with a message, so a problem and the change that resolved it are both traceable, and a broken change can be rolled back. There was no separate incident register, and no tool such as Trello or a bug tracker was used. With one developer, clear deadlines and regular commits, this was sufficient in practice.
+Incidents were recorded informally, through two mechanisms. The physical notebook held problems, ideas and what needed doing next, and was especially useful in the early stages. The Git history is the more durable record: every meaningful change was committed with a message, so a problem and the change that resolved it are both traceable, and a broken change can be rolled back. There was no separate incident register, and no tool such as Trello or a bug tracker was used. With one developer, clear deadlines and regular commits, this was sufficient in practice.
 
-**Honest assessment.** This works for a solo project but would not survive a team or a live product. Nothing records *why* a change was made if the commit message is thin — and I have already acknowledged that my commit messages are not always as descriptive as they should be. That is precisely the weakness a proper incident log exists to cover.
+Honestly, this works for a solo project but would not survive a team or a live product. Nothing records why a change was made if the commit message is thin, and I have already acknowledged that my commit messages are not always as descriptive as they should be. That is precisely the weakness a proper incident log exists to cover.
 
-**The formal equivalent.** In a professional setting, or if this project continued with real users, incidents would be recorded in a register with the following fields:
+In a professional setting, or if this project continued with real users, incidents would be recorded in a register. Each entry would have a unique ID, the date detected, a description of what was observed including the input that triggered it, and the affected component (crawler, parser, scoring, AI comparison, front-end, admin or database). It would also record the severity (blocker, major, minor or cosmetic), the root cause once identified, who is responsible, the status (open, in progress, resolved or closed), the solution applied with the commit reference, and the resolution date.
 
-| Field | Purpose |
-|---|---|
-| ID | Unique reference |
-| Date detected | When it appeared |
-| Description | What was observed, including the input that triggered it |
-| Affected component | Crawler, parser, scoring, AI comparison, front-end, admin, database |
-| Severity | Blocker / major / minor / cosmetic |
-| Cause | Root cause once identified |
-| Responsible | Who owns it |
-| Status | Open / in progress / resolved / closed |
-| Solution applied | What was changed, with the commit reference |
-| Resolution date | When it was closed |
-
-**Applying that format retrospectively.** The significant incidents of this project would have been logged as:
-
-| Description | Component | Severity | Cause | Solution applied |
-|---|---|---|---|---|
-| Field extraction unreliable across differing page structures | Parser | Major | Rule-based parsing cannot generalise over arbitrary HTML | Moved extraction to the OpenAI API |
-| Crawler fails or returns unusable content on new sites | Crawler | Major | Different structures, differing amounts of raw text, inconsistent JSON-LD | Five successive crawler versions |
-| Cost per run far too high at 15,000–20,000 tokens | Parser / comparator | Major | Oversized prompts and unfiltered input | Prompt optimisation; reduced to 2,000–5,000 tokens |
-| Schema does not support the comparison logic as first designed | Database | Major | The first schema was designed before the shape of real extracted data was known | Second and final schema version |
+Applying that format retrospectively, the significant incidents of this project would have been logged as follows. Field extraction was unreliable across differing page structures, a major incident in the parser caused by the fact that rule-based parsing cannot generalise over arbitrary HTML, and it was solved by moving extraction to the OpenAI API. The crawler failed or returned unusable content on new sites, a major incident caused by different structures, differing amounts of raw text and inconsistent JSON-LD, solved through five successive crawler versions. The cost per run was far too high at 15,000–20,000 tokens, a major incident in the parser and comparator caused by oversized prompts and unfiltered input, solved by prompt optimisation that reduced it to 2,000–5,000 tokens. Finally, the schema did not support the comparison logic as first designed, a major database incident caused by the first schema being designed before the shape of real extracted data was known, solved with a second and final schema version.
 
 Reconstructing these after the fact is possible but lossy, which is itself the argument for keeping the log as you go.
 
@@ -1263,19 +924,13 @@ Adapt the procedure to your project.
 
 **ANSWER**
 
-The process actually followed, and the one I would formalise:
+The process I actually followed, and the one I would formalise, starts with detecting and recording the problem. It is noted in the notebook together with the input that triggered it, so it can be reproduced later rather than recalled vaguely. Next the priority is classified: anything breaking the pipeline end to end is a blocker and is fixed before new work continues, while anything cosmetic, or affecting only the interface, waits until the current component is stable.
 
-1. **Detect and record.** The problem is noted in the notebook together with the input that triggered it, so it can be reproduced later rather than recalled vaguely.
-2. **Classify priority.** Anything breaking the pipeline end to end is a blocker and is fixed before new work continues. Anything cosmetic, or affecting only the interface, waits until the current component is stable.
-3. **Reproduce in isolation.** Run the affected component on its own — the crawler against a single URL, the parser against a single stored page, the scorer against a single listing id. Every script in the pipeline accepts an id argument and can be run independently from the command line, which exists specifically to make this step cheap.
-4. **Reproduce against known data.** Where the problem concerns matching rather than mechanics, reproduce it against the demo portal, where the expected result is already known.
-5. **Analyse the cause.** Distinguish a fault in my own code from a change in a third party — a site altering its HTML, or the model returning a differently shaped response. These require completely different responses, and misdiagnosing one as the other wastes a lot of time.
-6. **Propose and apply a change,** keeping it scoped to the component that is actually broken.
-7. **Test in isolation, then integrated.** The standing rule of the project: verify the component alone, then verify the full pipeline still runs end to end. A fix that repairs the parser but breaks the scorer is not a fix.
-8. **Commit with a message.** This is what makes the resolution traceable and reversible.
-9. **Close.** The incident is closed only once the full pipeline has been re-run successfully.
+The problem is then reproduced in isolation, running the affected component on its own, for example the crawler against a single URL, the parser against a single stored page, or the scorer against a single listing id. Every script in the pipeline accepts an id argument and can be run independently from the command line, which exists specifically to make this step cheap. Where the problem concerns matching rather than mechanics, it is reproduced against the demo portal, where the expected result is already known.
 
-Two points are specific to this project. Step 3 is only cheap because the pipeline was deliberately built as separate command-line scripts rather than as one monolithic process — a design decision that paid for itself repeatedly during debugging. And step 5 matters more here than in a typical project, because two of the most likely failure causes (a site changing its HTML, the API changing behaviour) are entirely outside my control, and the correct response to those is to adapt rather than to hunt for a bug that does not exist.
+After that comes analysing the cause, distinguishing a fault in my own code from a change in a third party, such as a site altering its HTML or the model returning a differently shaped response. These require completely different responses, and misdiagnosing one as the other wastes a lot of time. I then propose and apply a change, keeping it scoped to the component that is actually broken. The change is tested in isolation and then integrated, which is the standing rule of the project: verify the component alone, then verify the full pipeline still runs end to end, since a fix that repairs the parser but breaks the scorer is not a fix. The change is committed with a message, which is what makes the resolution traceable and reversible, and the incident is closed only once the full pipeline has been re-run successfully.
+
+Two points are specific to this project. Reproducing in isolation is only cheap because the pipeline was deliberately built as separate command-line scripts rather than as one monolithic process, a design decision that paid for itself repeatedly during debugging. And analysing the cause matters more here than in a typical project, because two of the most likely failure causes (a site changing its HTML, the API changing behaviour) are entirely outside my control, and the correct response to those is to adapt rather than to hunt for a bug that does not exist.
 
 ## 5.5. Management and logging of changes to resources and tasks
 
@@ -1297,23 +952,17 @@ For each change you can note:
 
 **ANSWER**
 
-**How changes were recorded.** The Git history is the change record. Every meaningful change was committed, so the initial plan and what actually happened can be compared by reading the repository. The notebook held the reasoning behind the larger decisions before they were made.
+The Git history is the change record. Every meaningful change was committed, so the initial plan and what actually happened can be compared by reading the repository. The notebook held the reasoning behind the larger decisions before they were made.
 
-**The significant changes that actually occurred.**
+Several significant changes occurred. During weeks 1–7 the parser was originally meant to parse listing fields in code without AI, but this proved at least very complicated and unreliable across differing page structures, so it moved to the OpenAI API (GPT-4.1-mini). That introduced a dependency on an external paid API but made the feature actually work, and I accepted it because it was the only approach that worked effectively. In the same weeks the crawler went through five successive versions before one was reliable, because different sites have different structures, different amounts of raw text and different JSON-LD implementations. It was the largest single consumer of effort in the project, and the change was accepted because nothing downstream works without it. The parser also went through two to three major iterations to improve extraction quality, at a time cost that was accepted.
 
-| Period | Element | Initial situation | Change made | Reason | Impact | Decision |
-|---|---|---|---|---|---|---|
-| Weeks 1–7 | Parser | Parse listing fields in code without AI | Moved to the OpenAI API (GPT-4.1-mini) | Parsing without AI proved at least very complicated and unreliable across differing page structures | Introduced a dependency on an external paid API; made the feature actually work | Accepted — it was the only approach that worked effectively |
-| Weeks 1–7 | Crawler | First working version | Five successive versions before one was reliable | Different sites have different structures, different amounts of raw text and different JSON-LD implementations | The largest single consumer of effort in the project | Accepted — nothing downstream works without it |
-| Weeks 1–7 | Parser | First version | Two to three major iterations | Extraction quality | Time cost | Accepted |
-| Mid-project | Database schema | First schema | Second and final version | The first structure did not fully support the comparison logic once real extracted data existed | Rework of dependent queries | Accepted — cheaper to fix early than to work around indefinitely |
-| Mid-project | Test data | Crawl real sites only | Built a demo portal of five fake listing pages | Only one real site could legally be crawled, and one site cannot produce varied near-duplicates | Added a small build task; made the matching logic testable at all | Accepted — it unblocked all downstream testing |
-| **2026-03-06** | Description comparison | ChromaDB planned as a vector database for semantic comparison | **ChromaDB removed entirely** and the comparison script deleted | GPT-4.1-mini handled description comparison more accurately and with far less complexity, and already worked | Removed a whole technology from the stack; simplified deployment; left the `vector_matches` table unused | Accepted — the accuracy and simplicity gain outweighed keeping it |
-| After 27 Feb | AI prompts | 15,000–20,000 tokens per run | Optimised to 2,000–5,000 tokens | Cost per run was far too high to be commercially plausible | Roughly a fourfold cost reduction | Accepted — cost is a product requirement, not just an optimisation |
-| After 27 Feb | Front-end | Basic functional interface for the presentation | Upgraded and cleaned across several iterations | The presentation showed a working prototype; the delivery needed a finished product | Time cost concentrated in the final phase | Accepted |
-| Throughout | Scope | Image and location matching considered in the original concept | Left out | Complexity and cost disproportionate to the benefit over text and numeric comparison | Narrowed scope; protected the deadline | Accepted — documented as a future extension |
+Mid-project, the database schema changed from the first schema to a second and final version, because the first structure did not fully support the comparison logic once real extracted data existed. This meant reworking dependent queries, and I accepted it because it was cheaper to fix early than to work around indefinitely. Also mid-project, the test data plan changed from crawling real sites only to building a demo portal of five fake listing pages, because only one real site could legally be crawled and one site cannot produce varied near-duplicates. This added a small build task and made the matching logic testable at all, so it unblocked all downstream testing.
 
-**Reading the record.** The pattern is consistent and worth stating explicitly: almost every change **simplified** the system rather than extending it. Dropping ChromaDB, excluding image matching, and consolidating extraction into a single AI call all reduced scope in exchange for something that worked reliably within the available time. The one change that went the other way — adopting the OpenAI API — added an external dependency, and it is recorded as the project's single largest risk in 4.5 for exactly that reason.
+On 6 March 2026 ChromaDB, which had been planned as a vector database for semantic comparison, was removed entirely and the comparison script deleted. GPT-4.1-mini handled description comparison more accurately and with far less complexity, and it already worked. The change removed a whole technology from the stack, simplified deployment and left the vector_matches table unused, and it was accepted because the accuracy and simplicity gain outweighed keeping it.
+
+After 27 February the AI prompts, which used 15,000–20,000 tokens per run, were optimised to 2,000–5,000 tokens, because the cost per run was far too high to be commercially plausible. This was roughly a fourfold cost reduction, accepted because cost is a product requirement, not just an optimisation. The front-end, a basic functional interface for the presentation, was also upgraded and cleaned across several iterations, because the presentation showed a working prototype while the delivery needed a finished product, with the time cost concentrated in the final phase. Throughout the project, image and location matching, which were considered in the original concept, were left out because their complexity and cost were disproportionate to the benefit over text and numeric comparison. This narrowed the scope and protected the deadline, and it is documented as a future extension.
+
+The pattern is consistent and worth stating explicitly: almost every change simplified the system rather than extending it. Dropping ChromaDB, excluding image matching, and consolidating extraction into a single AI call all reduced scope in exchange for something that worked reliably within the available time. The one change that went the other way, adopting the OpenAI API, added an external dependency, and it is recorded as the project's single largest risk in 4.5 for exactly that reason.
 
 ## 5.6. User participation in the evaluation
 
@@ -1335,21 +984,13 @@ If your project does not allow testing with users, justify it and consider how i
 
 **ANSWER**
 
-**What was actually done.** No structured testing with real users was carried out. This is a genuine gap rather than something I want to dress up, and it is worth saying why it happened: the project ran for two and a half months against two fixed deadlines, the system needed a working pipeline before it was worth showing to anyone, and the front-end was deliberately built last — which left very little window in which there was something testable to put in front of a real agent.
+No structured testing with real users was carried out. This is a genuine gap rather than something I want to dress up, and it is worth saying why it happened: the first stage ran for two and a half months against two fixed deadlines, the system needed a working pipeline before it was worth showing to anyone, and the front-end was deliberately built last, which left very little window in which there was something testable to put in front of a real agent.
 
-Two things partially substitute for it. First, the **public presentation on 27 February** was a live demonstration to a real audience, run as a working demo rather than as slides. It covered the purpose of the project, the duplicate detection pipeline and the database structure, and the audience came away with a clear understanding of the project. The main thing that did not go to plan was time: the crawler section had to be cut short. That is feedback about the product's explainability, even if it is not usability testing. Second, the requirements themselves come from **direct experience of the problem** — I identified this need while working in a real agency, so the product is grounded in observed user behaviour even though it was not validated with users afterwards.
+Two things partially substitute for it. First, the public presentation on 27 February was a live demonstration to a real audience, run as a working demo rather than as slides. It covered the purpose of the project, the duplicate detection pipeline and the database structure, and the audience came away with a clear understanding of the project. The main thing that did not go to plan was time: the crawler section had to be cut short. That is feedback about the product's explainability, even if it is not usability testing. Second, the requirements themselves come from direct experience of the problem, since I identified this need while working in a real agency, so the product is grounded in observed user behaviour even though it was not validated with users afterwards.
 
-**How it should be done in a real scenario.** Evaluation would target the buyer persona identified in the market analysis: real estate back-office staff aged roughly 30 to 45 on the Costa Blanca — the administrators who create the listings rather than the agents who do the selling, since they are the people who deal with duplicates daily and would recognise the value immediately.
+In a real scenario, the evaluation would target the buyer persona identified in the market analysis: real estate back-office staff aged roughly 30 to 45 on the Costa Blanca, meaning the administrators who create the listings rather than the agents who do the selling, since they are the people who deal with duplicates daily and would recognise the value immediately.
 
-| Method | Participants | What it would evaluate |
-|---|---|---|
-| Usability test, think-aloud | 5–8 back-office administrators | Can they submit a URL and correctly interpret the result without being taught? |
-| Accuracy validation | 2–3 agencies, using their own live listings | Does the system find the duplicates they already know about, and does it produce false positives? |
-| Semi-structured interview | Same participants, after use | Does this save real time? Would they pay 30 € a month for it? |
-| Satisfaction questionnaire | All participants | Clarity of results, confidence in the score, perceived usefulness |
-| Comprehension check | All participants | Do they understand what the score means, and that "first seen" is not the true publication date? |
-
-Results would be recorded per participant per task — completion, time taken, errors and verbatim comments — with the accuracy test scored against each agency's own ground truth.
+I would use several methods. A think-aloud usability test with 5–8 back-office administrators would show whether they can submit a URL and correctly interpret the result without being taught. An accuracy validation with 2–3 agencies, using their own live listings, would show whether the system finds the duplicates they already know about and whether it produces false positives. The same participants would then take part in a semi-structured interview after use, to find out whether it saves real time and whether they would pay 30 € a month for it. A satisfaction questionnaire for all participants would cover the clarity of results, confidence in the score and perceived usefulness, and a comprehension check would test whether they understand what the score means and that "first seen" is not the true publication date. Results would be recorded per participant per task, covering completion, time taken, errors and verbatim comments, with the accuracy test scored against each agency's own ground truth.
 
 The comprehension check matters most of all. If users read "first seen" as the genuine publication date, the product actively misleads them even while working exactly as designed. That is the kind of failure no amount of technical testing detects, and it is the strongest argument for doing this properly before the tool reaches a real client.
 
@@ -1368,34 +1009,19 @@ If your project does not have a formal specifications document, state so. You ma
 
 **ANSWER**
 
-**There is no formal specifications document.** FirstListing has no client, no contract and no external pliego de condiciones. It is a self-directed project whose requirements I defined myself, so there is no third-party specification to verify compliance against.
+There is no formal specifications document. FirstListing has no client, no contract and no external pliego de condiciones. It is a self-directed project whose requirements I defined myself, so there is no third-party specification to verify compliance against.
 
-**The equivalent reference.** In its place I use my own requirements and scope definition — the functional and non-functional requirements in 2.6 and the objectives in 3.4. These serve the same function: a fixed, written statement of what the system must do, set down before the work and checked against afterwards.
+In its place I use my own requirements and scope definition, meaning the functional and non-functional requirements in 2.6 and the objectives in 3.4. These serve the same function: a fixed, written statement of what the system must do, set down before the work and checked against afterwards.
 
-**Traceability matrix.**
+To trace each requirement, I related it to the file that implements it, the phase in which it was developed, and the test that verifies it, and all of them are complete. Registration and login (RF-01) is implemented by register.php and login.php in phase 9, and is verified by registering, logging in and confirming the stored password is a hash. The three roles (RF-02) are a role ENUM on the users table, developed in phases 1 and 9 and verified by inspecting the schema and creating a user of each role. The protected areas (RF-03) rely on a session check at the top of each protected page, in phase 9, verified by requesting a protected page while logged out and confirming the redirect. URL submission (RF-04) is the dashboard form, also phase 9, verified by submitting a URL.
 
-| Requirement | Implemented by | Developed in | Verified by | Status |
-|---|---|---|---|---|
-| RF-01 Registration and login | `register.php`, `login.php` | Phase 9 | Register and log in; confirm the stored password is a hash | Complete |
-| RF-02 Three roles | `role` ENUM on the users table | Phases 1, 9 | Inspect the schema; create a user of each role | Complete |
-| RF-03 Protected areas | Session check at the top of each protected page | Phase 9 | Request a protected page while logged out; confirm the redirect | Complete |
-| RF-04 URL submission | Dashboard form | Phase 9 | Submit a URL | Complete |
-| RF-05 Crawl and store | `python/crawler_v4.py` | Phase 3 | Confirm a new raw page row containing the HTML | Complete |
-| RF-06 AI field extraction | `scripts/openai_parse_raw_pages.php` | Phase 4 | Confirm a listings row with the expected fields | Complete |
-| RF-07 Weighted SQL scoring | `scripts/find_duplicates.php` | Phase 6 | Run against seeded duplicates; compare with expected scores | Complete |
-| RF-08 AI description comparison | `scripts/ai_compare_descriptions.php` | Phase 6 | Rewrite a description and confirm it is still matched | Complete |
-| RF-09 Ranked results | Dashboard results table | Phase 9 | Submit a URL and read the table | Complete |
-| RF-10 Search tracking | `search_usage` table | Phases 1, 9 | Run two searches; confirm the monthly counter increments | Complete |
-| RF-11 Admin panel | Admin dashboard, AI listings viewer, raw viewer, crawler log | Phase 9 | Perform each CRUD operation; view the live log | Complete |
-| RF-12 EN/ES interface | `public/js/lang.js` | Phase 9 | Toggle language on each page | Complete |
-| RF-13 AI chat widget | `public/chat.php`, chat widget partial | Phase 9 | Ask the widget a question about the project | Complete |
-| RF-14 Legal pages | `public/privacy.php`, `public/legal.php` | Phase 11 | Open both pages and check the required content | Complete |
-| RNF Security | PDO parameterised queries, bcrypt, session auth | Throughout | Review query construction and password storage | Complete |
-| RNF Performance | 120-second limit; AI comparison capped at the top 5 candidates | Phase 10 | Time a full run; confirm the cap in the dashboard code | Complete |
-| RNF Cost | Tokens per run | Phase 10 | Measure tokens per run — 2,000–5,000 | Complete |
-| RNF Data protection | Minimum data collected; processing documented | Phase 11 | Review the users table and the Privacy Policy | Complete |
+The crawl and store step (RF-05) is implemented by python/crawler_v4.py in phase 3 and verified by confirming a new raw page row containing the HTML. The AI field extraction (RF-06) is scripts/openai_parse_raw_pages.php in phase 4, verified by a listings row with the expected fields. The weighted SQL scoring (RF-07) is scripts/find_duplicates.php in phase 6, verified by running it against seeded duplicates and comparing with expected scores, and the AI description comparison (RF-08) is scripts/ai_compare_descriptions.php, also phase 6, verified by rewriting a description and confirming it is still matched. The ranked results (RF-09) are the dashboard results table in phase 9, verified by submitting a URL and reading the table. Search tracking (RF-10) uses the search_usage table, developed in phases 1 and 9 and verified by running two searches and confirming the monthly counter increments.
 
-Every stated requirement is implemented and verifiable. What the matrix does not claim is that the product is complete as a commercial proposition — the exclusions listed in 3.4, and particularly the absence of true publication dates, are deliberate limitations of scope rather than unmet requirements.
+The admin panel (RF-11), made up of the admin dashboard, AI listings viewer, raw viewer and crawler log, was built in phase 9 and verified by performing each CRUD operation and viewing the live log. The EN/ES interface (RF-12) is public/js/lang.js, verified by toggling the language on each page, and the AI chat widget (RF-13) is public/chat.php and the chat widget partial, verified by asking the widget a question about the project. The legal pages (RF-14), public/privacy.php and public/legal.php, were produced in phase 11 and verified by opening both pages and checking the required content.
+
+The non-functional requirements are traced in the same way. Security is covered by PDO parameterised queries, bcrypt and session authentication throughout the project, verified by reviewing query construction and password storage. Performance is covered by the 120-second limit and the cap of the AI comparison at the top 5 candidates, developed in phase 10 and verified by timing a full run and confirming the cap in the dashboard code. Cost is tokens per run, measured at 2,000–5,000 in phase 10. Data protection is the minimum data collected and the documented processing, from phase 11, verified by reviewing the users table and the Privacy Policy.
+
+Every stated requirement is implemented and verifiable. What this does not claim is that the product is complete as a commercial proposition: the exclusions listed in 3.4, and particularly the absence of true publication dates, are deliberate limitations of scope rather than unmet requirements.
 
 ------------------------------------------------------------------------
 
@@ -1416,28 +1042,21 @@ The conclusions must be related to what you have actually developed and to the o
 
 **ANSWER**
 
-**Has the initially identified need been resolved?** Partly, and it is worth being precise about which part. The need had two components: identifying that several advertisements describe the same property, and determining which one came first. The first is solved — the system reliably groups duplicate listings, including cases where the description has been rewritten, which was the hardest version of the problem. The second is not fully solved, because the system orders by when the crawler first encountered a listing rather than by genuine publication date, and the portals do not reliably expose the latter. The tool therefore delivers real value today as a duplicate detector, and the "which came first" claim is currently limited by data availability rather than by the implementation.
+Has the initially identified need been resolved? Partly, and it is worth being precise about which part. The need had two components: identifying that several advertisements describe the same property, and determining which one came first. The first is solved, because the system reliably groups duplicate listings, including cases where the description has been rewritten, which was the hardest version of the problem. The second is not fully solved, because the system orders by when the crawler first encountered a listing rather than by genuine publication date, and the portals do not reliably expose the latter. The tool therefore delivers real value today as a duplicate detector, and the "which came first" claim is currently limited by data availability rather than by the implementation.
 
-**Have the objectives been achieved?** Yes. All twelve objectives set out in 3.4 are implemented and verifiable on the delivered system, and both fixed deadlines were met — a working prototype demonstrated live at the presentation on 27 February, and the finished system delivered on 25 March.
+Have the objectives been achieved? Yes. All twelve objectives set out in 3.4 are implemented and verifiable on the delivered system, and both fixed deadlines of the first stage were met: a working prototype demonstrated live at the presentation on 27 February 2026, and the first version delivered on 25 March 2026. Since then, during the second year, I have kept smoothing out and streamlining the project, and more updates are planned.
 
-**What final result was obtained?** A working web application with a four-step pipeline from URL to ranked duplicate list, three user roles, a user dashboard, an administration panel with full CRUD and a live crawler log, a bilingual interface, an AI chat widget, GDPR and LSSI legal pages, and a documented public repository. It runs on a local stack and is designed to be deployable to a normal server environment.
+The final result is a working web application with a four-step pipeline from URL to ranked duplicate list, three user roles, a user dashboard, an administration panel with full CRUD and a live crawler log, a bilingual interface, an AI chat widget, GDPR and LSSI legal pages, and a documented public repository. It runs on a local stack and is designed to be deployable to a normal server environment.
 
-**What were the main difficulties?** Three stand out. The **crawler** was the largest single consumer of effort — five versions before one worked reliably, because different sites have different structures, different amounts of raw text and different JSON-LD implementations. The **parser** was the hardest design problem: extracting structured fields from arbitrary HTML in pure code proved at least very complicated, and only worked properly once I moved to the OpenAI API. And **cost control** turned out to be a real engineering constraint rather than an afterthought — at 15,000–20,000 tokens per run the system worked but would not have been sellable, and reducing that to 2,000–5,000 took deliberate effort.
+Three difficulties stand out. The crawler was the largest single consumer of effort, with five versions before one worked reliably, because different sites have different structures, different amounts of raw text and different JSON-LD implementations. The parser was the hardest design problem: extracting structured fields from arbitrary HTML in pure code proved at least very complicated, and only worked properly once I moved to the OpenAI API. And cost control turned out to be a real engineering constraint rather than an afterthought, because at 15,000–20,000 tokens per run the system worked but would not have been sellable, and reducing that to 2,000–5,000 took deliberate effort.
 
-**What have I learned?** Technically, how to integrate a language model into a pipeline as an ordinary component and — more usefully — when *not* to use it. The two-stage design, filtering cheaply in SQL before spending anything on AI, is the most transferable idea in the project. I also learned that removing technology is often the right decision rather than a retreat: dropping ChromaDB simplified the system and improved accuracy at the same time.
+Technically, I learned how to integrate a language model into a pipeline as an ordinary component and, more usefully, when not to use it. The two-stage design, filtering cheaply in SQL before spending anything on AI, is the most transferable idea in the project. I also learned that removing technology is often the right decision rather than a retreat, since dropping ChromaDB simplified the system and improved accuracy at the same time.
 
 On process, I learned that building the front-end last was correct, and that testing every function in isolation and then integrated is what kept a fragile system stable across nine major component rewrites. The clearest weakness I would fix is my commit messages, which are not descriptive enough to serve as the change record I have relied on them being.
 
-**What improvements or extensions could be made?** In rough order of value:
+As for future improvements, in rough order of value, the first would be genuine publication dates, which would convert the product from a duplicate detector into what it actually claims to be and is the single highest-value extension. Next would come more portals, which is the main scaling problem and the main source of fragility, followed by image-based matching, deliberately excluded here, which would catch listings whose text has been completely rewritten. A real deployment would need a production server with firewall, automated backups and monitoring, and a billing integration would be needed because the subscriptions table exists but no payment flow was built. Last, validation with real users is the largest gap in the evaluation, and the first thing I would do if the project continued.
 
-- **Genuine publication dates** — this would convert the product from a duplicate detector into what it actually claims to be, and is the single highest-value extension.
-- **More portals** — the main scaling problem and the main source of fragility.
-- **Image-based matching** — deliberately excluded here; it would catch listings whose text has been completely rewritten.
-- **Real deployment** — a production server with firewall, automated backups and monitoring.
-- **Billing integration** — the `subscriptions` table exists, but no payment flow was built.
-- **Validation with real users** — the largest gap in the evaluation, and the first thing I would do if the project continued.
-
-**Overall.** The project set out to demonstrate everything learned during the course by building something well beyond a simple example, and it does: server-side programming in two languages, persistent storage, a full CRUD administration panel, client-side work, internationalisation, an external API integration, legal compliance and version control, all applied to a real problem I encountered in a real job. It is a working product with honest, documented limitations rather than a finished commercial platform — and for the time available, I think that is the right outcome.
+Overall, the project set out to demonstrate everything learned during the course by building something well beyond a simple example, and it does: server-side programming in two languages, persistent storage, a full CRUD administration panel, client-side work, internationalisation, an external API integration, legal compliance and version control, all applied to a real problem I encountered in a real job. It is a working product with honest, documented limitations rather than a finished commercial platform. It is also still being improved in the second year, and more updates are planned, so I see the current state as a solid base and not as the end of the project.
 
 ------------------------------------------------------------------------
 
@@ -1451,30 +1070,13 @@ Do not include sources that have not been consulted, and distinguish, where appl
 
 **ANSWER**
 
-**Technical documentation**
+The technical documentation consulted was the following. The OpenAI API documentation (models, chat completions and token usage) was consulted throughout parser, comparator and chat widget development. The PHP manual from the PHP Group was used in particular for PDO, sessions and password hashing, and the Python 3 documentation from the Python Software Foundation for the standard library, HTTP requests and HTML parsing. The MySQL / MariaDB reference manual, from Oracle and the MariaDB Foundation, covered schema definition, joins and conditional expressions, and the Apache HTTP Server documentation from the Apache Software Foundation covered local configuration via Homebrew. I also used the Git and GitHub documentation for version control and repository hosting, and Schema.org for the JSON-LD structured data vocabulary, consulted while designing the crawler's extraction logic.
 
-- OpenAI. *API documentation* — models, chat completions and token usage. Consulted throughout parser, comparator and chat widget development.
-- The PHP Group. *PHP manual* — in particular PDO, sessions and password hashing.
-- Python Software Foundation. *Python 3 documentation* — standard library, HTTP requests and HTML parsing.
-- Oracle / MariaDB Foundation. *MySQL / MariaDB reference manual* — schema definition, joins and conditional expressions.
-- The Apache Software Foundation. *Apache HTTP Server documentation* — local configuration via Homebrew.
-- Git and GitHub documentation — version control and repository hosting.
-- Schema.org — JSON-LD structured data vocabulary, consulted while designing the crawler's extraction logic.
+The regulations consulted were Regulation (EU) 2016/679, the General Data Protection Regulation (GDPR), which I reviewed to confirm the application's data handling is compliant and whose Art. 6.1.b is used as the legal basis for processing, and Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE), the basis for the Legal Notice published on the site.
 
-**Regulations**
+The project sources are the FirstListing project repository by Sorensen, O. (https://github.com/oscarsorensen/FirstListing), and Sorensen, O., Proyecto Intermodular I, the first-year project report on FirstListing, which is the source of the sector analysis, business figures and development timeline reused in this document.
 
-- Regulation (EU) 2016/679, General Data Protection Regulation (GDPR) — reviewed to confirm the application's data handling is compliant; Art. 6.1.b used as the legal basis for processing.
-- Ley 34/2002, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE) — basis for the Legal Notice published on the site.
-
-**Project sources**
-
-- Sorensen, O. *FirstListing* — project repository. https://github.com/oscarsorensen/FirstListing
-- Sorensen, O. *Proyecto Intermodular I* — first-year project report on FirstListing. Source of the sector analysis, business figures and development timeline reused in this document.
-
-**Sector sources**
-
-- Direct professional experience in a real estate agency on the Costa Blanca — origin of the problem statement and source of the estimate of 850–900 active agencies in Costa Blanca South.
-- Idealista and Fotocasa — examined as the closest comparable products in the sector.
+The sector sources are my direct professional experience in a real estate agency on the Costa Blanca, which is the origin of the problem statement and the source of the estimate of 850–900 active agencies in Costa Blanca South, and the portals Idealista and Fotocasa, examined as the closest comparable products in the sector.
 
 > **This bibliography needs completing before submission — see item 5 in the manual review list.** The entries above reflect what was genuinely consulted, but most lack specific URLs, version numbers and access dates, and the sector figures come from personal experience rather than a citable published source.
 
@@ -1536,7 +1138,7 @@ Everything above was written from my *Proyecto Intermodular I* report and from t
 | 12 | Project dates — start ≈ 30 Jan 2026, presentation 27 Feb 2026, delivery 25 Mar 2026 | Taken from the Intermodular report. Confirm the year and the start date. |
 | 13 | PHP version stated as "PHP" generally in 3.6 | Confirm the version actually running if a specific number is wanted. |
 | 14 | 850–900 agencies on Costa Blanca South | My own estimate from working in the sector. Fine to present as such, but if a citable source is expected I need one. |
-| 15 | All financial figures — 24,000 € salary, ~7,500 € materials, ~31,500 € total, 88 break-even clients, 20 €/h, 375 h | Carried over unchanged from the Intermodular report for consistency. Confirm I still stand behind them. |
+| 15 | All financial figures — 24,000 € salary, ~7,500 € materials, ~31,500 € total, 88 break-even clients | Carried over unchanged from the Intermodular report for consistency. Confirm I still stand behind them. |
 | 16 | "All 14 functional requirements delivered" (5.2) and the full traceability matrix (5.7) | **I invented the RF-01…RF-14 requirement IDs for this report** — they did not exist before. Walk through the list once against the running application and confirm every row is genuinely complete before claiming it in writing. |
 | 17 | Developer and user manuals (4.8) | The Intermodular report described these as planned. Confirm whether they now exist; if not, either write them or change the wording from a description to future work. |
 
