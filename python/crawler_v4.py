@@ -8,7 +8,8 @@ from datetime import datetime
 from urllib.parse import urlparse, urldefrag
 from xml.etree import ElementTree
 
-import mysql.connector
+# pymysql is used instead of mysql-connector-python, which crashes with OpenSSL 4
+import pymysql
 import requests
 from lxml import html
 
@@ -35,6 +36,9 @@ DEFAULT_MAX_LISTINGS = 50
 
 # Path to the JSONL log file — one line per newly crawled listing
 LOG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "crawl_log.jsonl")
+
+# Path to the summary of the last finished sitemap run — shown in the admin Crawler Control box
+LAST_CRAWL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "last_crawl.json")
 
 
 # === HELPERS ===
@@ -198,6 +202,20 @@ def log_seen_event(url, raw_page_id):
     with open(LOG_PATH, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
+# Overwrites last_crawl.json with the numbers from the run that just finished.
+# admin.php reads this file so you can see how the last run went.
+def save_last_crawl_summary(max_listings, checked, new_count, seen_count, failed_count):
+    summary = {
+        "finished_at":  datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "max_listings": max_listings,
+        "checked":      checked,
+        "new":          new_count,
+        "seen":         seen_count,
+        "failed":       failed_count,
+    }
+    with open(LAST_CRAWL_PATH, "w", encoding="utf-8") as f:
+        json.dump(summary, f)
+
 
 # === DATABASE ===
 
@@ -236,7 +254,7 @@ def run():
     single_url = read_single_url()
     if single_url:
         url = normalize_url(single_url)
-        conn = mysql.connector.connect(**DB_CONFIG)
+        conn = pymysql.connect(**DB_CONFIG)
         cur = conn.cursor()
         try:
             # If we already have this URL in the database, just update the timestamp
@@ -279,7 +297,7 @@ def run():
                 print(f"[INSERTED]  {url}")
                 print(f"RAW_PAGE_ID:{new_id}")
                 log_crawl_event(result, "inserted", new_id)
-            except mysql.connector.IntegrityError:
+            except pymysql.IntegrityError:
                 # Race condition: URL was inserted between our check and insert.
                 # Roll back and try to find the existing ID.
                 conn.rollback()
@@ -300,7 +318,7 @@ def run():
 
     # Normal sitemap mode (unchanged from before)
     max_listings = read_max_listings()
-    conn = mysql.connector.connect(**DB_CONFIG)
+    conn = pymysql.connect(**DB_CONFIG)
     cur = conn.cursor()
 
     try:
@@ -313,6 +331,7 @@ def run():
 
         new_count = 0
         seen_count = 0
+        failed_count = 0
 
         for url in listing_urls:
             # Skip if already in the database, just update the timestamp
@@ -330,6 +349,7 @@ def run():
             try:
                 response = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
             except requests.RequestException:
+                failed_count += 1
                 print(f"[FAILED]   {url}")
                 continue
 
@@ -353,7 +373,7 @@ def run():
                 new_id = cur.lastrowid
                 print(f"[INSERTED] {url}")
                 log_crawl_event(result, "inserted", new_id)
-            except mysql.connector.IntegrityError:
+            except pymysql.IntegrityError:
                 # The URL already exists in the database (duplicate).
                 # This can happen if the URL was truncated in the DB and
                 # url_exists() didn't catch it. We just skip it and move on.
@@ -364,6 +384,9 @@ def run():
             time.sleep(REQUEST_DELAY)
 
         print(f"\nDone. New: {new_count} | Already seen: {seen_count}")
+
+        # Save this run's numbers so the admin page can show them next time
+        save_last_crawl_summary(max_listings, len(listing_urls), new_count, seen_count, failed_count)
 
     finally:
         cur.close()

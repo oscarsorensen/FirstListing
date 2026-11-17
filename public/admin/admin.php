@@ -252,6 +252,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'crawler_control') {
 }
 
 $crawler_running = crawler_is_running($crawler_pid_file);
+
+// Read the summary of the last finished crawl (written by crawler_v4.py), or null if there is none yet
+$last_crawl = null;
+$last_crawl_file = $project_root . '/data/last_crawl.json';
+if (is_file($last_crawl_file)) {
+    $last_crawl = json_decode((string)file_get_contents($last_crawl_file), true);
+}
 $crawled_total = (int)$pdo->query('SELECT COUNT(*) FROM raw_pages')->fetchColumn();
 
 // Count how many raw pages have been parsed by AI
@@ -411,6 +418,7 @@ $ai_latest = $pdo->query("
         <span class="badge <?= $crawler_running ? 'badge-running' : 'badge-stopped' ?>">
             <?= $crawler_running ? 'Running' : 'Stopped' ?>
         </span>
+
         <?php if ($crawler_feedback): ?>
             <ul style="margin-top: 10px;">
                 <?php foreach ($crawler_feedback as $line): ?>
@@ -432,6 +440,18 @@ $ai_latest = $pdo->query("
                         - Listings per run
                         <input type="number" id="crawl_max_listings" name="crawl_max_listings" min="1" step="1" value="<?= (int)$crawl_max_listings ?>" style="width:80px; margin-left:6px;">
                     </label>
+                    <!-- Summary of the last finished crawl run, on the same row as the options -->
+                    <span class="muted" style="font-size: 14px;">
+                        <?php if (is_array($last_crawl)): ?>
+                            Last run (<?= esc($last_crawl['finished_at'] ?? '') ?>):
+                            checked <?= (int)($last_crawl['checked'] ?? 0) ?> of <?= (int)($last_crawl['max_listings'] ?? 0) ?> listings —
+                            <strong><?= (int)($last_crawl['new'] ?? 0) ?> new</strong>,
+                            <?= (int)($last_crawl['seen'] ?? 0) ?> already seen,
+                            <?= (int)($last_crawl['failed'] ?? 0) ?> failed
+                        <?php else: ?>
+                            Last run: no finished run recorded yet.
+                        <?php endif; ?>
+                    </span>
                 </div>
             </div>
             <div class="actions">
